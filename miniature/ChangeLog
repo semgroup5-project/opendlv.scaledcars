@@ -1,0 +1,104 @@
+4.10.0 - SocketCAN, fix to avoid decoding Containers from incomplete istreams, fix for odplayer to avoid replaying empty .rec.mem files
+4.9.3 - Changed the automatic naming of recording files to cope with filesystem restrictions.
+4.9.2 - Improved timestamping for UDP packets
+4.9.1 - Compile fix
+4.9.0 - New player with better caching, fixes to odcockpit, odfilter can repair large deltas in sampleTimeStamp
+4.8.1 - odrecinspect can handle sendstamped containers
+4.8.0 - New tool odlivefeed; CANDevice::write returns errorcode; parallelized testsuites in libopendavinci
+4.7.0 - Circular UDP communication disabled and fix for double lock in UDPContainerConference
+4.6.1 - Compilation fix on 32bit systems
+4.6.0 - Restructuring PointCloud encoding
+4.5.1 - Added mutex to CANDevice::write
+4.5.0 - Propagating value from command line parameter --id to container field senderStamp
+4.4.4 - Updating rendering SPC and CPC
+4.4.3 - Changed CompactPointCloud base type from half_float to uint16_t with cm resolution
+4.4.2 - Added down-sampling feature to odfilter, added inter-container timestamping check to odrecinspect, updated CompactPointCloud message specification
+4.4.1 - ContainerListenerFork and MacOS compile fix
+4.4.0 - Improved performance of Container and Proto decoding; changed odrecintegrity to odrecinspect and extended analysis
+4.3.8 - Fixed odfilter and integrated odcore/base/Arguments
+4.3.7 - Added CompactPointCloud based on half_floats
+4.3.6 - Adjusted semantics for StringToolbox::split, added float half type
+4.3.5 - Fix WGS84 test suite and increased precision for odcockpit/livefeed.
+4.3.4 - Fix CAN device, tutorial for reading zip files.
+4.3.3 - CAN time stamping and WGS84 coordinate interface update
+4.3.2 - Enabled ccache
+4.3.1 - Refactored WGS84 coordinate interface
+4.3.0 - proto message exporter for odDataStructureGenerator and absolute time base for CANDevice
+4.2.0 - Visualization of SharedPointCloud
+4.1.1 - Minor fixes after testing at the lab.
+4.1.0 - Added sample time stamping to container
+4.0.6 - Compile fixes ARM and MacOS
+4.0.5 - Compile fixes for ARM
+4.0.4 - Fixing Docker-ized build for different users
+4.0.3 - Fixing Docker image creation
+4.0.2 - Compile fix for ArchLinux
+4.0.1 - Compile fixes for Ubuntu 14.04 and MacOS
+4.0.0 - Next major release of OpenDaVINCI
+3.2.0 - CAN library fixes
+3.1.0 - Enabling signedness in CAN specs
+3.0.8 - Added sensor time stamping
+3.0.7 - Minor updates from OpenDLV
+3.0.6 - Updated WGS84 coordinate
+3.0.5 - odsupercomponent allows several modules running under the same name; odcockpit visualizes system health and object data
+3.0.4 - Fixing and validating CAN message specification handling and code generation
+3.0.3 - Fixed warning in generated test code
+3.0.2 - Updating CAN message handling
+3.0.1 - Fixed compilation on Mac OSX; added CSVExporter visitor
+3.0.0 - Newest release of OpenDaVINCI.
+2.4.11 - Updated deployment process to use aptly over reprepro for deb packages
+2.4.10 - Updated FindOpenCV.cmake
+2.4.9 - Added container identifiers for ReVeRe/GCDC
+2.4.8 - Update to CMake scripts to find qwt library
+2.4.7 - Added signal handler for SIGTERM
+2.4.6 - Fix for odsimirus data simulation
+2.4.5 - Adding pre-compiled binaries for Ubuntu 15.10
+2.4.4 - Fixed deployment issue
+2.4.3 - Fixed compile error for Mac
+2.4.2 - Refactored odsimulation tools
+2.4.1 - Added missing protocol handler for configuration setting global.car
+2.4.0 - Refactored main include files
+2.3.0 - Refactored code base to clean up unneeded include headers
+2.2.1 - Added fxe data structures
+2.2.0 - Refactored odsplit(1) to run independently from odsupercomponent(1)
+2.1.8 - Fixed deployment
+2.1.7 - Refactored odredirector fix for compactified containers
+2.1.6 - odredirector fix for compactified containers
+2.1.5 - Fixes for jpeg-based texture handling and odredirector streaming of compactified containers
+2.1.4 - Improve deserialization speed and added another field in AutomotiveData
+2.1.3 - Fixed deserialization of existing recordings using former 0xAACF serialization
+2.1.2 - Integrated build of odcantools in master build system
+2.1.1 - Refactored odcantools to provide libodcantools
+2.1.0 - Updated data marshaling to create smaller containers
+2.0.32 - Cleaning up odcockpit
+2.0.31 - CMake modules path setting fixed
+2.0.30 - Updating dependencies in generated deb and rpm packages
+2.0.29 - Update Xtext and Xtend to Eclipse Mars environment
+2.0.28 - Display toString for Serializable types in LiveFeed
+2.0.27 - Added odcockpit's LiveFeed plugin
+2.0.26 - Fixing configuration handling for odcockpit in odsupercomponent
+2.0.25 - Fixing irus -> odsimirus in odcockpit
+2.0.24 - Compile fix for OpenBSD and NetBSD
+2.0.23 - Adding *NoHeader method to Proto serializers and deserializers
+2.0.22 - Updating data types for CaroloCup in AutomotiveData
+2.0.21 - Added odDataStructureGenerator build and more examples for AutomotiveData.odvd
+2.0.20 - Refactored cantools to odcantools
+2.0.19 - Added DataStore interface to write Containers to CAN bus.
+2.0.18 - Re-packaging docker images
+2.0.17 - Refactoring canmapper example; odcockpit/spy is printing GenericCANMessages
+2.0.16 - Added cantools
+2.0.15 - Refactored interface for odrecintegrity
+2.0.14 - Added further examples from automotive miniature platform
+2.0.13 - Added odcockpit
+2.0.12 - Fixed deployment tagging
+2.0.11 - Fixed packaging for odsimulation
+2.0.10 - Refactored odsimulation binaries to have prefix odsim
+2.0.9 - Refactored exception message composition
+2.0.8 - Added some compiling fixes for Darwin
+2.0.7 - Added some compiling fixes for Windows 7
+2.0.6 - Updating zlib to 1.2.8
+2.0.5 - Docker image creation test
+2.0.4 - Unifying Docker image creation
+2.0.3 - Added some compiling fixes for BSD-based platforms
+2.0.2 - Added support for i686 platform
+2.0.1 - Added package dependencies
+2.0.0 - Software for self-driving miniature vehicles realized with OpenDaVINCI
