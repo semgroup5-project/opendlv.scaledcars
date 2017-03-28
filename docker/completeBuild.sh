@@ -19,6 +19,7 @@
 
 BUILD_AS=$1
 UID_AS=$2
+PACKAGING_ENABLED=$3
 
 # Adding user for building.
 groupadd $BUILD_AS
@@ -30,7 +31,7 @@ cd /opt/opendlv.scaledcars.build
 
 echo "[opendlv.core Docker builder] Complete build."
 cmake -E remove_directory .
-PATH=/opt/od4/bin:$PATH cmake -D OPENDAVINCI_DIR=/opt/od4 -D CMAKE_INSTALL_PREFIX=/opt/opendlv.scaledcars /opt/opendlv.scaledcars.sources
+PATH=/opt/od4/bin:$PATH cmake -D OPENDAVINCI_DIR=/opt/od4 -D CMAKE_INSTALL_PREFIX=/opt/opendlv.scaledcars -D PACKAGING_ENABLED=$PACKAGING_ENABLED /opt/opendlv.scaledcars.sources
 make -j4
 EOF
 

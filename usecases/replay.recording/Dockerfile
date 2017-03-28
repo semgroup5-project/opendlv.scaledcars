@@ -15,6 +15,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-# Date: 2016-12-02
+# Date: 2017-03-27
 
-FROM seresearch/scaledcars-on-opendlv-on-opendlv-core-on-opendavinci-ubuntu-16.04-complete:latest
+FROM seresearch/scaledcars-on-opendlv-on-opendlv-core-on-opendavinci-on-base:latest

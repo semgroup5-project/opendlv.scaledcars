@@ -1,4 +1,4 @@
-# Dockerfile - Dockerfile to run OpenDLV software.
+# Dockerfile to create an image for building and running OpenDLV scaled cars.
 # Copyright (C) 2016 Christian Berger
 #
 # This program is free software; you can redistribute it and/or
@@ -14,7 +14,19 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+#
+# Date: 2016-09-15
+FROM BASEIMAGE
+MAINTAINER Christian Berger "christian.berger@gu.se"
 
-# Date: 2017-03-27
+# Add binaries.
+ADD opt.nonDev /opt
 
-FROM seresearch/scaledcars-on-opendlv-on-opendlv-core-on-opendavinci-on-base:latest
+# Change owner for binaries.
+RUN chown -R 1000:1000 /opt/opendlv.scaledcars
+
+# Environment parameters to allow GUIs.
+ENV QT_X11_NO_MITSHM=1
+ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/opendlv.scaledcars/lib
+WORKDIR /opt/opendlv.scaledcars/bin
+
