@@ -46,7 +46,7 @@ void Example::tearDown() {}
 
 void Example::nextContainer(odcore::data::Container &c) {
     // Example on how to receive Containers.
-    cout << "Received Container of type = " << c.getDataType() << endl;
+    cout << " Received Container of type = " << c.getDataType() << endl;
 }
 
 odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Example::body() {
