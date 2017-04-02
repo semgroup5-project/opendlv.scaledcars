@@ -22,6 +22,13 @@
 
 #include <opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h>
 #include <opendavinci/odcore/data/Container.h>
+#include <memory>
+
+#include <opencv/cv.h>
+
+#include <opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h>
+#include <opendavinci/odcore/data/Container.h>
+#include <opendavinci/odcore/wrapper/SharedMemory.h>
 
 namespace scaledcars {
 namespace control {
@@ -32,9 +39,11 @@ using namespace std;
  * Time-triggered example.
  */
 class Example : public odcore::base::module::TimeTriggeredConferenceClientModule {
-   private:
-    Example(const Example & /*obj*/) = delete;
-    Example &operator=(const Example & /*obj*/) = delete;
+//   private:
+//    Example(const Example & /*obj*/) = delete;
+//    Example &operator=(const Example & /*obj*/) = delete;
+
+
 
    public:
     /**
@@ -53,6 +62,16 @@ class Example : public odcore::base::module::TimeTriggeredConferenceClientModule
     void setUp();
     void tearDown();
     odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
+
+    private:
+        bool m_hasAttachedToSharedImageMemory;
+        std::shared_ptr<odcore::wrapper::SharedMemory> m_sharedImageMemory;
+        IplImage *m_image;
+        bool m_debug;
+        CvFont m_font;
+        odcore::data::TimeStamp m_previousTime;
+        double m_eSum;
+        double m_eOld;
 };
 }
 } // scaledcars::control

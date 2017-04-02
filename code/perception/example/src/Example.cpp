@@ -41,12 +41,19 @@ using namespace std;
 using namespace odcore::base;
 using namespace odcore::data;
 using namespace odcore::data::image;
+        using namespace automotive;
+        using namespace automotive::miniature;
+        using namespace odcore::wrapper;
 
-Example::Example(const int &argc, char **argv)
-    : DataTriggeredConferenceClientModule(argc, argv, "scaledcars-perception-example"),
+Example::Example(const int &argc, char **argv) : DataTriggeredConferenceClientModule(argc, argv, "scaledcars-perception-example"),
     m_hasAttachedToSharedImageMemory(false),
     m_sharedImageMemory(),
-    m_image(NULL) {}
+    m_image(NULL),
+    m_debug(false),
+    m_font(),
+    m_previousTime(),
+    m_eSum(0),
+    m_eOld(0){}
 
 Example::~Example() {}
 
@@ -64,9 +71,11 @@ void Example::tearDown() {
 }
 
 void Example::nextContainer(odcore::data::Container &c) {
+
+   
     if (c.getDataType() == odcore::data::image::SharedImage::ID()) {
         SharedImage si = c.getData<SharedImage> ();
-
+        cerr << "here" << endl;
         // Check if we have already attached to the shared memory containing the image from the virtual camera.
         if (!m_hasAttachedToSharedImageMemory) {
             m_sharedImageMemory = odcore::wrapper::SharedMemoryFactory::attachToSharedMemory(si.getName());
@@ -74,6 +83,7 @@ void Example::nextContainer(odcore::data::Container &c) {
 
         // Check if we could successfully attach to the shared memory.
         if (m_sharedImageMemory->isValid()) {
+            cerr << "IS valid" << endl;
             // Lock the memory region to gain exclusive access using a scoped lock.
             Lock l(m_sharedImageMemory);
 
@@ -83,26 +93,122 @@ void Example::nextContainer(odcore::data::Container &c) {
 
             // Example: Simply copy the image into our process space.
             if (m_image != NULL) {
+            cerr << "image not null" << endl;
                 memcpy(m_image->imageData, m_sharedImageMemory->getSharedMemory(), si.getWidth() * si.getHeight() * si.getBytesPerPixel());
             }
 
             // Mirror the image.
             cvFlip(m_image, 0, -1);
-        }
 
+
+        }
+         drive();
         // Do some image processing.
         processImage();
+
     }
 }
 
 void Example::processImage() {
-    // Example: Show the image.
+
+        static bool useRightLaneMarking = true;
+    //    double e = 0;
+
+        const int32_t CONTROL_SCANLINE = 462; // calibrated length to right: 280px
+   //     const int32_t distance = 280;
+
+        TimeStamp beforeImageProcessing;
+        for(int32_t y = m_image->height - 8; y > m_image->height * .6; y -= 10) {
+            // Search from middle to the left:
+            CvScalar pixelLeft;
+            CvPoint left;
+            left.y = y;
+            left.x = -1;
+            for(int x = m_image->width/2; x > 0; x--) {
+                pixelLeft = cvGet2D(m_image, y, x);
+                if (pixelLeft.val[0] >= 200) {
+                    left.x = x;
+                    break;
+                }
+            }
+
+            // Search from middle to the right:
+            CvScalar pixelRight;
+            CvPoint right;
+            right.y = y;
+            right.x = -1;
+            for(int x = m_image->width/2; x < m_image->width; x++) {
+                pixelRight = cvGet2D(m_image, y, x);
+                if (pixelRight.val[0] >= 200) {
+                    right.x = x;
+                    break;
+                }
+            }
+
+            if (m_debug) {
+                if (left.x > 0) {
+                    CvScalar green = CV_RGB(0, 255, 0);
+                    cvLine(m_image, cvPoint(m_image->width/2, y), left, green, 1, 8);
+
+                    stringstream sstr;
+                    sstr << (m_image->width/2 - left.x);
+                    cvPutText(m_image, sstr.str().c_str(), cvPoint(m_image->width/2 - 100, y - 2), &m_font, green);
+                }
+                if (right.x > 0) {
+                    CvScalar red = CV_RGB(255, 0, 0);
+                    cvLine(m_image, cvPoint(m_image->width/2, y), right, red, 1, 8);
+
+                    stringstream sstr;
+                    sstr << (right.x - m_image->width/2);
+                    cvPutText(m_image, sstr.str().c_str(), cvPoint(m_image->width/2 + 100, y - 2), &m_font, red);
+                }
+            }
+
+            if (y == CONTROL_SCANLINE) {
+                // Calculate the deviation error.
+                if (right.x > 0) {
+                    if (!useRightLaneMarking) {
+                        m_eSum = 0;
+                        m_eOld = 0;
+                    }
+
+            //        e = ((right.x - m_image->width/2.0) - distance)/distance;
+
+                    useRightLaneMarking = true;
+                }
+                else if (left.x > 0) {
+                    if (useRightLaneMarking) {
+                        m_eSum = 0;
+                        m_eOld = 0;
+                    }
+
+            //        e = (distance - (m_image->width/2.0 - left.x))/distance;
+
+                    useRightLaneMarking = false;
+                }
+                else {
+                    // If no measurements are available, reset PID controller.
+                    m_eSum = 0;
+                    m_eOld = 0;
+                }
+            }
+        }
     if (m_image != NULL) {
-        cvShowImage("Camera Feed Image", m_image);
-        cvWaitKey(10);
+
+    cerr << "Image was processed" << endl;
+    cvShowImage("Camera Feed Image", m_image);
+    cvWaitKey(10);
     }
 }
 
+    void Example::drive(){
+        VehicleControl vc;
+        vc.setSpeed(1);
+        vc.setSteeringWheelAngle(0);
+        Container c(vc);
+        getConference().send(c);
+
+    }
 
 }
 } // scaledcars::perception

@@ -18,4 +18,5 @@
 project(scaledcars-control)
 
 add_subdirectory(example)
+add_subdirectory(lanefollower)
 

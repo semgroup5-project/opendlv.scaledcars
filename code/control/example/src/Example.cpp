@@ -18,14 +18,23 @@
  */
 
 #include <stdint.h>
-
+#include <opencv/highgui.h>
 #include <iostream>
+#include <memory>
+#include <opencv/cv.h>
 
 #include <automotivedata/GeneratedHeaders_AutomotiveData.h>
-
+#include <opendavinci/GeneratedHeaders_OpenDaVINCI.h>
+#include <opendavinci/odcore/base/Lock.h>
 #include "odvdscaledcarsdatamodel/generated/chalmersrevere/scaledcars/ExampleMessage.h"
-
+#include <opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h>
+#include <opendavinci/odcore/data/Container.h>
+#include <opendavinci/odcore/wrapper/SharedMemoryFactory.h>
+#include <opendavinci/odcore/wrapper/SharedMemory.h>
 #include "Example.h"
+
+
+
 
 namespace scaledcars {
 namespace control {
@@ -33,41 +42,91 @@ namespace control {
 using namespace std;
 using namespace odcore::base;
 using namespace odcore::data;
+    using namespace odcore::data::image;
+    using namespace automotive;
+    using namespace automotive::miniature;
+    using namespace odcore::wrapper;
 
 Example::Example(const int &argc, char **argv)
-    : TimeTriggeredConferenceClientModule(argc, argv, "scaledcars-control-example") {}
+    : TimeTriggeredConferenceClientModule(argc, argv, "scaledcars-control-example"),
+    m_hasAttachedToSharedImageMemory(false),
+    m_sharedImageMemory(),
+    m_image(NULL),
+    m_debug(false),
+    m_font(),
+    m_previousTime(),
+    m_eSum(0),
+    m_eOld(0){}
 
 
 Example::~Example() {}
 
-void Example::setUp() {}
-
-void Example::tearDown() {}
-
-void Example::nextContainer(odcore::data::Container &c) {
-    // Example on how to receive Containers.
-    cout << "Received Container of type = " << c.getDataType() << endl;
+void Example::setUp() {
+    cvNamedWindow("Camera Feed Image", CV_WINDOW_AUTOSIZE);
+    cvMoveWindow("Camera Feed Image", 300, 100);
 }
 
+void Example::tearDown() {
+    if (m_image != NULL) {
+        cvReleaseImage(&m_image);
+    }
+    cvDestroyWindow("Camera Feed Image");
+}
+//attempt to get a sharedImage and process it
+void Example::nextContainer(odcore::data::Container &c) {
+
+   // cout << "Received Container of type = " << c.getDataType() << endl;
+    if (c.getDataType() == odcore::data::image::SharedImage::ID()) {
+        SharedImage si = c.getData<SharedImage>();
+
+        // Check if we have already attached to the shared memory containing the image from the virtual camera.
+        if (!m_hasAttachedToSharedImageMemory) {
+            m_sharedImageMemory = odcore::wrapper::SharedMemoryFactory::attachToSharedMemory(si.getName());
+        }
+
+        // Check if we could successfully attach to the shared memory.
+        if (m_sharedImageMemory->isValid()) {
+            ;
+            // Lock the memory region to gain exclusive access using a scoped lock.
+            Lock l(m_sharedImageMemory);
+
+            if (m_image == NULL) {
+                m_image = cvCreateImage(cvSize(si.getWidth(), si.getHeight()), IPL_DEPTH_8U, si.getBytesPerPixel());
+            }
+
+            // Example: Simply copy the image into our process space.
+            if (m_image != NULL) {
+
+                memcpy(m_image->imageData, m_sharedImageMemory->getSharedMemory(),
+                       si.getWidth() * si.getHeight() * si.getBytesPerPixel());
+            }
+
+            // Mirror the image.
+            //cvFlip(m_image, 0, -1);
+            if (m_image != NULL) {
+
+                cerr << "Image was processed" << endl;
+                cvShowImage("Camera Feed Image", m_image);
+                cvWaitKey(10);
+            }
+        }
+    }
+}
+    //body with vehicle control
 odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Example::body() {
-    // Example on how to use self-defined data structures.
-    chalmersrevere::scaledcars::ExampleMessage em;
-    cout << em.toString() << endl;
-    em.setField1(1234);
-    cout << em.toString() << endl;
 
     while (getModuleStateAndWaitForRemainingTimeInTimeslice() == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
-        cout << "Inside the main processing loop." << endl;
-
+        cerr << "driving" << endl;
         // Example how to send commands to the vehicle.
         automotive::VehicleControl vc;
-        vc.setSpeed(2);
-        vc.setSteeringWheelAngle(5 * cartesian::Constants::DEG2RAD);
-        Container c(vc);
-        getConference().send(c);
-    }
+        vc.setSpeed(-2);
+        vc.setSteeringWheelAngle(25);
+        Container ac(vc);
+        getConference().send(ac);
 
+    }
     return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
 }
 }
 } // scaledcars::control
+
