@@ -15,7 +15,6 @@ typedef struct {
  * Final data form
  */
 typedef struct {
-    int type;
     int id;
     int value;
 } protocol_data;

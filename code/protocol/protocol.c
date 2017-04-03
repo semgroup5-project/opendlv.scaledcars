@@ -10,34 +10,21 @@ char protocol_checksum_calculate(protocol_frame frame)
         (((frame.a >> 7) & 0b1) | ((frame.b >> 1 & 0b11111) << 1))
     );
 
-    // C0 = (((R0) XOR (R2)) XOR (R4))
-    char c0 = (((r >> 0) & 0b1) ^ ((r >> 2) & 0b1)) ^ ((r >> 4) & 0b1);
-
-    // C1 = (((R1) XOR (R3)) XOR (R5))
-    char c1 = (((r >> 1) & 0b1) ^ ((r >> 3) & 0b1)) ^ ((r >> 5) & 0b1);
-
-    return (
-        ((c0 & 0b1) << 0) |
-        ((c1 & 0b1) << 1)
+    // C0-2 = R0-2 XOR R3-5
+    char c = (
+        ((r >> 0) & 0b111) ^
+        ((r >> 3) & 0b111)
     );
+
+    return c;
 }
 
 bool protocol_checksum_check(protocol_frame frame)
 {
-    char checksum = protocol_checksum_calculate(frame);
+    char expected = protocol_checksum_calculate(frame);
+    char obtained = (frame.b >> 5) & 0b111;
 
-    // Calculated checksum
-    char expected_c0 = (checksum >> 0) & 0b1;
-    char expected_c1 = (checksum >> 1) & 0b1;
-
-    // Frame checksum
-    char obtained_c0 = (frame.b >> 6) & 0b1;
-    char obtained_c1 = (frame.b >> 7) & 0b1;
-
-    return (
-        obtained_c0 == expected_c0 &&
-        obtained_c1 == expected_c1
-    );
+    return expected == obtained;
 }
 
 protocol_frame protocol_encode(protocol_data data)
@@ -46,18 +33,17 @@ protocol_frame protocol_encode(protocol_data data)
 
     frame.a = (
         (0 << 0) |
-        ((data.type & 0b11) << 1) |
-        ((data.id & 0b11) << 3) |
-        ((data.value & 0b111) << 5)
+        ((data.id & 0b111) << 1) |
+        ((data.value & 0b1111) << 4)
     );
 
     frame.b = (
         (1 << 0) |
-        (((data.value >> 3) & 0b11111) << 1)
+        (((data.value >> 4) & 0b1111) << 1)
     );
 
     frame.b = frame.b | (
-        (protocol_checksum_calculate(frame) & 0b11) << 6
+        (protocol_checksum_calculate(frame) & 0b111) << 5
     );
 
     return frame;
@@ -67,11 +53,10 @@ protocol_data protocol_decode(protocol_frame frame)
 {
     protocol_data data;
 
-    data.type = (frame.a >> 1) & 0b11;
-    data.id = (frame.a >> 3) & 0b11;
+    data.id = (frame.a >> 1) & 0b111;
     data.value = (
-        ((frame.a >> 5) & 0b111) |
-        (((frame.b >> 1) & 0b11111) << 3)
+        ((frame.a >> 4) & 0b1111) |
+        (((frame.b >> 1) & 0b1111) << 4)
     );
 
     return data;
