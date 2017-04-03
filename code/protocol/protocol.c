@@ -1,7 +1,5 @@
 #include "protocol.h"
 
-#include <stdio.h>
-
 char protocol_checksum_calculate(protocol_frame frame)
 {
     // (A1-6) XOR (A7,B1-5) = R0-5
