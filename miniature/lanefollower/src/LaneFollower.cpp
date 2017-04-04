@@ -397,7 +397,7 @@ namespace automotive {
 
                         // Approaching an obstacle (stationary or driving slower than us).
                         if (  (distanceToObstacle > 0) && (((distanceToObstacleOld - distanceToObstacle) > 0) || (fabs(distanceToObstacleOld - distanceToObstacle) < 1e-2)) ) {
-                            // Check if overtaking shall be started.                        
+                            // Check if overtaking shall be started.
                             stageMeasuring = FIND_OBJECT_PLAUSIBLE;
                         }
 

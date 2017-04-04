@@ -19,7 +19,7 @@
 # GLOBAL CONFIGURATION
 #
 global.car = file://Scenarios/Models/Car1.objx
-global.scenario = file://Parking-boxes-1.scnx
+global.scenario = file://Parking-boxes-2.scnx
 global.showGrid = 0
 
 # The following attributes define the buffer sizes for recording and
