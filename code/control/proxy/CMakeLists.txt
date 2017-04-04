@@ -17,7 +17,7 @@
 
 CMAKE_MINIMUM_REQUIRED (VERSION 2.8)
 
-PROJECT (scaledcars-control-lanefollwer)
+PROJECT (scaledcars-control-proxy)
 
 ###########################################################################
 # Set the search path for .cmake files.
@@ -118,5 +118,5 @@ ENDIF(CXXTEST_FOUND)
 INSTALL(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin COMPONENT scaledcars-software)
 INSTALL(TARGETS ${PROJECT_NAME}-static DESTINATION lib COMPONENT scaledcars-software)
 # Install header files.
-INSTALL(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/" DESTINATION include/scaledcars-control-lanefollower COMPONENT scaledcars-software)
+INSTALL(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/" DESTINATION include/scaledcars-control-proxy COMPONENT scaledcars-software)
 
