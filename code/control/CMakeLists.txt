@@ -19,4 +19,4 @@ project(scaledcars-control)
 
 add_subdirectory(example)
 add_subdirectory(lanefollower)
-
+add_subdirectory(proxy)

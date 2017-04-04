@@ -33,7 +33,7 @@
 namespace scaledcars {
 namespace control {
 
-using namespace std;
+    using namespace std;
 
 /**
  * Time-triggered example.
