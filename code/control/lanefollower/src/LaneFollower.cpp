@@ -187,10 +187,7 @@ namespace scaledcars {
                 }
 
                 if (y == CONTROL_SCANLINE) {
-                    // Calculate the deviation error.
-                    //Push the image to the left so that we can find the left lane.
-                    if (right.x > 0) right.x += 30;
-                    if (left.x > 0) left.x += 30;
+
 
 
                     if (right.x > 0) {
@@ -250,15 +247,12 @@ namespace scaledcars {
             }
 
 
-            //Good values dont change
-//            const double Kp = 1.3;
-//            const double Ki = 0.01;
-//            const double Kd = 0.1;
+            //Values wont work
+            const double Kp = 3;
+            const double Ki = 2.5;
+            const double Kd = 0.01;
 
 
-            const double Kp = 1.3;
-            const double Ki = 0.01;
-            const double Kd = 0.1;
 
             // The following values have been determined by Twiddle algorithm.
             //Kp -> Proportional -> how big of a turn when the car try to "fix" the error
@@ -279,10 +273,10 @@ namespace scaledcars {
                 desiredSteering = y;
 
                 if (desiredSteering > 25.0) {
-                    // desiredSteering = 25.0;
+                     desiredSteering = 25.0;
                 }
                 if (desiredSteering < -25.0) {
-                    //desiredSteering = -25.0;
+                    desiredSteering = -25.0;
                 }
             }
 
