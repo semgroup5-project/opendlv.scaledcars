@@ -285,7 +285,7 @@ namespace scaledcars {
 
 
             // Go forward
-            m_vehicleControl.setSpeed(20);
+            m_vehicleControl.setSpeed(50);
             m_vehicleControl.setSteeringWheelAngle(desiredSteering);
         }
 
@@ -341,8 +341,9 @@ namespace scaledcars {
 //            int32_t stageToRightLaneLeftTurn = 0;
 
             // Distance variables to ensure we are overtaking only stationary or slowly driving obstacles.
-//            double distanceToObstacle = 0;
-//            double distanceToObstacleOld = 0;
+            ////
+            double distanceToObstacle = 0;
+            double distanceToObstacleOld = 0;
 
             // Overall state machine handler.
             while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
