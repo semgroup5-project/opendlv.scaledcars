@@ -136,7 +136,7 @@ namespace scaledcars {
             double e = 0;
 
             const int32_t CONTROL_SCANLINE = 462; // calibrated length to right: 280px
-            const int32_t distance = 180;
+            const int32_t distance = 300;
 
             TimeStamp beforeImageProcessing;
             for(int32_t y = m_image->height - 8; y > m_image->height * .6; y -= 10) { //->contain , Datatype
@@ -173,6 +173,7 @@ namespace scaledcars {
 
                         stringstream sstr;
                         sstr << (m_image->width/2 - left.x);
+                        //the 0 pixel on the image is at the left
                         cvPutText(m_image, sstr.str().c_str(), cvPoint(m_image->width/2 - 100, y - 2), &m_font, green);
                     }
                     if (right.x > 0) {
@@ -187,8 +188,13 @@ namespace scaledcars {
 
                 if (y == CONTROL_SCANLINE) {
                     // Calculate the deviation error.
-                    if (right.x > 0) {//if the right part is missing we consider the left one
-                        if (!useRightLaneMarking) {
+                    //Push the image to the left so that we can find the left lane.
+                    if (right.x > 0) right.x += 30;
+                    if (left.x > 0) left.x += 30;
+
+
+                    if (right.x > 0) {
+                        if (!useRightLaneMarking) {//if the right part is missing we consider the left one
                             m_eSum = 0;
                             m_eOld = 0;
                         }
@@ -255,7 +261,7 @@ namespace scaledcars {
             const double Kd = 0.1;
 
             // The following values have been determined by Twiddle algorithm.
-            //Kp -> Proportional -> the bigger the value is the more smooth the turn will be
+            //Kp -> Proportional -> how big of a turn when the car try to "fix" the error
             //const double Kp = 0.4482626884328734;
             //Ki -> Integral -> Current -> might be the middle position of the car
             //const double Ki = 3.103197570937628;
