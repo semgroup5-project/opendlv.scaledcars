@@ -14,6 +14,10 @@
 #define ID_IN_INFRARED_BACK         5
 #define ID_IN_ENCODER               6
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * Data transfer unit
  */
@@ -68,5 +72,9 @@ char protocol_get_byte_index(char byte);
  * Handle received byte
  */
 void protocol_receive(protocol_state *state, char byte);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
