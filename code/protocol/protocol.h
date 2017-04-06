@@ -5,6 +5,7 @@
 
 #define ID_OUT_MOTOR                1
 #define ID_OUT_SERVO                2
+#define ID_OUT_ODOMETER             3
 
 #define ID_IN_ULTRASONIC_CENTER     1
 #define ID_IN_ULTRASONIC_SIDE_FRONT 2
