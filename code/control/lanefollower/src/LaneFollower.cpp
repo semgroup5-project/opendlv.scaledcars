@@ -244,15 +244,11 @@ namespace scaledcars {
             }
 
 
-            //Good values dont change
-//            const double Kp = 1.3;
-//            const double Ki = 0.01;
-//            const double Kd = 0.1;
 
 
-            const double Kp = 1.3;
-            const double Ki = 0.01;
-            const double Kd = 0.1;
+            const double Kp = 0.1;
+            const double Ki = 3;
+            const double Kd = 1;
 
             // The following values have been determined by Twiddle algorithm.
             //Kp -> Proportional -> the bigger the value is the more smooth the turn will be
@@ -285,7 +281,7 @@ namespace scaledcars {
 
 
             // Go forward
-            m_vehicleControl.setSpeed(20);
+            m_vehicleControl.setSpeed(50);
             m_vehicleControl.setSteeringWheelAngle(desiredSteering);
         }
 
