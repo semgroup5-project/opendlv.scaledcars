@@ -20,7 +20,7 @@
 #include <unistd.h>
 
 #include "LaneFollower.h"
-#include <opendavinci/odtools/player/Player.h>
+
 
 namespace scaledcars {
     namespace control {
@@ -47,7 +47,7 @@ namespace scaledcars {
                 m_sharedProcessedImage(),
                 m_hasAttachedToSharedImageMemory(false),
                 m_debug(false),
-                Sim(true),
+                Sim(false),
                 m_image(),
                 m_previousTime(),
                 m_eSum(0),
@@ -58,9 +58,9 @@ namespace scaledcars {
                 m_control_scanline(200),//needs testing with real c
                 m_stop_scanline(250),//needs testing with real car
                 m_distance(190),  //needs testing with real car as well
-                p_gain(1.30),       // the gain values can be adjusted here outside of simulation scenario (see @setUp() )
-                i_gain(0.01),
-                d_gain(0.10){}
+                p_gain(0),       // the gain values can be adjusted here outside of simulation scenario (see @setUp() )
+                i_gain(0),
+                d_gain(0){}
 
         LaneFollower::~LaneFollower() {}
 
@@ -69,16 +69,12 @@ namespace scaledcars {
         void LaneFollower::setUp() {
             // setup window for debugging
             if (m_debug) {
-                cvNamedWindow("WindowShowImage", CV_WINDOW_AUTOSIZE);
-                cvMoveWindow("WindowShowImage", 300, 100);
+                cvNamedWindow("Debug Image", CV_WINDOW_AUTOSIZE);
+                cvMoveWindow("Debug Image", 300, 100);
             }
             if (Sim){
                 m_control_scanline = 462; // calibrated length to right: 280px
                 m_distance = 250;  // distance from right lane marking
-
-                p_gain = 1.30;
-                i_gain = 0;
-                d_gain = 0;
 
             }
         }
@@ -100,22 +96,21 @@ namespace scaledcars {
             if (c.getDataType() == SharedImage::ID()) {
                 SharedImage si = c.getData<SharedImage> ();
 
-
                 // Check if we have already attached to the shared memory.
                 if (!m_hasAttachedToSharedImageMemory) {
 
-                    m_sharedImageMemory = odcore::wrapper::SharedMemoryFactory::attachToSharedMemory(si.getName());  // non valid when using camera
+                    m_sharedImageMemory = odcore::wrapper::SharedMemoryFactory::attachToSharedMemory(si.getName());
 
-//
-//                    cerr << "sharedmemory.get is " << m_sharedImageMemory.get() << endl;
-//                      cerr << "si.getWidth is " << si.getName() << endl;
-//                    cerr << "si.getWidth is " << si.getWidth() << endl;
-//                    cerr << "sharedmemory.getSM is " << m_sharedImageMemory->getSharedMemory() << endl;
-//                    cerr << "name at m_sharedMemory " << m_sharedImageMemory->getName() << endl;
-//                    cerr << "size at m_sharedMemory " << m_sharedImageMemory->getSize() << endl;
-//                    cerr << "value for m_sharedMemory -> valid " << m_sharedImageMemory->isValid() << endl;
+                    if(!Sim){
+                        m_sharedProcessedImageMemory = SharedMemoryFactory::createSharedMemory("ProcessedImg", si.getHeight() * si.getWidth());
+                        m_sharedProcessedImage.setName("ProcessedImg");
+                        m_sharedProcessedImage.setHeight(si.getHeight());
+                        m_sharedProcessedImage.setWidth(si.getWidth());
+                        m_sharedProcessedImage.setBytesPerPixel(1);
+                        m_sharedProcessedImage.setSize(si.getHeight() * si.getWidth());
+                        //m_sharedImageMemory = SharedMemoryFactory::attachToSharedMemory("ProcessedImg");
 
-
+                    }
 
                     m_hasAttachedToSharedImageMemory = true;
 
@@ -157,14 +152,14 @@ namespace scaledcars {
 
             Canny(m_image_new, m_image_new, m_threshold1, m_threshold2, 3); // see header for algorithm and threshold explanation
 
-//            if (!Sim){ //If not in sim mode, copy processed image to shared memory
-//                if (m_sharedProcessedImageMemory.get() && m_sharedProcessedImageMemory->isValid()) {
-//                    m_sharedProcessedImageMemory->lock();
-//                    cerr << "inside image process and fixing shared process image for display" << endl;
-//                    memcpy(m_sharedProcessedImageMemory->getSharedMemory(), m_image_new.data, 640*480);
-//                    m_sharedProcessedImageMemory->unlock();
-//                }
-//            }
+            if (!Sim){ //If not in sim mode, copy processed image to shared memory
+                if (m_sharedProcessedImageMemory.get() && m_sharedProcessedImageMemory->isValid()) {
+                    m_sharedProcessedImageMemory->lock();
+                   // cerr << "inside image process and fixing shared process image for display" << endl;
+                    memcpy(m_sharedProcessedImageMemory->getSharedMemory(), m_image_new.data, 640*480);
+                    m_sharedProcessedImageMemory->unlock();
+                }
+            }
         }
 
         // Calculate deviation from goal
@@ -247,7 +242,7 @@ namespace scaledcars {
 
             // stopline logic
 
-            uchar pixelFrontLeft, pixelFrontRight;
+            uchar front_left, front_right;
             Point stop_left, stop_right;
 
             int left_dist = 0;
@@ -257,8 +252,8 @@ namespace scaledcars {
 
             // Find first grey pixel in the front of the car
             for(int i = m_control_scanline; i > m_stop_scanline; i--) {
-                pixelFrontLeft = m_image_new.at<uchar>(Point(stop_left.x, i));
-                if(pixelFrontLeft > 150) {
+                front_left = m_image_new.at<uchar>(Point(stop_left.x, i));
+                if(front_left > 150) {
                     stop_left.y = i;
                     left_dist = m_control_scanline - stop_left.y;
                     break;
@@ -272,8 +267,8 @@ namespace scaledcars {
 
             // Find first grey pixel in front of the car
             for(int i = m_control_scanline; i > m_stop_scanline; i--) {
-                pixelFrontRight = m_image_new.at<uchar>(Point(stop_right.x, i));
-                if(pixelFrontRight > 150) {
+                front_right = m_image_new.at<uchar>(Point(stop_right.x, i));
+                if(front_right > 150) {
                     stop_right.y = i;
                     right_dist = m_control_scanline - stop_right.y;
                     break;
@@ -294,8 +289,9 @@ namespace scaledcars {
 
             static int counter = 0;
 
+            // is the detected stopline at a similar distance on both sides
 
-            if(counter < 5 && (left_dist - right_dist) > -10 && (left_dist - right_dist) < 10 && left_dist != 0 && right_dist != 0) {  // is the detected stopline at a similar distance on both sides
+            if(counter < 5 && (left_dist - right_dist) > -10 && (left_dist - right_dist) < 10 && left_dist != 0 && right_dist != 0) {
                 counter ++;
             } else {
                 counter = 0;
@@ -364,7 +360,7 @@ namespace scaledcars {
             // Show resulting features.
             if (m_debug) {
                 if (m_image.data != NULL) {
-                    imshow("WindowShowImage", m_image);
+                    imshow("Debug Image", m_image);
                     waitKey(10);
                 }
             }
@@ -382,17 +378,30 @@ namespace scaledcars {
             KeyValueConfiguration kv = getKeyValueConfiguration();
             m_debug = kv.getValue<int32_t>("lanefollower.debug") == 1;
 
+            Sim = kv.getValue<int32_t>("lanefollower.sim") == 1;
+            p_gain = kv.getValue<double>("lanefollower.p");
+            d_gain= kv.getValue<double>("lanefollower.d");
+            i_gain= kv.getValue<double>("lanefollower.i");
+
+
+            // debug, make sure we get the correct values
+            cerr << "Sim is" << Sim << endl;
+            cerr << "p is " << p_gain << endl;
+            cerr << "d is " << d_gain << endl;
+            cerr << "i is " << i_gain << endl;
+
+
 
             // Overall state machine handler.
             while (getModuleStateAndWaitForRemainingTimeInTimeslice() == ModuleStateMessage::RUNNING) {
                 bool has_next_frame = false;
 
                 // Get the most recent available container for a SharedImage.
-                Container imageC = getKeyValueDataStore().get(SharedImage::ID());
+                Container image_container = getKeyValueDataStore().get(SharedImage::ID());
 
 
-                if (imageC.getDataType() == SharedImage::ID()) {
-                    has_next_frame = readSharedImage(imageC);
+                if (image_container.getDataType() == SharedImage::ID()) {
+                    has_next_frame = readSharedImage(image_container);
                 }
 
                 // If we have an image from the previous call, it is then processed
@@ -401,10 +410,12 @@ namespace scaledcars {
                     double error = errorCalculation();
                     laneFollower(error);
                 }
-//                if (!Sim){
-//                    Container processedC(m_sharedProcessedImage);
-//                    getConference().send(processedC);
-//                }
+
+                if(!Sim){
+                    Container processed_image_container(m_sharedProcessedImage);
+                    getConference().send(processed_image_container);
+                }
+
 
                 // State control for intersection stop
                 if (state == "moving"){
@@ -442,6 +453,7 @@ namespace scaledcars {
                         cerr << "Moving!" << endl;
                     }
                 }
+
 
                 // Create container for finally sending the set values for the control algorithm.
                 Container c2(m_vehicleControl);
