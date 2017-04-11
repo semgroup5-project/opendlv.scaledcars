@@ -22,14 +22,14 @@
 
 #include <stdint.h>
 #include <string>
-
 #include <memory>
+
 #include "opendavinci/odcore/wrapper/SharedMemory.h"
 #include "opendavinci/GeneratedHeaders_OpenDaVINCI.h"
 
+
 namespace scaledcars {
 namespace control {
-
         using namespace std;
 
         /**
@@ -90,6 +90,7 @@ namespace control {
 
                 virtual bool isValid() const = 0;
 
+
                 const string getName() const;
 
                 uint32_t getID() const;
@@ -104,7 +105,7 @@ namespace control {
 
             private:
                 odcore::data::image::SharedImage m_sharedImage;
-                std::shared_ptr<odcore::wrapper::SharedMemory> m_sharedMemory;
+                shared_ptr<odcore::wrapper::SharedMemory> m_sharedMemory;
                 
             protected:
                 string m_name;
@@ -115,7 +116,7 @@ namespace control {
                 uint32_t m_size;
         };
 
-    }
-} // automotive::miniature
+    }   // control
+} // scaledcars
 
 #endif /*CAMERA_H_*/

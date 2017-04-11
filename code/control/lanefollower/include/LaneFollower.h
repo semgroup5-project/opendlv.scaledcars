@@ -20,15 +20,29 @@
 #ifndef LANEFOLLOWER_H_
 #define LANEFOLLOWER_H_
 
-#include <opencv/cv.h>
-
+#include <iostream>
+#include <stdint.h>
 #include <memory>
-#include "opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h"
-#include "opendavinci/odcore/data/TimeStamp.h"
-#include "opendavinci/odcore/wrapper/SharedMemory.h"
+#include <math.h>
 
-#include "automotivedata/GeneratedHeaders_AutomotiveData.h"
-#include "opendavinci/GeneratedHeaders_OpenDaVINCI.h"
+#include <opencv2/opencv.hpp>
+#include <opencv2/highgui/highgui.hpp>
+
+#include <opendavinci/odcore/base/KeyValueConfiguration.h>
+#include <opendavinci/odcore/base/Lock.h>
+
+#include <opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h>
+#include "opendavinci/odcore/io/conference/ContainerConference.h"
+#include <opendavinci/odcore/data/Container.h>
+
+#include <opendavinci/odcore/data/TimeStamp.h>
+
+#include <opendavinci/odcore/wrapper/SharedMemoryFactory.h>
+#include <opendavinci/odcore/wrapper/SharedMemory.h>
+
+#include <opendavinci/GeneratedHeaders_OpenDaVINCI.h>
+#include <automotivedata/GeneratedHeaders_AutomotiveData.h>
+
 
 namespace scaledcars {
 namespace control {
@@ -82,26 +96,52 @@ namespace control {
 	            bool readSharedImage(odcore::data::Container &c);
 
             private:
-	            bool m_hasAttachedToSharedImageMemory;
-	            std::shared_ptr<odcore::wrapper::SharedMemory> m_sharedImageMemory;
-	            IplImage *m_image;
-                bool m_debug;
-                CvFont m_font;
 
+	            shared_ptr<odcore::wrapper::SharedMemory> m_sharedImageMemory;
+				shared_ptr<odcore::wrapper::SharedMemory> m_sharedProcessedImageMemory;
+			    odcore::data::image::SharedImage m_sharedProcessedImage;
+
+                bool m_hasAttachedToSharedImageMemory;
+                bool m_debug;
+                bool Sim;
+
+                cv::Mat m_image;
                 odcore::data::TimeStamp m_previousTime;
+
                 double m_eSum;
                 double m_eOld;
 
                 automotive::VehicleControl m_vehicleControl;
+                /**
+                 *Canny algoithm
+                 * http://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/canny_detector/canny_detector.html
+                 *
+                 *If a pixel gradient is higher than the upper threshold, the pixel is accepted as an edge
+                 *If a pixel gradient value is below the lower threshold, then it is rejected.
+                 *If the pixel gradient is between the two thresholds, then it will be accepted only if it is connected to a pixel that is above the upper threshold.
+                 *
+                 **/
+                int32_t m_threshold1;
+                int32_t m_threshold2;
+                int32_t m_control_scanline;
+                int32_t m_stop_scanline;
+                int32_t m_distance;
+
+
+                double p_gain;
+                double i_gain;
+                double d_gain;
 
 	            virtual void setUp();
 
 	            virtual void tearDown();
 
                 void processImage();
+                double errorCalculation();
+                void laneFollower(double e);
         };
 
-    }
-} // automotive::miniature
+    } //control
+} // scaledcars
 
 #endif /*LANEFOLLOWER_H_*/

@@ -22,6 +22,8 @@
 
 #include <map>
 #include <memory>
+#include <iostream>
+#include <stdint.h>
 
 #include "opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h"
 #include "opendavinci/odcore/data/Container.h"

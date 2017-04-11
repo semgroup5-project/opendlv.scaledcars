@@ -30,7 +30,8 @@ namespace control {
         OpenCVCamera::OpenCVCamera(const string &name, const uint32_t &id, const uint32_t &width, const uint32_t &height, const uint32_t &bpp) :
             Camera(name, id, width, height, bpp),
             m_capture(NULL),
-            m_image(NULL) {
+            m_image(NULL),
+            m_sharedImageMemory(){
 
             m_capture = cvCaptureFromCAM(id);
             if (m_capture) {
@@ -61,7 +62,7 @@ namespace control {
                         IplImage *tmpFrame = cvRetrieveFrame(m_capture);
 
                         if (m_image == NULL) {
-                            m_image = cvCreateImage(cvGetSize(tmpFrame), IPL_DEPTH_8U, 1);                    
+                            m_image = cvCreateImage(cvGetSize(tmpFrame), IPL_DEPTH_8U, 1);
                         }
 
                         cvCvtColor(tmpFrame, m_image, CV_BGR2GRAY);
@@ -80,7 +81,7 @@ namespace control {
             bool retVal = false;
 
             if ( (dest != NULL) && (size > 0) && (m_image != NULL) ) {
-                ::memcpy(dest, m_image->imageData, size);
+                memcpy(dest, m_image->imageData, size);
 
                 cvShowImage("WindowShowImage", m_image);
                 cvWaitKey(10);
@@ -91,6 +92,6 @@ namespace control {
             return retVal;
         }
 
-    }
-} // automotive::miniature
+    }   // control
+} // scaledcars
 

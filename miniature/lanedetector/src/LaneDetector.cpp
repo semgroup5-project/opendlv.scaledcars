@@ -120,13 +120,7 @@ namespace automotive {
                 }
             }
 
-            VehicleControl vc;
 
-                // Moving state machine.
-          
-                    // Go forward.
-            vc.setSpeed(1);
-            vc.setSteeringWheelAngle(0);
 
             // 1. Do something with the image m_image here, for example: find lane marking features, optimize quality, ...
 
@@ -143,7 +137,7 @@ namespace automotive {
             sd.setExampleData(1234.56);
 
             // Create container for finally sending the data.
-            Container c(vc);
+            Container c(sd);
             // Send container.
             getConference().send(c);
         }

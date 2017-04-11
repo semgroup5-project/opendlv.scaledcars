@@ -260,6 +260,7 @@ namespace automotive {
 	        // Get configuration data.
 	        KeyValueConfiguration kv = getKeyValueConfiguration();
 	        m_debug = kv.getValue<int32_t> ("lanefollower.debug") == 1;
+
             // Initialize fonts.
             const double hscale = 0.4;
             const double vscale = 0.3;

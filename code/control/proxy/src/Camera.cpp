@@ -18,7 +18,7 @@
  */
 
 #include <iostream>
-
+#include <unistd.h>
 #include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/highgui/highgui.hpp"
 
@@ -27,27 +27,26 @@
 #include "Camera.h"
 
 namespace scaledcars {
-namespace control {
+    namespace control {
 
         Camera::Camera(const string &name, const uint32_t &id, const uint32_t &width, const uint32_t &height, const uint32_t &bpp) :
-            m_sharedImage(),
-            m_sharedMemory(),
-            m_name(name),
-            m_id(id),
-            m_width(width),
-            m_height(height),
-            m_bpp(bpp),
-            m_size(0) {
+                m_sharedImage(),
+                m_sharedMemory(),
+                m_name(name),
+                m_id(id),
+                m_width(width),
+                m_height(height),
+                m_bpp(bpp),
+                m_size(0) {
 
-            m_sharedMemory = odcore::wrapper::SharedMemoryFactory::createSharedMemory(name, width * height * bpp);
+                    m_sharedMemory = odcore::wrapper::SharedMemoryFactory::createSharedMemory(name, width * height * bpp);
 
-            m_sharedImage.setName(name);
-            m_sharedImage.setWidth(width);
-            m_sharedImage.setHeight(height);
-            m_sharedImage.setBytesPerPixel(bpp);
-
-            m_size = width * height * bpp;
-            m_sharedImage.setSize(m_size);
+                    m_sharedImage.setName(name);
+                    m_sharedImage.setWidth(width);
+                    m_sharedImage.setHeight(height);
+                    m_sharedImage.setBytesPerPixel(bpp);
+                    m_size = width * height * bpp;
+                    m_sharedImage.setSize(m_size);
         }
 
         Camera::~Camera() {}
@@ -81,7 +80,7 @@ namespace control {
                 if (captureFrame()) {
                     if (m_sharedMemory.get() && m_sharedMemory->isValid()) {
                         m_sharedMemory->lock();
-                            copyImageTo((char*)m_sharedMemory->getSharedMemory(), m_size);
+                        copyImageTo(static_cast<char*> (m_sharedMemory->getSharedMemory()), m_size);
                         m_sharedMemory->unlock();
                     }
                 }
@@ -90,6 +89,5 @@ namespace control {
             return m_sharedImage;
         }
 
-    }
-} // automotive::miniature
-
+    }   //control
+} // scaledcars

@@ -21,6 +21,8 @@
 #define OPENCVCAMERA_H_
 
 #include "opencv2/highgui/highgui.hpp"
+#include <opendavinci/odcore/wrapper/SharedMemoryFactory.h>
+#include <opendavinci/odcore/wrapper/SharedMemory.h>
 
 #include "Camera.h"
 
@@ -77,6 +79,7 @@ namespace control {
             private:
                 CvCapture *m_capture;
                 IplImage *m_image;
+                shared_ptr<odcore::wrapper::SharedMemory> m_sharedImageMemory;
         };
 
     }
