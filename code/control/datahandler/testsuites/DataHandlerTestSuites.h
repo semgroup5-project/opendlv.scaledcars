@@ -1,5 +1,5 @@
 /**
- * DataHandler
+ * DataHandler.
  * Copyright (C) 2017 Mattias Landkvist
  *
  * This program is free software; you can redistribute it and/or
@@ -17,9 +17,26 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#include "DataHandler.h"
+#ifndef SCALEDCARS_CONTROL_DATAHANDLER_TESTSUITE_H
+#define SCALEDCARS_CONTROL_DATAHANDLER_TESTSUITE_H
 
-int32_t main(int32_t /*argc*/, char **/*argv*/) {
-    scaledcars::control::DataHandler datahandler(argc, argv);
-    return datahandler.runModule();
-}
+#include "cxxtest/TestSuite.h"
+
+// Include local header files.
+#include "../include/DataHandler.h"
+
+using namespace std;
+using namespace scaledcars::control;
+
+class DataHandlerTest : public CxxTest::TestSuite {
+   public:
+    void setUp() {}
+
+    void tearDown() {}
+
+    void testApplication() {
+        TS_ASSERT(true);
+    }
+};
+
+#endif /*SCALEDCARS_CONTROL_DATAHANDLER_TESTSUITE_H*/

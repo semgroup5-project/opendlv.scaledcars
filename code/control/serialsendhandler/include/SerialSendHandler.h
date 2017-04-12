@@ -1,6 +1,8 @@
 #include <opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h>
-
-class Filter : public odcore::base::module::DataTriggeredConferenceClientModule {
+namespace scaledcars {
+	namespace control {
+	
+class SerialSendHandler : public odcore::base::module::DataTriggeredConferenceClientModule {
     private:
         /**
          * "Forbidden" copy constructor. Goal: The compiler should warn
@@ -9,7 +11,7 @@ class Filter : public odcore::base::module::DataTriggeredConferenceClientModule 
          *
          * @param obj Reference to an object of this class.
          */
-        Filter(const Filter &/*obj*/);
+        SerialSendHandler(const SerialSendHandler &/*obj*/);
 
         /**
          * "Forbidden" assignment operator. Goal: The compiler should warn
@@ -19,7 +21,7 @@ class Filter : public odcore::base::module::DataTriggeredConferenceClientModule 
          * @param obj Reference to an object of this class.
          * @return Reference to this instance.
          */
-        Filter& operator=(const DataTriggeredReceiver &/*obj*/);
+        SerialSendHandler& operator=(const SerialSendHandler &/*obj*/);
 
     public:
         /**
@@ -28,9 +30,9 @@ class Filter : public odcore::base::module::DataTriggeredConferenceClientModule 
          * @param argc Number of command line arguments.
          * @param argv Command line arguments.
          */
-        Filter(const int32_t &argc, char **argv);
+        SerialSendHandler(const int32_t &argc, char **argv);
 
-        virtual ~Filter();
+        virtual ~SerialSendHandler();
 
         virtual void nextContainer(odcore::data::Container &c);
 
@@ -39,3 +41,5 @@ class Filter : public odcore::base::module::DataTriggeredConferenceClientModule 
 
         virtual void tearDown();
 };
+}
+}
