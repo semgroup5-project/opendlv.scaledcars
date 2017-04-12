@@ -34,29 +34,27 @@ void SerialSendHandler::tearDown() {
     cout << "This method is called after the program flow returns from the component's body." << endl;
 }
 
-void SerialSendHandler::nextContainer(Container &/*c*/) {
-    const string SERIAL_PORT = "/dev/ttyACM1";
-    const uint32_t BAUD_RATE = 11500;
+void SerialSendHandler::nextContainer(Container &c) {
+	const string SERIAL_PORT = "/dev/ttyACM1";
+	const uint32_t BAUD_RATE = 11500;
 
     // We are using OpenDaVINCI's std::shared_ptr to automatically
     // release any acquired resources.
     
-    //if (c.getDataType() == VehicleControl::ID()) {
-      //  VehicleControl vd = c.getData<VehicleControl>();
+   if (c.getDataType() == automotive::VehicleControl::ID()) {
+      const automotive::VehicleControl vd = c.getData<automotive::VehicleControl>();
     	try {
         	std::shared_ptr<SerialPort> serial(SerialPortFactory::createSerialPort(SERIAL_PORT, BAUD_RATE));
-
+			
         	serial->send("Hello World\r\n");
         	//serial->send(vd.toString());
     	}
     	catch(string &exception) {
         	cerr << "Serial port could not be created: " << exception << endl;
     	}
-
-    //}
+	}
 }
 
-
-}
-}
+} /*---------*/
+} /*NAMESPACE*/
 
