@@ -60,7 +60,7 @@ namespace scaledcars {
                 m_distance(190),  //needs testing with real car as well
                 p_gain(0),       // the gain values can be adjusted here outside of simulation scenario (see @setUp() )
                 i_gain(0),
-                d_gain(0){}
+                d_gain(0) {}
 
         LaneFollower::~LaneFollower() {}
 
@@ -74,8 +74,8 @@ namespace scaledcars {
 
             Sim = kv.getValue<int32_t>("lanefollower.sim") == 1;
             p_gain = kv.getValue<double>("lanefollower.p");
-            d_gain= kv.getValue<double>("lanefollower.d");
-            i_gain= kv.getValue<double>("lanefollower.i");
+            d_gain = kv.getValue<double>("lanefollower.d");
+            i_gain = kv.getValue<double>("lanefollower.i");
 
 
             // debug, make sure we get the correct values
@@ -88,7 +88,7 @@ namespace scaledcars {
                 cvNamedWindow("Debug Image", CV_WINDOW_AUTOSIZE);
                 cvMoveWindow("Debug Image", 300, 100);
             }
-            if (Sim){
+            if (Sim) {
                 m_control_scanline = 462; // calibrated length to right: 280px
                 m_distance = 250;  // distance from right lane marking
             }
@@ -109,15 +109,17 @@ namespace scaledcars {
             bool retVal = false;
 
             if (c.getDataType() == SharedImage::ID()) {
-                SharedImage si = c.getData<SharedImage> ();
+                SharedImage si = c.getData<SharedImage>();
 
                 // Check if we have already attached to the shared memory.
                 if (!m_hasAttachedToSharedImageMemory) {
 
                     m_sharedImageMemory = odcore::wrapper::SharedMemoryFactory::attachToSharedMemory(si.getName());
 
-                    if(!Sim){
-                        m_sharedProcessedImageMemory = SharedMemoryFactory::createSharedMemory("ProcessedImg", si.getHeight() * si.getWidth());
+                    if (!Sim) {
+                        m_sharedProcessedImageMemory = SharedMemoryFactory::createSharedMemory("ProcessedImg",
+                                                                                               si.getHeight() *
+                                                                                               si.getWidth());
                         m_sharedProcessedImage.setName("ProcessedImg");
                         m_sharedProcessedImage.setHeight(si.getHeight());
                         m_sharedProcessedImage.setWidth(si.getWidth());
@@ -137,15 +139,15 @@ namespace scaledcars {
                     m_sharedImageMemory->lock();
 
                     if (m_image.empty()) { // If image is empty, create a new cv::Mat image
-                        m_image.create(si.getHeight(), si.getWidth(), CV_8UC3); //From opencv documentation: CV_8UC3 = unsigned integer 8bit matrix/image wih 3 channels (typically RGB or BRG in opencv case)
+                        m_image.create(si.getHeight(), si.getWidth(),
+                                       CV_8UC3); //From opencv documentation: CV_8UC3 = unsigned integer 8bit matrix/image wih 3 channels (typically RGB or BRG in opencv case)
+                    } else { // Copying the image data
+                        memcpy(m_image.data, m_sharedImageMemory->getSharedMemory(),
+                               si.getWidth() * si.getHeight() * si.getBytesPerPixel());
                     }
+                    m_sharedImageMemory->unlock(); // Release the memory region lock
 
-                    else { // Copying the image data
-                        memcpy(m_image.data, m_sharedImageMemory->getSharedMemory(), si.getWidth() * si.getHeight() * si.getBytesPerPixel());
-                    }
-                    m_sharedImageMemory-> unlock(); // Release the memory region lock
-
-                    if (Sim){ // If in Sim mode, flip the image
+                    if (Sim) { // If in Sim mode, flip the image
                         flip(m_image, m_image, -1);
                     }
                     retVal = true;
@@ -165,13 +167,14 @@ namespace scaledcars {
             // Copy the original image to the new image as greyscale
             cvtColor(m_image, m_image_new, COLOR_BGR2GRAY);
 
-            Canny(m_image_new, m_image_new, m_threshold1, m_threshold2, 3); // see header for algorithm and threshold explanation
+            Canny(m_image_new, m_image_new, m_threshold1, m_threshold2,
+                  3); // see header for algorithm and threshold explanation
 
-            if (!Sim){ //If not in sim mode, copy processed image to shared memory
+            if (!Sim) { //If not in sim mode, copy processed image to shared memory
                 if (m_sharedProcessedImageMemory.get() && m_sharedProcessedImageMemory->isValid()) {
                     m_sharedProcessedImageMemory->lock();
-                   // cerr << "inside image process and fixing shared process image for display" << endl;
-                    memcpy(m_sharedProcessedImageMemory->getSharedMemory(), m_image_new.data, 640*480);
+                    // cerr << "inside image process and fixing shared process image for display" << endl;
+                    memcpy(m_sharedProcessedImageMemory->getSharedMemory(), m_image_new.data, 640 * 480);
                     m_sharedProcessedImageMemory->unlock();
                 }
             }
@@ -243,14 +246,16 @@ namespace scaledcars {
                     stringstream sstr;
                     sstr << (m_image.cols / 2 - left.x);
 
-                    putText(m_image, sstr.str().c_str(), Point(m_image.cols / 2 - 100, y - 2), FONT_HERSHEY_PLAIN, 1, CV_RGB(0, 255, 0));
+                    putText(m_image, sstr.str().c_str(), Point(m_image.cols / 2 - 100, y - 2), FONT_HERSHEY_PLAIN, 1,
+                            CV_RGB(0, 255, 0));
                 }
                 if (right.x > 0) {
-                    line(m_image, cvPoint(m_image.cols / 2, y), right, Scalar( 0, 0, 255));
+                    line(m_image, cvPoint(m_image.cols / 2, y), right, Scalar(0, 0, 255));
 
                     stringstream sstr;
                     sstr << (right.x - m_image.cols / 2);
-                    putText(m_image, sstr.str().c_str(), cvPoint(m_image.cols / 2 + 100, y - 2), FONT_HERSHEY_PLAIN, 1, CV_RGB(255, 0, 0));
+                    putText(m_image, sstr.str().c_str(), cvPoint(m_image.cols / 2 + 100, y - 2), FONT_HERSHEY_PLAIN, 1,
+                            CV_RGB(255, 0, 0));
                 }
             }
 
@@ -262,13 +267,13 @@ namespace scaledcars {
 
             int left_dist = 0;
 
-            stop_left.x = (m_image_new.cols/2) - 50;
+            stop_left.x = (m_image_new.cols / 2) - 50;
             stop_left.y = m_control_scanline;
 
             // Find first grey pixel in the front of the car
-            for(int i = m_control_scanline; i > m_stop_scanline; i--) {
+            for (int i = m_control_scanline; i > m_stop_scanline; i--) {
                 front_left = m_image_new.at<uchar>(Point(stop_left.x, i));
-                if(front_left > 150) {
+                if (front_left > 150) {
                     stop_left.y = i;
                     left_dist = m_control_scanline - stop_left.y;
                     break;
@@ -277,13 +282,13 @@ namespace scaledcars {
 
             int right_dist = 0;
 
-            stop_right.x = (m_image_new.cols/2) + 50;
+            stop_right.x = (m_image_new.cols / 2) + 50;
             stop_right.y = m_control_scanline;
 
             // Find first grey pixel in front of the car
-            for(int i = m_control_scanline; i > m_stop_scanline; i--) {
+            for (int i = m_control_scanline; i > m_stop_scanline; i--) {
                 front_right = m_image_new.at<uchar>(Point(stop_right.x, i));
-                if(front_right > 150) {
+                if (front_right > 150) {
                     stop_right.y = i;
                     right_dist = m_control_scanline - stop_right.y;
                     break;
@@ -291,12 +296,12 @@ namespace scaledcars {
             }
 
             // Draw lines if debug true
-            if(m_debug) {
-                if(stop_left.y < m_control_scanline) {
+            if (m_debug) {
+                if (stop_left.y < m_control_scanline) {
                     line(m_image, Point(stop_left.x, m_control_scanline), stop_left, Scalar(128, 0, 0));
                 }
 
-                if(stop_right.y < m_control_scanline) {
+                if (stop_right.y < m_control_scanline) {
                     line(m_image, Point(stop_right.x, m_control_scanline), stop_right, Scalar(128, 0, 0));
                 }
             }
@@ -306,24 +311,23 @@ namespace scaledcars {
 
             // is the detected stopline at a similar distance on both sides
 
-            if(counter < 5 && (left_dist - right_dist) > -10 && (left_dist - right_dist) < 10 && left_dist != 0 && right_dist != 0) {
-                counter ++;
+            if (counter < 5 && (left_dist - right_dist) > -10 && (left_dist - right_dist) < 10 && left_dist != 0 &&
+                right_dist != 0) {
+                counter++;
             } else {
                 counter = 0;
             }
 
-            if(counter > 4) {
+            if (counter > 4) {
                 stop = true;
-            }
-            else{
+            } else {
                 stop = false;
             }
             return e;
         }
 
 
-
-        void  LaneFollower::laneFollower(double e){
+        void LaneFollower::laneFollower(double e) {
 
             TimeStamp currentTime;
             double timeStep = (currentTime.toMicroseconds() - m_previousTime.toMicroseconds()) / (1000.0 * 1000.0);
@@ -338,8 +342,7 @@ namespace scaledcars {
             }
             if (fabs(e) < 1e-3) {
                 m_eSum = 0;
-            }
-            else {
+            } else {
                 m_eSum += e;
             }
 
@@ -408,43 +411,43 @@ namespace scaledcars {
                     laneFollower(error);
                 }
 
-                if(!Sim){
+                if (!Sim) {
                     Container processed_image_container(m_sharedProcessedImage);
                     getConference().send(processed_image_container);
                 }
 
 
                 // State control for intersection stop
-                if (state == "moving"){
+                if (state == "moving") {
                     m_vehicleControl.setSpeed(1);
 
-                    if (stop){
-                        if (stopCounter < 6.0){
-                            stopCounter+= 0.5;
+                    if (stop) {
+                        if (stopCounter < 6.0) {
+                            stopCounter += 0.5;
                             cerr << stopCounter << endl;
-                        }else{
+                        } else {
                             state = "stop";
                             cerr << "Stopline found ! " << endl;
                         }
                     }
 
                 }
-                if (state == "stop"){
+                if (state == "stop") {
                     m_vehicleControl.setSpeed(0);
                     m_vehicleControl.setSteeringWheelAngle(0);
-                    stopCounter+= 0.5;
+                    stopCounter += 0.5;
 
-                    if (stopCounter > 29.9999){
+                    if (stopCounter > 29.9999) {
                         state = "resume";
                         m_vehicleControl.setSpeed(1);
                         cerr << "Resuming!" << endl;
                     }
                 }
-                if (state == "resume"){
-                    if (stopCounter < 50){
-                        stopCounter+= 0.5;
+                if (state == "resume") {
+                    if (stopCounter < 50) {
+                        stopCounter += 0.5;
                         cerr << "counter " << stopCounter << endl;
-                    }else{
+                    } else {
                         stopCounter = 0;
                         state = "moving";
                         cerr << "Moving!" << endl;
