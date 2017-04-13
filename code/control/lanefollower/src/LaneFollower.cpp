@@ -361,7 +361,7 @@ namespace scaledcars {
 
             const double y = p + i + d;
 
-            double desiredSteering = 0;
+            double desiredSteering = 0, arduino_steering = 0;
 
             if (fabs(e) > 1e-2) {
                 desiredSteering = y;
@@ -372,19 +372,35 @@ namespace scaledcars {
                 if (desiredSteering < -25.0) {
                     // desiredSteering = -25.0;
                 }
+
             }
 
             // Show resulting features.
             if (m_debug) {
                 if (m_image.data != NULL) {
-                    imshow("Debug Image", m_image_new);  //m_image = image without canny || m_image_new = fully processed image
+                    imshow("Debug Image", m_image);  //m_image = image without canny || m_image_new = fully processed image
                     waitKey(10);
                 }
             }
 
-            m_vehicleControl.setSteeringWheelAngle(desiredSteering);
+            // change values if real car to acceptable arduino values
+            if (!Sim){
+                arduino_steering = valueRange(desiredSteering);
+                m_vehicleControl.setSteeringWheelAngle(arduino_steering);
+                cerr << " steering val" << arduino_steering << endl;
+            }
+            else {
+                m_vehicleControl.setSteeringWheelAngle(desiredSteering);
+            }
 
 
+
+
+        }
+        // map the simulation values to real care acceptable values
+        int LaneFollower::valueRange(double angle){
+            double new_angle = (angle - (-25)*(180 - 0) / (25 - (-25)) + 0);   // (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+            return new_angle;
         }
 
 
@@ -452,6 +468,8 @@ namespace scaledcars {
                         cerr << "Moving!" << endl;
                     }
                 }
+
+
 
 
                 // Create container for finally sending the set values for the control algorithm.
