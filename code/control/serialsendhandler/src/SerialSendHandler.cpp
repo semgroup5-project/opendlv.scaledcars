@@ -28,14 +28,6 @@ SerialSendHandler::SerialSendHandler(const int32_t &argc, char **argv) :
 SerialSendHandler::~SerialSendHandler() {}
 
 void SerialSendHandler::setUp() {
-   automotive::VehicleControl vc;
-   vc.setSteeringWheelAngle(0);
-   
-
-	// Create container for finally sending the set values for the control algorithm.
-   Container c2(vc);
-   // Send container.
-   getConference().send(c2);
    cout << "This method is called before the component's body is executed." << endl;
 }
 
@@ -44,46 +36,45 @@ void SerialSendHandler::tearDown() {
 }
 
 void SerialSendHandler::nextContainer(Container &c) {
-	//const string SERIAL_PORT = "/dev/ttyACM0";
-	//const uint32_t BAUD_RATE = 11500;
-	   cout << "Container <3" << endl;
-
-	cout << "The correct id: " << automotive::VehicleControl::ID() << endl;
-	cout << "Type of container: " << c.getDataType() << endl;
+	const string SERIAL_PORT = "/dev/ttyACM0";
+	const uint32_t BAUD_RATE = 11500;
 
     // We are using OpenDaVINCI's std::shared_ptr to automatically
     // release any acquired resources.
     
-   //if (c.getDataType() == automotive::VehicleControl::ID()) {
-   	   cout << "if statement <3" << endl;
+   if (c.getDataType() == automotive::VehicleControl::ID()) {
       const automotive::VehicleControl vd = c.getData<automotive::VehicleControl>();
-//      int angle = vd.getSteeringWheelAngle();
-//      int speed = vd.getSpeed();
+      int angle = vd.getSteeringWheelAngle();
+      int speed = vd.getSpeed();
       protocol_data pd;
       protocol_data *ppd = &pd;
-      ppd->id = 2;
-      ppd->value = 180;
+      
+      if(vd.getSpeed() != -1){
+      	ppd->id = 1;
+      	ppd->value = speed;
+      } else {
+      	ppd->id = 2;
+      	ppd->value = angle;
+      }
+      
+      // TODO - ADD SUPPORT FOR THE ODOMETER "ID 3" "ANY VALUE OVER 0"
       
       protocol_frame pf = protocol_encode(pd);
       protocol_frame *ppf = &pf;
       
-      string test = "";
-      test.insert(test.end(), ppf->a);
-      test.insert(test.end(), ppf->b);
-      
-      cout << test << endl;
+      string message = "";
+      message.insert(message.end(), ppf->a);
+      message.insert(message.end(), ppf->b);
       
     	try {
-        	//std::shared_ptr<SerialPort> serial(SerialPortFactory::createSerialPort(SERIAL_PORT, BAUD_RATE));
+        	std::shared_ptr<SerialPort> serial(SerialPortFactory::createSerialPort(SERIAL_PORT, BAUD_RATE));
 			
-        	// serial->send(test);
-        		   cout << "Sexy cream sent by serial <3" << endl;
-        	//serial->send(vd.toString());
+        	serial->send(message);
     	}
     	catch(string &exception) {
         	cerr << "Serial port could not be created: " << exception << endl;
     	}
-	//}
+	}
 }
 
 } /*---------*/
