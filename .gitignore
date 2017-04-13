@@ -4,5 +4,4 @@ builds
 *.swo
 *~
 *.pyc
-misc.xml
-vcs.xml
+*.idea
