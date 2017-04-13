@@ -71,7 +71,6 @@ namespace scaledcars {
             // Get configuration data.
             KeyValueConfiguration kv = getKeyValueConfiguration();
             m_debug = kv.getValue<int32_t>("lanefollower.debug") == 1;
-
             Sim = kv.getValue<int32_t>("lanefollower.sim") == 1;
             p_gain = kv.getValue<double>("lanefollower.p");
             d_gain = kv.getValue<double>("lanefollower.d");
@@ -378,7 +377,7 @@ namespace scaledcars {
             // Show resulting features.
             if (m_debug) {
                 if (m_image.data != NULL) {
-                    imshow("Debug Image", m_image);
+                    imshow("Debug Image", m_image_new);  //m_image = image without canny || m_image_new = fully processed image
                     waitKey(10);
                 }
             }
