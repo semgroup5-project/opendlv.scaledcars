@@ -44,18 +44,9 @@ void SerialSendHandler::tearDown() {
 }
 
 void SerialSendHandler::nextContainer(Container &c) {
-	const string SERIAL_PORT = "/dev/ttyACM0";
-	const uint32_t BAUD_RATE = 11500;
+	//const string SERIAL_PORT = "/dev/ttyACM0";
+	//const uint32_t BAUD_RATE = 11500;
 	   cout << "Container <3" << endl;
-
-	automotive::VehicleControl vc;
-   vc.setSteeringWheelAngle(0);
-   
-
-	// Create container for finally sending the set values for the control algorithm.
-   Container c2(vc);
-   // Send container.
-   getConference().send(c2);
 
 	cout << "The correct id: " << automotive::VehicleControl::ID() << endl;
 	cout << "Type of container: " << c.getDataType() << endl;
@@ -71,17 +62,21 @@ void SerialSendHandler::nextContainer(Container &c) {
       protocol_data pd;
       protocol_data *ppd = &pd;
       ppd->id = 2;
-      ppd->value = 0;
+      ppd->value = 180;
       
       protocol_frame pf = protocol_encode(pd);
       protocol_frame *ppf = &pf;
       
-      string test = "" + ppf->a + ppf->b;
+      string test = "";
+      test.insert(test.end(), ppf->a);
+      test.insert(test.end(), ppf->b);
+      
+      cout << test << endl;
       
     	try {
-        	std::shared_ptr<SerialPort> serial(SerialPortFactory::createSerialPort(SERIAL_PORT, BAUD_RATE));
+        	//std::shared_ptr<SerialPort> serial(SerialPortFactory::createSerialPort(SERIAL_PORT, BAUD_RATE));
 			
-        	serial->send(test);
+        	// serial->send(test);
         		   cout << "Sexy cream sent by serial <3" << endl;
         	//serial->send(vd.toString());
     	}
