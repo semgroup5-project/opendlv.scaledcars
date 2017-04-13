@@ -67,6 +67,21 @@ namespace scaledcars {
 
         // This method will be call automatically _before_ running body().
         void LaneFollower::setUp() {
+            // Get configuration data.
+            KeyValueConfiguration kv = getKeyValueConfiguration();
+            m_debug = kv.getValue<int32_t>("lanefollower.debug") == 1;
+
+            Sim = kv.getValue<int32_t>("lanefollower.sim") == 1;
+            p_gain = kv.getValue<double>("lanefollower.p");
+            d_gain= kv.getValue<double>("lanefollower.d");
+            i_gain= kv.getValue<double>("lanefollower.i");
+
+
+            // debug, make sure we get the correct values
+            cerr << "Sim is" << Sim << endl;
+            cerr << "p is " << p_gain << endl;
+            cerr << "d is " << d_gain << endl;
+            cerr << "i is " << i_gain << endl;
             // setup window for debugging
             if (m_debug) {
                 cvNamedWindow("Debug Image", CV_WINDOW_AUTOSIZE);
@@ -75,7 +90,6 @@ namespace scaledcars {
             if (Sim){
                 m_control_scanline = 462; // calibrated length to right: 280px
                 m_distance = 250;  // distance from right lane marking
-
             }
         }
 
@@ -374,24 +388,6 @@ namespace scaledcars {
         // This method will do the main data processing job.
         // Therefore, it tries to open the real camera first. If that fails, the virtual camera images from camgen are used.
         ModuleExitCodeMessage::ModuleExitCode LaneFollower::body() {    // this method still needs
-            // Get configuration data.
-            KeyValueConfiguration kv = getKeyValueConfiguration();
-            m_debug = kv.getValue<int32_t>("lanefollower.debug") == 1;
-
-            Sim = kv.getValue<int32_t>("lanefollower.sim") == 1;
-            p_gain = kv.getValue<double>("lanefollower.p");
-            d_gain= kv.getValue<double>("lanefollower.d");
-            i_gain= kv.getValue<double>("lanefollower.i");
-
-
-            // debug, make sure we get the correct values
-            cerr << "Sim is" << Sim << endl;
-            cerr << "p is " << p_gain << endl;
-            cerr << "d is " << d_gain << endl;
-            cerr << "i is " << i_gain << endl;
-
-
-
             // Overall state machine handler.
             while (getModuleStateAndWaitForRemainingTimeInTimeslice() == ModuleStateMessage::RUNNING) {
                 bool has_next_frame = false;
