@@ -49,7 +49,7 @@ void SerialSendHandler::nextContainer(Container &c) {
       protocol_data pd;
       protocol_data *ppd = &pd;
       
-      if(vd.getSpeed() != -1){
+      if((int)vd.getSpeed() != -1){
       	ppd->id = 1;
       	ppd->value = speed;
       } else {
