@@ -4,3 +4,4 @@ builds
 *.swo
 *~
 *.pyc
+.idea
