@@ -67,6 +67,7 @@ namespace scaledcars {
 
         // This method will be call automatically _before_ running body().
         void LaneFollower::setUp() {
+
             // Get configuration data.
             KeyValueConfiguration kv = getKeyValueConfiguration();
             m_debug = kv.getValue<int32_t>("lanefollower.debug") == 1;
