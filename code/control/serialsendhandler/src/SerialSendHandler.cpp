@@ -7,6 +7,7 @@
 #include <iostream>
 
 #include "SerialSendHandler.h"
+#include "protocol.c"
 
 namespace scaledcars {
 namespace control {
@@ -43,10 +44,22 @@ void SerialSendHandler::nextContainer(Container &c) {
     
    if (c.getDataType() == automotive::VehicleControl::ID()) {
       const automotive::VehicleControl vd = c.getData<automotive::VehicleControl>();
+      int angle = vd.getSteeringWheelAngle();
+//      int speed = vd.getSpeed();
+      protocol_data pd;
+      protocol_data *ppd = &pd;
+      ppd->id = 2;
+      ppd->value = angle;
+      
+      protocol_frame pf = protocol_encode(pd);
+      protocol_frame *ppf = &pf;
+      
+      string test = "" + ppf->a + ppf->b;
+      
     	try {
         	std::shared_ptr<SerialPort> serial(SerialPortFactory::createSerialPort(SERIAL_PORT, BAUD_RATE));
 			
-        	serial->send("Hello World\r\n");
+        	serial->send(test);
         	//serial->send(vd.toString());
     	}
     	catch(string &exception) {
