@@ -37,7 +37,7 @@ void SerialSendHandler::tearDown() {
 
 void SerialSendHandler::nextContainer(Container &c) {
 	const string SERIAL_PORT = "/dev/ttyACM0";
-	const uint32_t BAUD_RATE = 11500;
+	const uint32_t BAUD_RATE = 115200;
 
     // We are using OpenDaVINCI's std::shared_ptr to automatically
     // release any acquired resources.
@@ -46,35 +46,40 @@ void SerialSendHandler::nextContainer(Container &c) {
       const automotive::VehicleControl vd = c.getData<automotive::VehicleControl>();
       int angle = vd.getSteeringWheelAngle();
       int speed = vd.getSpeed();
-      protocol_data pd;
-      protocol_data *ppd = &pd;
+      //int odometer = TODO ;
       
-      if((int)vd.getSpeed() != -1){
-      	ppd->id = 1;
-      	ppd->value = speed;
-      } else {
-      	ppd->id = 2;
-      	ppd->value = angle;
-      }
-      
-      // TODO - ADD SUPPORT FOR THE ODOMETER "ID 3" "ANY VALUE OVER 0"
-      
-      protocol_frame pf = protocol_encode(pd);
-      protocol_frame *ppf = &pf;
-      
-      string message = "";
-      message.insert(message.end(), ppf->a);
-      message.insert(message.end(), ppf->b);
-      
+      string speedMessage = pack(1, speed);
+      string angleMessage = pack(2, angle);
+     	//string odometerMessage = pack(3, odometer); TODO
+     
     	try {
         	std::shared_ptr<SerialPort> serial(SerialPortFactory::createSerialPort(SERIAL_PORT, BAUD_RATE));
 			
-        	serial->send(message);
+        	serial->send(speedMessage);
+        	serial->send(angleMessage);
+        	//serial->send(odometerMessage); TODO
     	}
     	catch(string &exception) {
         	cerr << "Serial port could not be created: " << exception << endl;
     	}
 	}
+}
+
+string SerialSendHandler::pack(int id, int value){  
+	protocol_data protocolData;
+	protocol_data *pointerProtocolData = &protocolData;
+
+   pointerProtocolData->id = id;
+   pointerProtocolData->value = value;
+   
+   protocol_frame protocolFrame = protocol_encode(protocolData);
+   protocol_frame *pointerProtocolFrame = &protocolFrame;
+   
+   string message = "";
+   message.insert(message.end(), pointerProtocolFrame->a);
+   message.insert(message.end(), pointerProtocolFrame->b);
+   
+   return message;
 }
 
 } /*---------*/

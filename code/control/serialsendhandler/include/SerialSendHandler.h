@@ -45,6 +45,8 @@ class SerialSendHandler : public odcore::base::module::DataTriggeredConferenceCl
         virtual ~SerialSendHandler();
 
         virtual void nextContainer(odcore::data::Container &c);
+        
+        virtual std::string pack(int id, int value);
 
     private:
     
