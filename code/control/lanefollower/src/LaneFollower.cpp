@@ -387,7 +387,7 @@ namespace scaledcars {
             if (!Sim){
                 arduino_steering = valueRange(desiredSteering);
                 m_vehicleControl.setSteeringWheelAngle(arduino_steering);
-                cerr << " steering val" << arduino_steering << endl;
+                cerr << " steering pid val " << arduino_steering << endl;
             }
             else {
                 m_vehicleControl.setSteeringWheelAngle(desiredSteering);
@@ -434,7 +434,12 @@ namespace scaledcars {
 
                 // State control for intersection stop
                 if (state == "moving") {
-                    m_vehicleControl.setSpeed(1);
+                    if (Sim) {
+                        m_vehicleControl.setSpeed(1);
+                    } else {
+                        m_vehicleControl.setSpeed(valueRange(15));
+                        cerr << " speed moving val " << valueRange(15) << endl;
+                    }
 
                     if (stop) {
                         if (stopCounter < 6.0) {
@@ -448,13 +453,27 @@ namespace scaledcars {
 
                 }
                 if (state == "stop") {
-                    m_vehicleControl.setSpeed(0);
-                    m_vehicleControl.setSteeringWheelAngle(0);
+                    if (Sim) {
+                        m_vehicleControl.setSpeed(0);
+                        m_vehicleControl.setSteeringWheelAngle(0);
+                    } else {
+                        m_vehicleControl.setSpeed(valueRange(15));
+                        m_vehicleControl.setSteeringWheelAngle(valueRange(0));
+                        cerr << " steer stop val " << valueRange(0) << endl;
+                        cerr << " speed stop val " << valueRange(15) << endl;
+
+                    }
+
                     stopCounter += 0.5;
 
                     if (stopCounter > 29.9999) {
                         state = "resume";
-                        m_vehicleControl.setSpeed(1);
+                        if (Sim) {
+                            m_vehicleControl.setSpeed(1);
+                        } else {
+                            m_vehicleControl.setSpeed(valueRange(15));
+                            cerr << " speed resume val " << valueRange(15) << endl;
+                        }
                         cerr << "Resuming!" << endl;
                     }
                 }
