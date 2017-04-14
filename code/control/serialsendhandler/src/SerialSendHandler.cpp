@@ -10,73 +10,97 @@
 #include "protocol.c"
 
 namespace scaledcars {
-namespace control {
+    namespace control {
 
-using namespace std;
+        using namespace std;
 
 // We add some of OpenDaVINCI's namespaces for the sake of readability.
-using namespace odcore;
-using namespace odcore::base::module;
-using namespace odcore::data;
-using namespace odcore::wrapper;
+        using namespace odcore;
+        using namespace odcore::base::module;
+        using namespace odcore::data;
+        using namespace odcore::wrapper;
 
 
-SerialSendHandler::SerialSendHandler(const int32_t &argc, char **argv) :
-    DataTriggeredConferenceClientModule(argc, argv, "SerialSendHandler")
-{}
+        SerialSendHandler::SerialSendHandler(const int32_t &argc, char **argv) :
+                DataTriggeredConferenceClientModule(argc, argv, "SerialSendHandler") {}
 
-SerialSendHandler::~SerialSendHandler() {}
+        SerialSendHandler::~SerialSendHandler() {}
 
-void SerialSendHandler::setUp() {
-   cout << "This method is called before the component's body is executed." << endl;
-}
+        void SerialSendHandler::setUp() {
+            cout << "This method is called before the component's body is executed." << endl;
+        }
 
-void SerialSendHandler::tearDown() {
-    cout << "This method is called after the program flow returns from the component's body." << endl;
-}
+        void SerialSendHandler::tearDown() {
+            cout << "This method is called after the program flow returns from the component's body." << endl;
+        }
 
-void SerialSendHandler::nextContainer(Container &c) {
-	const string SERIAL_PORT = "/dev/ttyACM0";
-	const uint32_t BAUD_RATE = 11500;
+        void SerialSendHandler::nextContainer(Container &c) {
+            const string SERIAL_PORT = "/dev/ttyACM0";
+            const uint32_t BAUD_RATE = 115200;
 
-    // We are using OpenDaVINCI's std::shared_ptr to automatically
-    // release any acquired resources.
-    
-   if (c.getDataType() == automotive::VehicleControl::ID()) {
-      const automotive::VehicleControl vd = c.getData<automotive::VehicleControl>();
-      int angle = vd.getSteeringWheelAngle();
-      int speed = vd.getSpeed();
-      protocol_data pd;
-      protocol_data *ppd = &pd;
-      
-      if((int)vd.getSpeed() != -1){
-      	ppd->id = 1;
-      	ppd->value = speed;
-      } else {
-      	ppd->id = 2;
-      	ppd->value = angle;
-      }
-      
-      // TODO - ADD SUPPORT FOR THE ODOMETER "ID 3" "ANY VALUE OVER 0"
-      
-      protocol_frame pf = protocol_encode(pd);
-      protocol_frame *ppf = &pf;
-      
-      string message = "";
-      message.insert(message.end(), ppf->a);
-      message.insert(message.end(), ppf->b);
-      
-    	try {
-        	std::shared_ptr<SerialPort> serial(SerialPortFactory::createSerialPort(SERIAL_PORT, BAUD_RATE));
-			
-        	serial->send(message);
-    	}
-    	catch(string &exception) {
-        	cerr << "Serial port could not be created: " << exception << endl;
-    	}
-	}
-}
+            // We are using OpenDaVINCI's std::shared_ptr to automatically
+            // release any acquired resources.
 
-} /*---------*/
+            if (c.getDataType() == automotive::VehicleControl::ID()) {
+                const automotive::VehicleControl vd = c.getData<automotive::VehicleControl>();
+                int angle = vd.getSteeringWheelAngle();
+                cerr << "angle: " << angle << endl;
+                int speed = vd.getSpeed();
+                cerr << "speed: " << speed << endl;
+//                protocol_data pds, pda;
+//                protocol_data *ppds = &pds;
+//                protocol_data *ppda = &pda;
+
+                string message1 = "";
+                string message2 = "";
+
+                if ((int) vd.getSpeed() != -1) {
+//                    ppds->id = 1;
+//                    ppds->value = speed;
+//                    cerr << "speed" << endl;
+                    message1 = "m" + to_string(speed) + "\n";
+
+                }
+                if ((int) vd.getSteeringWheelAngle() != -1){
+//                    ppda->id = 2;
+//                    ppda->value = angle;
+//                    cerr << "angle" << endl;
+                    message2 = "t" + to_string(angle) + "\n";
+                }
+
+                // TODO - ADD SUPPORT FOR THE ODOMETER "ID 3" "ANY VALUE OVER 0"
+
+//                protocol_frame pfs = protocol_encode(pds);
+//                protocol_frame *ppfs = &pfs;
+//
+//                protocol_frame pfa = protocol_encode(pda);
+//                protocol_frame *ppfa = &pfa;
+
+
+//                message1.insert(message1.end(), ppfs->a);
+//                message1.insert(message1.end(), ppfs->b);
+//
+//
+//                message2.insert(message2.end(), ppfa->a);
+//                message2.insert(message2.end(), ppfa->b);
+
+                try {
+                    std::shared_ptr <SerialPort> serial(SerialPortFactory::createSerialPort(SERIAL_PORT, BAUD_RATE));
+
+                    cerr << "angleS: " << message2 << endl;
+
+                    cerr << "speedS: " << message1 << endl;
+
+                    serial->send(message1);
+
+                    serial->send(message2);
+                }
+                catch (string &exception) {
+                    cerr << "Serial port could not be created: " << exception << endl;
+                }
+            }
+        }
+
+    } /*---------*/
 } /*NAMESPACE*/
 
