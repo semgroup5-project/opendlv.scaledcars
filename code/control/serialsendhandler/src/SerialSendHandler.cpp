@@ -22,8 +22,7 @@ using namespace odcore::wrapper;
 
 
 SerialSendHandler::SerialSendHandler(const int32_t &argc, char **argv) :
-    DataTriggeredConferenceClientModule(argc, argv, "SerialSendHandler")
-{}
+    DataTriggeredConferenceClientModule(argc, argv, "SerialSendHandler"){}
 
 SerialSendHandler::~SerialSendHandler() {}
 

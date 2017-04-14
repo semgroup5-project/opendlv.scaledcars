@@ -81,3 +81,4 @@ void protocol_receive(protocol_state *state, char byte)
         state->data = protocol_decode(state->frame);
     }
 }
+

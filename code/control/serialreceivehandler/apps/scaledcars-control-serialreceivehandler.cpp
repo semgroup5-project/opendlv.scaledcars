@@ -1,5 +1,5 @@
 /**
- * DataHandler
+ * serialreceivehandler
  * Copyright (C) 2017 Mattias Landkvist
  *
  * This program is free software; you can redistribute it and/or
@@ -17,9 +17,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#include "DataHandler.h"
+#include "SerialReceiveHandler.h"
 
-int32_t main(int32_t /*argc*/, char **/*argv*/) {
-    scaledcars::control::DataHandler datahandler(argc, argv);
-    return datahandler.runModule();
+int32_t main(int32_t argc, char **argv) {
+    scaledcars::control::SerialReceiveHandler serialreceivehandler(argc, argv);
+    return serialreceivehandler.runModule();
 }
