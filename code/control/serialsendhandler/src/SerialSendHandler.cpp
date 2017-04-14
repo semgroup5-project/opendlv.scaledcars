@@ -10,97 +10,102 @@
 #include "protocol.c"
 
 namespace scaledcars {
-    namespace control {
+namespace control {
 
-        using namespace std;
+using namespace std;
 
 // We add some of OpenDaVINCI's namespaces for the sake of readability.
-        using namespace odcore;
-        using namespace odcore::base::module;
-        using namespace odcore::data;
-        using namespace odcore::wrapper;
+using namespace odcore;
+using namespace odcore::base::module;
+using namespace odcore::data;
+using namespace odcore::wrapper;
 
 
-        SerialSendHandler::SerialSendHandler(const int32_t &argc, char **argv) :
-                DataTriggeredConferenceClientModule(argc, argv, "SerialSendHandler") {}
+SerialSendHandler::SerialSendHandler(const int32_t &argc, char **argv) :
+    DataTriggeredConferenceClientModule(argc, argv, "SerialSendHandler")
+{}
 
-        SerialSendHandler::~SerialSendHandler() {}
+SerialSendHandler::~SerialSendHandler() {}
 
-        void SerialSendHandler::setUp() {
-            cout << "This method is called before the component's body is executed." << endl;
-        }
+void SerialSendHandler::setUp() {
+   cout << "This method is called before the component's body is executed." << endl;
+}
 
-        void SerialSendHandler::tearDown() {
-            cout << "This method is called after the program flow returns from the component's body." << endl;
-        }
+void SerialSendHandler::tearDown() {
+    cout << "This method is called after the program flow returns from the component's body." << endl;
+}
 
-        void SerialSendHandler::nextContainer(Container &c) {
-            const string SERIAL_PORT = "/dev/ttyACM0";
-            const uint32_t BAUD_RATE = 115200;
+void SerialSendHandler::nextContainer(Container &c) {	
+   if (c.getDataType() == automotive::VehicleControl::ID()) {
+      const automotive::VehicleControl vd = c.getData<automotive::VehicleControl>();
+      int angle = vd.getSteeringWheelAngle();
+      int speed = vd.getSpeed();
+      //int odometer = TODO ;
+      
+      string speedMessage = pack(1, speed);
+      string angleMessage = pack(2, angle);
+     	//string odometerMessage = pack(3, odometer); TODO
+     
+    	send(speedMessage);
+    	send(angleMessage);
+    	//send(odometerMessage); TODO
+	}
+}
 
-            // We are using OpenDaVINCI's std::shared_ptr to automatically
-            // release any acquired resources.
+string SerialSendHandler::pack(int id, int value){  
+	protocol_data protocolData;
+	protocol_data *pointerProtocolData = &protocolData;
 
-            if (c.getDataType() == automotive::VehicleControl::ID()) {
-                const automotive::VehicleControl vd = c.getData<automotive::VehicleControl>();
-                int angle = vd.getSteeringWheelAngle();
-                cerr << "angle: " << angle << endl;
-                int speed = vd.getSpeed();
-                cerr << "speed: " << speed << endl;
-//                protocol_data pds, pda;
-//                protocol_data *ppds = &pds;
-//                protocol_data *ppda = &pda;
+   pointerProtocolData->id = id;
+   pointerProtocolData->value = value;
+   
+   protocol_frame protocolFrame = protocol_encode(protocolData);
+   protocol_frame *pointerProtocolFrame = &protocolFrame;
+   
+   string message = "";
+   message.insert(message.end(), pointerProtocolFrame->a);
+   message.insert(message.end(), pointerProtocolFrame->b);
+   
+   return message;
+}
 
-                string message1 = "";
-                string message2 = "";
+void SerialSendHandler::simpleMessage(automotive::VehicleControl vd){
+	int angle = vd.getSteeringWheelAngle();
+	cerr << "angle: " << angle << endl;
+   int speed = vd.getSpeed();
+   cerr << "speed: " << speed << endl;
 
-                if ((int) vd.getSpeed() != -1) {
-//                    ppds->id = 1;
-//                    ppds->value = speed;
-//                    cerr << "speed" << endl;
-                    message1 = "m" + to_string(speed) + "\n";
+   string message1 = "";
+   string message2 = "";
 
-                }
-                if ((int) vd.getSteeringWheelAngle() != -1){
-//                    ppda->id = 2;
-//                    ppda->value = angle;
-//                    cerr << "angle" << endl;
-                    message2 = "t" + to_string(angle) + "\n";
-                }
+   if ((int) vd.getSpeed() != -1) {
+   	message1 = "m" + to_string(speed) + "\n";
+   }
+   
+   if ((int) vd.getSteeringWheelAngle() != -1){
+   	message2 = "t" + to_string(angle) + "\n";
+   }
+	
+	cerr << "angleS: " << message2 << endl;
+	cerr << "speedS: " << message1 << endl;
+	
+	send(message1);
+	send(message2);
+}
 
-                // TODO - ADD SUPPORT FOR THE ODOMETER "ID 3" "ANY VALUE OVER 0"
+void SerialSendHandler::send(string message){
+	const string SERIAL_PORT = "/dev/ttyACM0";
+	const uint32_t BAUD_RATE = 115200;
+	
+	try {
+		std::shared_ptr <SerialPort> serial(SerialPortFactory::createSerialPort(SERIAL_PORT, BAUD_RATE));
+		serial->send(message);
+	}
+   catch (string &exception) {
+   	cerr << "Serial port could not be created: " << exception << endl;
+   }
+}
 
-//                protocol_frame pfs = protocol_encode(pds);
-//                protocol_frame *ppfs = &pfs;
-//
-//                protocol_frame pfa = protocol_encode(pda);
-//                protocol_frame *ppfa = &pfa;
-
-
-//                message1.insert(message1.end(), ppfs->a);
-//                message1.insert(message1.end(), ppfs->b);
-//
-//
-//                message2.insert(message2.end(), ppfa->a);
-//                message2.insert(message2.end(), ppfa->b);
-
-                try {
-                    std::shared_ptr <SerialPort> serial(SerialPortFactory::createSerialPort(SERIAL_PORT, BAUD_RATE));
-
-                    cerr << "angleS: " << message2 << endl;
-
-                    cerr << "speedS: " << message1 << endl;
-
-                    serial->send(message1);
-
-                    serial->send(message2);
-                }
-                catch (string &exception) {
-                    cerr << "Serial port could not be created: " << exception << endl;
-                }
-            }
-        }
-
-    } /*---------*/
+} /*---------*/
 } /*NAMESPACE*/
 

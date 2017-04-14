@@ -47,6 +47,10 @@ class SerialSendHandler : public odcore::base::module::DataTriggeredConferenceCl
         virtual void nextContainer(odcore::data::Container &c);
         
         virtual std::string pack(int id, int value);
+        
+        virtual void simpleMessage(automotive::VehicleControl vd);
+        
+        virtual void send(std::string Message);
 
     private:
     
