@@ -96,7 +96,7 @@ namespace scaledcars {
                     serial->send(message2);
                 }
                 catch (string &exception) {
-                    cerr << "Serial port could not be created : " << exception << endl;
+                    cerr << "Serial port could not be created: " << exception << endl;
                 }
             }
         }
