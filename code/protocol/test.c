@@ -37,6 +37,21 @@ int main(int argc, const char *argv[])
 
     printf("0==%d \n", protocol_checksum_check(_frame));
 
+    protocol_data _data = {
+        .id = 7,
+        .value = 255
+    };
+
+    _frame = protocol_encode(_data);
+
+    protocol_state state;
+    protocol_receive(&state, _frame.a);
+    protocol_receive(&state, _frame.b);
+
+    printf("%d==%d \n", true, state.valid);
+    printf("%d==%d \n", _data.id, state.data.id);
+    printf("%d==%d \n", _data.value, state.data.value);
+
     return 0;
 
     /*
