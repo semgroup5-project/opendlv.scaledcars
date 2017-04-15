@@ -5,6 +5,7 @@
 
 #define ID_OUT_MOTOR                1
 #define ID_OUT_SERVO                2
+#define ID_OUT_ODOMETER             3
 
 #define ID_IN_ULTRASONIC_CENTER     1
 #define ID_IN_ULTRASONIC_SIDE_FRONT 2
@@ -12,6 +13,10 @@
 #define ID_IN_INFRARED_SIDE_BACK    4
 #define ID_IN_INFRARED_BACK         5
 #define ID_IN_ENCODER               6
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * Data transfer unit
@@ -67,5 +72,9 @@ char protocol_get_byte_index(char byte);
  * Handle received byte
  */
 void protocol_receive(protocol_state *state, char byte);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
