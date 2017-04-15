@@ -6,7 +6,6 @@
 #include <opendavinci/odcore/base/Thread.h>
 #include <opendavinci/odcore/wrapper/SerialPort.h>
 #include <opendavinci/odcore/wrapper/SerialPortFactory.h>
-#include <iostream>
 
 #include "SerialReceiveHandler.h"
 #include "SerialListener.h"
@@ -23,7 +22,7 @@ using namespace odcore;
 using namespace odcore::wrapper;
 
 SerialReceiveHandler::SerialReceiveHandler(const int32_t &argc, char **argv) :
-    TimeTriggeredConferenceClientModule(argc, argv, "TimeTriggeredSender")
+    TimeTriggeredConferenceClientModule(argc, argv, "SerialReceiveHandler")
     {}
 
 SerialReceiveHandler::~SerialReceiveHandler() {}

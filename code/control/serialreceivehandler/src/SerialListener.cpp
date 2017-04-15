@@ -1,11 +1,3 @@
-#include <stdint.h>
-#include <iostream>
-#include <string>
-#include <memory>
-#include <opendavinci/odcore/base/Thread.h>
-#include <opendavinci/odcore/wrapper/SerialPort.h>
-#include <opendavinci/odcore/wrapper/SerialPortFactory.h>
-
 #include "SerialListener.h"
 #include "Filter.cpp"
 #include "protocol.h"
@@ -27,7 +19,7 @@ namespace scaledcars {
     			
     				//Filter::.filterProtocol(protocol_decode(pf)); TODO Sebastian
     			}
-    			
+    			i++;
     		}
 		}
 	}
