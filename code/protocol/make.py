@@ -3,6 +3,7 @@
 
 import re
 
+
 NOTICE = '\n'.join([
     '/*',
     ' * (!) DO NOT MODIFY THIS FILE',
