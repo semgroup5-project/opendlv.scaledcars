@@ -107,6 +107,8 @@ namespace scaledcars {
             //const uint32_t ONE_MS = 1000 * 1;
             //odcore::base::Thread::usleepFor(1 * ONE_MS);
             //odcore::base::Thread::usleepFor(87);
+
+
             this->serialPort->send(message);
 
             cerr << "sending done" << endl;

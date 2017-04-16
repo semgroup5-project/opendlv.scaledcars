@@ -437,8 +437,8 @@ namespace scaledcars {
                     if (Sim) {
                         m_vehicleControl.setSpeed(1);
                     } else {
-                        m_vehicleControl.setSpeed(valueRange(15));
-                        cerr << " speed moving val " << valueRange(15) << endl;
+                        m_vehicleControl.setSpeed(valueRange(11));
+                        cerr << " speed moving val " << valueRange(11) << endl;
                     }
 
                     if (stop) {
@@ -457,10 +457,10 @@ namespace scaledcars {
                         m_vehicleControl.setSpeed(0);
                         m_vehicleControl.setSteeringWheelAngle(0);
                     } else {
-                        m_vehicleControl.setSpeed(valueRange(15));
+                        m_vehicleControl.setSpeed(valueRange(0));
                         m_vehicleControl.setSteeringWheelAngle(valueRange(0));
                         cerr << " steer stop val " << valueRange(0) << endl;
-                        cerr << " speed stop val " << valueRange(15) << endl;
+                        cerr << " speed stop val " << valueRange(0) << endl;
 
                     }
 
@@ -471,8 +471,8 @@ namespace scaledcars {
                         if (Sim) {
                             m_vehicleControl.setSpeed(1);
                         } else {
-                            m_vehicleControl.setSpeed(valueRange(15));
-                            cerr << " speed resume val " << valueRange(15) << endl;
+                            m_vehicleControl.setSpeed(valueRange(11));
+                            cerr << " speed resume val " << valueRange(11) << endl;
                         }
                         cerr << "Resuming!" << endl;
                     }
