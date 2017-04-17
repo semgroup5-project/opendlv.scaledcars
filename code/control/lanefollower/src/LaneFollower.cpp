@@ -37,7 +37,7 @@ namespace scaledcars {
 
         Mat m_image_new;
         bool stop = false;
-        double stopCounter = 0;
+        double stopCounter = 0, desiredSteering = 0, arduino_steering = 0, old_steering = 0;;
         String state = "moving";
 
         LaneFollower::LaneFollower(const int32_t &argc, char **argv) :
@@ -361,11 +361,11 @@ namespace scaledcars {
 
             const double y = p + i + d;
 
-            double desiredSteering = 0, arduino_steering = 0;
+            old_steering = desiredSteering;
 
             if (fabs(e) > 1e-2) {
                 desiredSteering = y;
-
+                old_steering = desiredSteering;
                 if (desiredSteering > 25.0) {
                     // desiredSteering = 25.0;
                 }
@@ -385,9 +385,11 @@ namespace scaledcars {
 
             // change values if real car to acceptable arduino values
             if (!Sim){
-                arduino_steering = valueRange(desiredSteering);
-                m_vehicleControl.setSteeringWheelAngle(arduino_steering);
-                cerr << " steering pid val " << arduino_steering << endl;
+                if (fabs(old_steering - desiredSteering) > 0.1){  //check if there has been a significant change in the values
+                    arduino_steering = valueRange(desiredSteering);
+                    m_vehicleControl.setSteeringWheelAngle(arduino_steering);
+                    cerr << " steering pid val " << arduino_steering << endl;
+                }
             }
             else {
                 m_vehicleControl.setSteeringWheelAngle(desiredSteering);
