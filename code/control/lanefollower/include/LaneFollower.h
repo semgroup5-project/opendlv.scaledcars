@@ -139,7 +139,6 @@ namespace control {
                 void processImage();
                 double errorCalculation();
                 void laneFollower(double e);
-                int valueRange(double angle);
         };
 
     } //control

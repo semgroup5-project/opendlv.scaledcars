@@ -18,6 +18,7 @@
  */
 
 #include <unistd.h>
+#include <math.h>
 
 #include "LaneFollower.h"
 
@@ -39,6 +40,7 @@ namespace scaledcars {
         bool stop = false;
         double stopCounter = 0;
         String state = "moving";
+        double pi = 3.1415926535897;
 
         LaneFollower::LaneFollower(const int32_t &argc, char **argv) :
                 TimeTriggeredConferenceClientModule(argc, argv, "lanefollower"),
@@ -55,7 +57,7 @@ namespace scaledcars {
                 m_vehicleControl(),
                 m_threshold1(50),
                 m_threshold2(190),
-                m_control_scanline(200),//needs testing with real c
+                m_control_scanline(400),//needs testing with real c
                 m_stop_scanline(250),//needs testing with real car
                 m_distance(190),  //needs testing with real car as well
                 p_gain(0),       // the gain values can be adjusted here outside of simulation scenario (see @setUp() )
@@ -383,32 +385,22 @@ namespace scaledcars {
                 }
             }
 
-            // change values if real car to acceptable arduino values
+            // change values if real car to acceptable arduino values: radians to degress
             if (!Sim){
-
-                cerr << " steering val  " << desiredSteering << endl;
-                arduino_steering = valueRange(desiredSteering * 100);   // turning simulation values into meaningful arduino values
-                m_vehicleControl.setSteeringWheelAngle(arduino_steering);
-                cerr << " steering val after arduino map" << arduino_steering << endl;
+                if (desiredSteering < 0){
+                    arduino_steering = 90 + (desiredSteering * (180 / pi));
+                    cerr << " degrees to the left " << arduino_steering << endl;
+                }else if (desiredSteering > 0){
+                    arduino_steering = 90+ (desiredSteering * (180 / pi));
+                    cerr << " degrees to the right " << arduino_steering << endl;
+                }
             }
             else {
                 cerr << " steering val  " << desiredSteering << endl;
-                arduino_steering = valueRange(desiredSteering * 100);   // turning simulation values into meaningful arduino values
-                m_vehicleControl.setSteeringWheelAngle(arduino_steering);
-                cerr << " steering val after arduino map" << arduino_steering << endl;
                 m_vehicleControl.setSteeringWheelAngle(desiredSteering);
             }
 
-
-
-
         }
-        // map the simulation values to real care acceptable values
-        int LaneFollower::valueRange(double angle){
-            double new_angle = (angle - (-2500)*(180 - 0) / (2500 - (-2500)) + 0);   // (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
-            return new_angle;
-        }
-
 
         // This method will do the main data processing job.
         // Therefore, it tries to open the real camera first. If that fails, the virtual camera images from camgen are used.
