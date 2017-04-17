@@ -367,10 +367,10 @@ namespace scaledcars {
                 desiredSteering = y;
 
                 if (desiredSteering > 25.0) {
-                    // desiredSteering = 25.0;
+                     desiredSteering = 25.0;
                 }
                 if (desiredSteering < -25.0) {
-                    // desiredSteering = -25.0;
+                     desiredSteering = -25.0;
                 }
 
             }
@@ -385,11 +385,17 @@ namespace scaledcars {
 
             // change values if real car to acceptable arduino values
             if (!Sim){
+
+                cerr << " steering val  " << desiredSteering << endl;
                 arduino_steering = valueRange(desiredSteering * 100);   // turning simulation values into meaningful arduino values
                 m_vehicleControl.setSteeringWheelAngle(arduino_steering);
-                cerr << " steering val" << arduino_steering << endl;
+                cerr << " steering val after arduino map" << arduino_steering << endl;
             }
             else {
+                cerr << " steering val  " << desiredSteering << endl;
+                arduino_steering = valueRange(desiredSteering * 100);   // turning simulation values into meaningful arduino values
+                m_vehicleControl.setSteeringWheelAngle(arduino_steering);
+                cerr << " steering val after arduino map" << arduino_steering << endl;
                 m_vehicleControl.setSteeringWheelAngle(desiredSteering);
             }
 
@@ -399,7 +405,7 @@ namespace scaledcars {
         }
         // map the simulation values to real care acceptable values
         int LaneFollower::valueRange(double angle){
-            double new_angle = (angle - (-25)*(180 - 0) / (25 - (-25)) + 0);   // (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+            double new_angle = (angle - (-2500)*(180 - 0) / (2500 - (-2500)) + 0);   // (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
             return new_angle;
         }
 
