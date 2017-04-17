@@ -18,4 +18,4 @@
 project(scaledcars-perception)
 
 add_subdirectory(example)
-
+add_subdirectory(overtaker)

@@ -98,7 +98,11 @@ namespace control {
 
 	            virtual void tearDown();
 
-                void processImage();
+                virtual void processImage();
+
+				void measuring_state_machine();
+
+				void movingMachine(bool has_next_frame);
         };
 
     }
