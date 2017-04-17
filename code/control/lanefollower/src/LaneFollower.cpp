@@ -36,8 +36,8 @@ namespace scaledcars {
         using namespace automotive::miniature;
 
         Mat m_image_new;
-        bool stop = false;
-        double stopCounter = 0, desiredSteering = 0, arduino_steering = 0, old_steering = 0;;
+        bool stop = false, send = false;
+        double stopCounter = 0, desiredSteering = 0, arduino_steering = 0, old_steering = 0;
         String state = "moving";
 
         LaneFollower::LaneFollower(const int32_t &argc, char **argv) :
@@ -388,11 +388,12 @@ namespace scaledcars {
                 if (fabs(old_steering - desiredSteering) > 0.1){  //check if there has been a significant change in the values
                     arduino_steering = valueRange(desiredSteering);
                     m_vehicleControl.setSteeringWheelAngle(arduino_steering);
-                    cerr << " steering pid val " << arduino_steering << endl;
+                    send = true;
                 }
             }
             else {
                 m_vehicleControl.setSteeringWheelAngle(desiredSteering);
+                send = false;
             }
 
 
@@ -491,12 +492,21 @@ namespace scaledcars {
                 }
 
 
+                if (!Sim){
+                    if (send){
+                        // Create container for finally sending the set values for the control algorithm.
+                        Container c2(m_vehicleControl);
+                        // Send container.
+                        getConference().send(c2);
+                    }
+                }else{
+                    // Create container for finally sending the set values for the control algorithm.
+                    Container c2(m_vehicleControl);
+                    // Send container.
+                    getConference().send(c2);
+                }
 
 
-                // Create container for finally sending the set values for the control algorithm.
-                Container c2(m_vehicleControl);
-                // Send container.
-                getConference().send(c2);
             }
 
             return ModuleExitCodeMessage::OKAY;
