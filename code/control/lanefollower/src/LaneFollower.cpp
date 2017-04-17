@@ -36,8 +36,8 @@ namespace scaledcars {
         using namespace automotive::miniature;
 
         Mat m_image_new;
-        bool stop = false, send = false;
-        double stopCounter = 0, desiredSteering = 0, arduino_steering = 0, old_steering = 0;
+        bool stop = false;
+        double stopCounter = 0;
         String state = "moving";
 
         LaneFollower::LaneFollower(const int32_t &argc, char **argv) :
@@ -361,11 +361,11 @@ namespace scaledcars {
 
             const double y = p + i + d;
 
-            old_steering = desiredSteering;
+            double desiredSteering = 0, arduino_steering = 0;
 
             if (fabs(e) > 1e-2) {
                 desiredSteering = y;
-                old_steering = desiredSteering;
+
                 if (desiredSteering > 25.0) {
                     // desiredSteering = 25.0;
                 }
@@ -385,15 +385,12 @@ namespace scaledcars {
 
             // change values if real car to acceptable arduino values
             if (!Sim){
-                if (fabs(old_steering - desiredSteering) > 0.1){  //check if there has been a significant change in the values
-                    arduino_steering = valueRange(desiredSteering);
-                    m_vehicleControl.setSteeringWheelAngle(arduino_steering);
-                    send = true;
-                }
+                arduino_steering = valueRange(desiredSteering * 100);   // turning simulation values into meaningful arduino values
+                m_vehicleControl.setSteeringWheelAngle(arduino_steering);
+                cerr << " steering val" << arduino_steering << endl;
             }
             else {
                 m_vehicleControl.setSteeringWheelAngle(desiredSteering);
-                send = false;
             }
 
 
@@ -437,12 +434,7 @@ namespace scaledcars {
 
                 // State control for intersection stop
                 if (state == "moving") {
-                    if (Sim) {
-                        m_vehicleControl.setSpeed(1);
-                    } else {
-                        m_vehicleControl.setSpeed(valueRange(11));
-                        cerr << " speed moving val " << valueRange(11) << endl;
-                    }
+                    m_vehicleControl.setSpeed(1);
 
                     if (stop) {
                         if (stopCounter < 6.0) {
@@ -456,27 +448,13 @@ namespace scaledcars {
 
                 }
                 if (state == "stop") {
-                    if (Sim) {
-                        m_vehicleControl.setSpeed(0);
-                        m_vehicleControl.setSteeringWheelAngle(0);
-                    } else {
-                        m_vehicleControl.setSpeed(valueRange(0));
-                        m_vehicleControl.setSteeringWheelAngle(valueRange(0));
-                        cerr << " steer stop val " << valueRange(0) << endl;
-                        cerr << " speed stop val " << valueRange(0) << endl;
-
-                    }
-
+                    m_vehicleControl.setSpeed(0);
+                    m_vehicleControl.setSteeringWheelAngle(0);
                     stopCounter += 0.5;
 
                     if (stopCounter > 29.9999) {
                         state = "resume";
-                        if (Sim) {
-                            m_vehicleControl.setSpeed(1);
-                        } else {
-                            m_vehicleControl.setSpeed(valueRange(11));
-                            cerr << " speed resume val " << valueRange(11) << endl;
-                        }
+                        m_vehicleControl.setSpeed(1);
                         cerr << "Resuming!" << endl;
                     }
                 }
@@ -492,25 +470,16 @@ namespace scaledcars {
                 }
 
 
-                if (!Sim){
-                    if (send){
-                        // Create container for finally sending the set values for the control algorithm.
-                        Container c2(m_vehicleControl);
-                        // Send container.
-                        getConference().send(c2);
-                    }
-                }else{
-                    // Create container for finally sending the set values for the control algorithm.
-                    Container c2(m_vehicleControl);
-                    // Send container.
-                    getConference().send(c2);
-                }
 
 
+                // Create container for finally sending the set values for the control algorithm.
+                Container c2(m_vehicleControl);
+                // Send container.
+                getConference().send(c2);
             }
 
             return ModuleExitCodeMessage::OKAY;
         }
 
     }
-} // scaledcars::control
+} // scaledcars::contr
