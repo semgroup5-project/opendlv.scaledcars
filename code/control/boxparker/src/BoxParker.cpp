@@ -37,7 +37,7 @@ namespace scaledcars {
         using namespace automotive;
 
         BoxParker::BoxParker(const int32_t &argc, char **argv) :
-            TimeTriggeredConferenceClientModule(argc, argv, "BoxParker"),
+            DataTriggeredConferenceClientModule(argc, argv, "BoxParker"),
             m_foundGaps() {}
 
         BoxParker::~BoxParker() {}
@@ -59,8 +59,7 @@ namespace scaledcars {
             double distanceOld = 0;
             double absPathStart = 0;
             double absPathEnd = 0;
-
-            int stageMoving = 0;
+            const double parkingSpace;//ParkingSpace
             int stageMeasuring = 0;
 
             while (getModuleStateAndWaitForRemainingTimeInTimeslice() == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
@@ -71,17 +70,28 @@ namespace scaledcars {
                 // 2. Get most recent sensor board data describing virtual sensor data:
                 Container containerSensorBoardData = getKeyValueDataStore().get(automotive::miniature::SensorBoardData::ID());
                 SensorBoardData sbd = containerSensorBoardData.getData<SensorBoardData> ();
+                //IR sensor
+                double FRONT_SENSOR = sbd.getValueForKey_MapOfDistances(3);
+                double RIGHT_SENSOR = sbd.getValueForKey_MapOfDistances(0);
+                double DISTANCE_CAR = vd.getAbsTraveledPath();
+                //double parkingSpace = absPathStart - absPathEnd;
+                //Status
+                cout << "Front Sensor = " << FRONT_SENSOR << endl;
+                cout << "Right Front Sensor = " << RIGHT_SENSOR << endl;
+                cout << "distance = " << DISTANCE_CAR << endl;
 
-                // Create vehicle control data.
+                //Create vehicle control data.
                 VehicleControl vc;
 
                 // Moving state machine.
-                if (stageMoving == 0) {
+                if (parkingSpace < 50) {
                     // Go forward.
+                    // Change here to adapt lanefollower
+                    cout << "moving forward... " << endl;
                     vc.setSpeed(1);
                     vc.setSteeringWheelAngle(0);
                 }
-                if ((stageMoving > 0) && (stageMoving < 20)) {
+                if (parkingSpace > 50) {
                     // Move slightly forward.
                     vc.setSpeed(1);
                     vc.setSteeringWheelAngle(0);
@@ -123,8 +133,9 @@ namespace scaledcars {
                     case 1:
                         {
                             // Checking for distance sequence +, -.
-                            if ((distanceOld > 0) && (sbd.getValueForKey_MapOfDistances(2) < 0)) {
+                            if ((sbd.getValueForKey_MapOfDistances(0) < 300)) {
                                 // Found distance sequence +, -.
+                                cout << "Stage 1 the distance = " << endl;
                                 stageMeasuring = 2;
                                 absPathStart = vd.getAbsTraveledPath();
                             }
@@ -134,17 +145,21 @@ namespace scaledcars {
                     case 2:
                         {
                             // Checking for distance sequence -, +.
-                            if ((distanceOld < 0) && (sbd.getValueForKey_MapOfDistances(2) > 0)) {
+                            if ((sbd.getValueForKey_MapOfDistances(2) > 200)) {
                                 // Found distance sequence -, +.
                                 stageMeasuring = 1;
                                 absPathEnd = vd.getAbsTraveledPath();
 
-                                const double GAP_SIZE = (absPathEnd - absPathStart);
-                                cerr << "Size = " << GAP_SIZE << endl;
-                                m_foundGaps.push_back(GAP_SIZE);
+                                const double parkingSpace = (absPathEnd - absPathStart);
+                                cerr << "parkingSpace = " << parkingSpace<< endl;
 
-                                if ((stageMoving < 1) && (GAP_SIZE > 3.5)) {
+                                m_foundGaparkingSpace.push_back(parkingSpace);
+
+                                if ((parkingSpace > 50)) {
                                     stageMoving = 1;
+                                    vc.setSpeet(-1);
+                                    absPathStart = vd.getAbsTravledPath();
+                                    m_foundGaparkingSpace.push_back(parkingSpace);
                                 }
                             }
                             distanceOld = sbd.getValueForKey_MapOfDistances(2);
@@ -161,6 +176,6 @@ namespace scaledcars {
             return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
         }
 
-    } // miniature
+    }
 } // automotive
 
