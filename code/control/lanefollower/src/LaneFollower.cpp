@@ -332,7 +332,7 @@ namespace scaledcars {
 
 
             // Go forward
-            m_vehicleControl.setSpeed(1);//5
+            m_vehicleControl.setSpeed(2);//5
             m_vehicleControl.setSteeringWheelAngle(desiredSteering);
         }
 
@@ -450,8 +450,8 @@ namespace scaledcars {
 
                 // State machine measuring: Both IRs need to have the same distance before leaving this moving state.
                 stageMeasuring = HAVE_BOTH_IR_SAME_DISTANCE;
-                if(stageToRightLaneLeftTurn <305) {
-                    m_vehicleControl.setSpeed(0.3);
+                if(stageToRightLaneLeftTurn <150) {
+                    m_vehicleControl.setSpeed(0.5);
                     m_vehicleControl.setSteeringWheelAngle(5);
                     stageToRightLaneLeftTurn++;
                 }
@@ -491,9 +491,9 @@ namespace scaledcars {
                 //TESTING steps
                 if (stageToRightLaneLeftTurn == 0) {
                     // Start over.
-
-                    stageMoving = FORWARD;
                     overtake = false;
+                    stageMoving = FORWARD;
+
                     stageMeasuring = FIND_OBJECT_INIT;
 
                     distanceToObstacle = 0;
