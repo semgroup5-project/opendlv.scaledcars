@@ -103,7 +103,7 @@ namespace scaledcars {
         double distanceToObstacle = 0;
         double distanceToObstacleOld = 0;
 
-
+        bool overtake = true;
         LaneFollower::~LaneFollower() {}
 
         void LaneFollower::setUp() {
@@ -371,7 +371,7 @@ namespace scaledcars {
             } else if (stageMeasuring == FIND_OBJECT_PLAUSIBLE) {
                 if (sbd.getValueForKey_MapOfDistances(ULTRASONIC_FRONT_CENTER) < OVERTAKING_DISTANCE) {
                     stageMoving = TO_LEFT_LANE_LEFT_TURN;
-
+                    overtake = true;
                     // Disable measuring until requested from moving state machine again.
                     stageMeasuring = DISABLE;
                 } else {
@@ -423,11 +423,11 @@ namespace scaledcars {
             Container containerSensorBoardData = getKeyValueDataStore().get(
                     automotive::miniature::SensorBoardData::ID());
             SensorBoardData sbd = containerSensorBoardData.getData<SensorBoardData>();
-
+            overtake = false;
             // Moving state machine.
             if (stageMoving == FORWARD && has_next_frame == true) {
                 // Use m_vehicleControl data from image processing.
-                processImage();
+                //processImage();
 
                 stageToRightLaneLeftTurn = 0;
                 stageToRightLaneRightTurn = 0;
@@ -436,6 +436,7 @@ namespace scaledcars {
                 m_vehicleControl.setSpeed(0.5);
                 m_vehicleControl.setSteeringWheelAngle(-10);
 
+
                 // State machine measuring: Both IRs need to see something before leaving this moving state.
                 stageMeasuring = HAVE_BOTH_IR;
 
@@ -443,18 +444,22 @@ namespace scaledcars {
                 cout << "StageToRightLaneRightTurn is" << stageToRightLaneRightTurn << endl;
             } else if (stageMoving == TO_LEFT_LANE_RIGHT_TURN) {
                 // Move to the left lane: Turn right part until both IRs have the same distance to obstacle.
-                m_vehicleControl.setSpeed(0.5);
-                m_vehicleControl.setSteeringWheelAngle(5);
+
+
 
 
                 // State machine measuring: Both IRs need to have the same distance before leaving this moving state.
                 stageMeasuring = HAVE_BOTH_IR_SAME_DISTANCE;
+                if(stageToRightLaneLeftTurn <305) {
+                    m_vehicleControl.setSpeed(0.3);
+                    m_vehicleControl.setSteeringWheelAngle(5);
+                    stageToRightLaneLeftTurn++;
+                }
 
-                stageToRightLaneLeftTurn++;
-                cout << "Stage is" << stageToRightLaneLeftTurn << endl;
+                cout << "Stage RightLanelLeftTurn is" << stageToRightLaneLeftTurn << endl;
             } else if (stageMoving == CONTINUE_ON_LEFT_LANE) {
                 // Move to the left lane: Passing stage.
-
+          //      processImage();
                 // Use m_vehicleControl data from image processing.
 
                 // Find end of object.
@@ -465,8 +470,9 @@ namespace scaledcars {
                 m_vehicleControl.setSteeringWheelAngle(10);
 
 
+
                 stageToRightLaneRightTurn--;
-                cout << "Stage is" << stageToRightLaneRightTurn << endl;
+                cout << "Stage RightLaneRightTurn is" << stageToRightLaneRightTurn << endl;
 
                 if (stageToRightLaneRightTurn < -10) {
                     cout << "Going left" << endl;
@@ -479,12 +485,15 @@ namespace scaledcars {
                 m_vehicleControl.setSteeringWheelAngle(-10);
 
 
+
                 stageToRightLaneLeftTurn--;
-                cout << "Stage is" << stageToRightLaneLeftTurn << endl;
+                cout << "Stage  is" << stageToRightLaneLeftTurn << endl;
                 //TESTING steps
                 if (stageToRightLaneLeftTurn == 0) {
                     // Start over.
+
                     stageMoving = FORWARD;
+                    overtake = false;
                     stageMeasuring = FIND_OBJECT_INIT;
 
                     distanceToObstacle = 0;
@@ -514,6 +523,7 @@ namespace scaledcars {
             while (getModuleStateAndWaitForRemainingTimeInTimeslice() == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
                 bool has_next_frame = false;
 
+
                 // Get the most recent available container for a SharedImage.
                 Container c = getKeyValueDataStore().get(odcore::data::image::SharedImage::ID());
 
@@ -527,14 +537,20 @@ namespace scaledcars {
                     processImage();
                 }
 
+
                  //Overtaking part.
                 movingMachine(has_next_frame) ;
                 measuring_state_machine();
 
-                // Create container for finally sending the set values for the control algorithm.
-                Container c2(m_vehicleControl);
-                // Send container.
-                getConference().send(c2);
+                if(overtake){
+                    Container c1(m_vehicleControl);
+                    getConference().send(c1);
+                }else {// Create container for finally sending the set values for the control algorithm.
+                    Container c2(m_vehicleControl);
+                    getConference().send(c2);
+                }
+                    // Send container.
+
             }
 
             return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;

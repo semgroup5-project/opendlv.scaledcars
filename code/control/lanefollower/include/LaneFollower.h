@@ -88,6 +88,7 @@ namespace control {
                 bool m_debug;
                 CvFont m_font;
 
+
                 odcore::data::TimeStamp m_previousTime;
                 double m_eSum;
                 double m_eOld;
