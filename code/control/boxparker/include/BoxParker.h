@@ -25,7 +25,7 @@
 #include "opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h"
 
 namespace scaledcars {
-    namespace perception {
+    namespace control {
 
         using namespace std;
 

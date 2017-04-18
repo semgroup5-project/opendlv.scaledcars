@@ -20,6 +20,6 @@
 #include "BoxParker.h"
 
 int32_t main(int32_t argc, char **argv) {
-    scaledcars::perception::BoxParker bp(argc, argv);
+    scaledcars::control::BoxParker bp(argc, argv);
     return bp.runModule();
 }

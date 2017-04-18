@@ -27,7 +27,8 @@
 #include "BoxParker.h"
 
 namespace scaledcars {
-    namespace perception {
+    namespace control
+    {
 
         using namespace std;
         using namespace odcore::base;
