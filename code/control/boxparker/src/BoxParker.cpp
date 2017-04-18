@@ -27,8 +27,7 @@
 #include "BoxParker.h"
 
 namespace scaledcars {
-    namespace control
-    {
+    namespace control {
 
         using namespace std;
         using namespace odcore::base;
@@ -37,8 +36,8 @@ namespace scaledcars {
         using namespace automotive;
 
         BoxParker::BoxParker(const int32_t &argc, char **argv) :
-            DataTriggeredConferenceClientModule(argc, argv, "BoxParker"),
-            m_foundGaps() {}
+                TimeTriggeredConferenceClientModule(argc, argv, "BoxParker"),
+                m_foundGaps() {}
 
         BoxParker::~BoxParker() {}
 
@@ -59,39 +58,31 @@ namespace scaledcars {
             double distanceOld = 0;
             double absPathStart = 0;
             double absPathEnd = 0;
-            const double parkingSpace;//ParkingSpace
+
+            int stageMoving = 0;
             int stageMeasuring = 0;
 
-            while (getModuleStateAndWaitForRemainingTimeInTimeslice() == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
+            while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
+                   odcore::data::dmcp::ModuleStateMessage::RUNNING) {
                 // 1. Get most recent vehicle data:
                 Container containerVehicleData = getKeyValueDataStore().get(automotive::VehicleData::ID());
-                VehicleData vd = containerVehicleData.getData<VehicleData> ();
+                VehicleData vd = containerVehicleData.getData<VehicleData>();
 
                 // 2. Get most recent sensor board data describing virtual sensor data:
-                Container containerSensorBoardData = getKeyValueDataStore().get(automotive::miniature::SensorBoardData::ID());
-                SensorBoardData sbd = containerSensorBoardData.getData<SensorBoardData> ();
-                //IR sensor
-                double FRONT_SENSOR = sbd.getValueForKey_MapOfDistances(3);
-                double RIGHT_SENSOR = sbd.getValueForKey_MapOfDistances(0);
-                double DISTANCE_CAR = vd.getAbsTraveledPath();
-                //double parkingSpace = absPathStart - absPathEnd;
-                //Status
-                cout << "Front Sensor = " << FRONT_SENSOR << endl;
-                cout << "Right Front Sensor = " << RIGHT_SENSOR << endl;
-                cout << "distance = " << DISTANCE_CAR << endl;
+                Container containerSensorBoardData = getKeyValueDataStore().get(
+                        automotive::miniature::SensorBoardData::ID());
+                SensorBoardData sbd = containerSensorBoardData.getData<SensorBoardData>();
 
-                //Create vehicle control data.
+                // Create vehicle control data.
                 VehicleControl vc;
 
                 // Moving state machine.
-                if (parkingSpace < 50) {
+                if (stageMoving == 0) {
                     // Go forward.
-                    // Change here to adapt lanefollower
-                    cout << "moving forward... " << endl;
                     vc.setSpeed(1);
                     vc.setSteeringWheelAngle(0);
                 }
-                if (parkingSpace > 50) {
+                if ((stageMoving > 0) && (stageMoving < 20)) {
                     // Move slightly forward.
                     vc.setSpeed(1);
                     vc.setSteeringWheelAngle(0);
@@ -123,48 +114,40 @@ namespace scaledcars {
 
                 // Measuring state machine.
                 switch (stageMeasuring) {
-                    case 0:
-                        {
-                            // Initialize measurement.
-                            distanceOld = sbd.getValueForKey_MapOfDistances(2);
-                            stageMeasuring++;
+                    case 0: {
+                        // Initialize measurement.
+                        distanceOld = sbd.getValueForKey_MapOfDistances(2);
+                        stageMeasuring++;
+                    }
+                        break;
+                    case 1: {
+                        // Checking for distance sequence +, -.
+                        if ((distanceOld > 0) && (sbd.getValueForKey_MapOfDistances(2) < 0)) {
+                            // Found distance sequence +, -.
+                            stageMeasuring = 2;
+                            absPathStart = vd.getAbsTraveledPath();
                         }
-                    break;
-                    case 1:
-                        {
-                            // Checking for distance sequence +, -.
-                            if ((sbd.getValueForKey_MapOfDistances(0) < 300)) {
-                                // Found distance sequence +, -.
-                                cout << "Stage 1 the distance = " << endl;
-                                stageMeasuring = 2;
-                                absPathStart = vd.getAbsTraveledPath();
+                        distanceOld = sbd.getValueForKey_MapOfDistances(2);
+                    }
+                        break;
+                    case 2: {
+                        // Checking for distance sequence -, +.
+                        if ((distanceOld < 0) && (sbd.getValueForKey_MapOfDistances(2) > 0)) {
+                            // Found distance sequence -, +.
+                            stageMeasuring = 1;
+                            absPathEnd = vd.getAbsTraveledPath();
+
+                            const double GAP_SIZE = (absPathEnd - absPathStart);
+                            cerr << "Size = " << GAP_SIZE << endl;
+                            m_foundGaps.push_back(GAP_SIZE);
+
+                            if ((stageMoving < 1) && (GAP_SIZE > 3.5)) {
+                                stageMoving = 1;
                             }
-                            distanceOld = sbd.getValueForKey_MapOfDistances(2);
                         }
-                    break;
-                    case 2:
-                        {
-                            // Checking for distance sequence -, +.
-                            if ((sbd.getValueForKey_MapOfDistances(2) > 200)) {
-                                // Found distance sequence -, +.
-                                stageMeasuring = 1;
-                                absPathEnd = vd.getAbsTraveledPath();
-
-                                const double parkingSpace = (absPathEnd - absPathStart);
-                                cerr << "parkingSpace = " << parkingSpace<< endl;
-
-                                m_foundGaparkingSpace.push_back(parkingSpace);
-
-                                if ((parkingSpace > 50)) {
-                                    stageMoving = 1;
-                                    vc.setSpeet(-1);
-                                    absPathStart = vd.getAbsTravledPath();
-                                    m_foundGaparkingSpace.push_back(parkingSpace);
-                                }
-                            }
-                            distanceOld = sbd.getValueForKey_MapOfDistances(2);
-                        }
-                    break;
+                        distanceOld = sbd.getValueForKey_MapOfDistances(2);
+                    }
+                        break;
                 }
 
                 // Create container for finally sending the data.
@@ -176,6 +159,6 @@ namespace scaledcars {
             return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
         }
 
-    }
+    } // miniature
 } // automotive
 

@@ -17,7 +17,7 @@
 
 CMAKE_MINIMUM_REQUIRED (VERSION 2.8)
 
-PROJECT (scaledcars-control-lanefollwer)
+PROJECT (scaledcars-control-parallelparker)
 
 ###########################################################################
 # Set the search path for .cmake files.
@@ -45,10 +45,6 @@ INCLUDE (CheckCxxTestEnvironment)
 FIND_PACKAGE (OpenDaVINCI REQUIRED)
 
 ###########################################################################
-# Find OpenCV.
-FIND_PACKAGE(OpenCV REQUIRED)
-
-###########################################################################
 # Find AutomotiveData.
 FIND_PACKAGE (AutomotiveData REQUIRED)
 
@@ -57,8 +53,7 @@ FIND_PACKAGE (AutomotiveData REQUIRED)
 find_package(ODVDScaledCarsDataModel REQUIRED)
 
 ###############################################################################
-# Set header files from OpenCV.
-INCLUDE_DIRECTORIES (SYSTEM ${OpenCV_INCLUDE_DIR})
+
 # Set header files from ODVDScaledCarsDataModel.
 INCLUDE_DIRECTORIES (SYSTEM ${ODVDSCALEDCARSDATAMODEL_INCLUDE_DIRS})
 # Set header files from OpenDaVINCI.
@@ -70,22 +65,21 @@ INCLUDE_DIRECTORIES(include)
 
 # Set libraries to link against.
 set(LIBRARIES ${OPENDAVINCI_LIBRARIES}
-              ${AUTOMOTIVEDATA_LIBRARIES}
-              ${ODVDSCALEDCARSDATAMODEL_LIBRARIES}
-              ${OpenCV_LIBS})
+        ${AUTOMOTIVEDATA_LIBRARIES}
+        ${ODVDSCALEDCARSDATAMODEL_LIBRARIES})
 
 ###############################################################################
 # Build this project.
 FILE(GLOB_RECURSE thisproject-sources "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 ADD_LIBRARY (${PROJECT_NAME}-static STATIC ${thisproject-sources})
 ADD_EXECUTABLE (${PROJECT_NAME} "${CMAKE_CURRENT_SOURCE_DIR}/apps/${PROJECT_NAME}.cpp")
-TARGET_LINK_LIBRARIES (${PROJECT_NAME} ${PROJECT_NAME}-static ${LIBRARIES}) 
+TARGET_LINK_LIBRARIES (${PROJECT_NAME} ${PROJECT_NAME}-static ${LIBRARIES})
 
 ###############################################################################
 # Enable CxxTest for all available testsuites.
 IF(CXXTEST_FOUND)
     FILE(GLOB thisproject-testsuites "${CMAKE_CURRENT_SOURCE_DIR}/testsuites/*.h")
-    
+
     FOREACH(testsuite ${thisproject-testsuites})
         STRING(REPLACE "/" ";" testsuite-list ${testsuite})
 
@@ -97,9 +91,9 @@ IF(CXXTEST_FOUND)
         CXXTEST_ADD_TEST(${testsuite-short}-TestSuite ${testsuite-short}-TestSuite.cpp ${testsuite})
         IF(UNIX)
             IF( (   ("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
-                 OR ("${CMAKE_SYSTEM_NAME}" STREQUAL "FreeBSD")
-                 OR ("${CMAKE_SYSTEM_NAME}" STREQUAL "DragonFly") )
-                AND (NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang") )
+                    OR ("${CMAKE_SYSTEM_NAME}" STREQUAL "FreeBSD")
+                    OR ("${CMAKE_SYSTEM_NAME}" STREQUAL "DragonFly") )
+                    AND (NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang") )
                 SET_SOURCE_FILES_PROPERTIES(${testsuite-short}-TestSuite.cpp PROPERTIES COMPILE_FLAGS "-Wno-effc++ -Wno-float-equal -Wno-error=suggest-attribute=noreturn")
             ELSE()
                 SET_SOURCE_FILES_PROPERTIES(${testsuite-short}-TestSuite.cpp PROPERTIES COMPILE_FLAGS "-Wno-effc++ -Wno-float-equal")
@@ -118,6 +112,6 @@ ENDIF(CXXTEST_FOUND)
 INSTALL(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin COMPONENT scaledcars-software)
 INSTALL(TARGETS ${PROJECT_NAME}-static DESTINATION lib COMPONENT scaledcars-software)
 # Install header files.
-INSTALL(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/" DESTINATION include/scaledcars-control-lanefollower COMPONENT scaledcars-software)
+INSTALL(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/" DESTINATION include/scaledcars-control-parallelparker COMPONENT scaledcars-software)
 
 
