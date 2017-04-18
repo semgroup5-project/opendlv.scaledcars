@@ -25,7 +25,7 @@ namespace scaledcars {
 
         int port = 0;
         const string SERIAL_PORTS[] = {"/dev/ttyACM0", "/dev/ttyACM1", "/dev/ttyACM2", "/dev/ttyACM3"};
-        const uint32_t BAUD_RATE = 9600;
+        const uint32_t BAUD_RATE = 115200;
 
         void SerialReceiveListener::nextString(const string &s) {
             cerr << "Received: " << s << " Contains : " << s.length << " bytes . . " << endl;
@@ -48,9 +48,9 @@ namespace scaledcars {
                 this->serialPort->start();
 
                 // Wait for serial port to be ready for communication
-                cerr << "Sleeping for 5 secs" << endl;
+                cerr << "Sleeping for 10 secs" << endl;
                 const uint32_t ONE_SECOND = 1000 * 1000;
-                odcore::base::Thread::usleepFor(5 * ONE_SECOND);
+                odcore::base::Thread::usleepFor(10 * ONE_SECOND);
 
             } catch (string &exception) {
                 cerr << "Serial error : " << exception << endl;
@@ -85,13 +85,14 @@ namespace scaledcars {
                     cerr << "speed to arduino : " << speed << endl;
                     // TODO: int odometer = vd.getOdometer();
 
-                    string speedMessage = pack(ID_OUT_MOTOR, speed);
-                    string angleMessage = pack(ID_OUT_SERVO, angle);
+                string speedMessage = pack(ID_OUT_MOTOR, speed);
+                string angleMessage = pack(ID_OUT_SERVO, arduinoAngle);
+
+            //this->serialPort->send("hello");
 
                     // TODO: string odometerMessage = pack(ID_OUT_ODOMETER, odometer);
 
                     send(speedMessage);
-
                     send(angleMessage);
                     // TODO: send(odometerMessage);
                 }
@@ -131,6 +132,7 @@ namespace scaledcars {
 
 
             this->serialPort->send(message);
+            //odcore::base::Thread::usleepFor(10000);
 
 //            const uint32_t ONE_MS = 1000 * 1;
 //            odcore::base::Thread::usleepFor(100 * ONE_MS);
