@@ -84,14 +84,14 @@ namespace scaledcars {
                 cvDestroyWindow("WindowShowImage");
             }
         }
-
-        bool LaneFollower::readSharedImage(Container &c) { //pointer to the container
+        //declaring pointer to the container
+        bool LaneFollower::readSharedImage(Container &c) {
 
             bool retVal = false;
 
             if (c.getDataType() == odcore::data::image::SharedImage::ID()) {
-                SharedImage si = c.getData<SharedImage> ();//if is =shareImage the container get the data from the container
-
+                SharedImage si = c.getData<SharedImage> ();
+                //if si=shareImage the container get the data
 
                 cerr << si << endl; //
 
@@ -121,7 +121,7 @@ namespace scaledcars {
                                m_sharedImageMemory->getSharedMemory(),
                                si.getWidth() * si.getHeight() * numberOfChannels);
                     }
-                    // Mirror the image.
+                    // Mirror the image, flip the image
                     cvFlip(m_image, 0, -1);
 
                     retVal = true; //return Value
@@ -135,25 +135,27 @@ namespace scaledcars {
             static bool useRightLaneMarking = true;
             double e = 0;
 
-            const int32_t CONTROL_SCANLINE = 462; // calibrated length to right: 280px
-            const int32_t distance = 300;
+            const int32_t CONTROL_SCANLINE = 462;   // calibrated length to right: 280px
+            const int32_t distance = 300;           // calibrating the distance
 
             TimeStamp beforeImageProcessing;
-            for(int32_t y = m_image->height - 8; y > m_image->height * .6; y -= 10) { //->contain , Datatype
-                // Search from middle to the left://y axes every time goes down when the car is moving
+            for(int32_t y = m_image->height - 8; y > m_image->height * .6; y -= 10) {
+                // Searching from middle to the left //Y axes goes down when the car is moving
                 CvScalar pixelLeft;
                 CvPoint left;
                 left.y = y;
                 left.x = -1;
-                for(int x = m_image->width/2; x > 0; x--) {//from the midle to the left
-                    pixelLeft = cvGet2D(m_image, y, x);//updating
-                    if (pixelLeft.val[0] >= 200) {
-                        left.x = x;//1st white pixel to the left
+                //for loop that goes from the midle of the street to the left
+                for(int x = m_image->width/2; x > 0; x--) {
+                    pixelLeft = cvGet2D(m_image, y, x);//updating the image(Pixels)
+                    if (pixelLeft.val[0] >= 200) {//using an array for representing the pixels, if the first element is white
+                        left.x = x;//setting the 1st white pixel to the left
                         break;
                     }
                 }
 
-                // Search from middle to the right://function that find the white lines in the route//same above for the right
+                // Search from middle to the right:
+                // function that find the white lines in the route//same above for the right
                 CvScalar pixelRight;
                 CvPoint right;
                 right.y = y;
@@ -166,9 +168,10 @@ namespace scaledcars {
                     }
                 }
                 //printing the line
+                //green lines that appears in the window
                 if (m_debug) {
                     if (left.x > 0) {
-                        CvScalar green = CV_RGB(0, 255, 0); //green lines that appears in the window
+                        CvScalar green = CV_RGB(0, 255, 0);
                         cvLine(m_image, cvPoint(m_image->width/2, y), left, green, 1, 8);
 
                         stringstream sstr;
@@ -199,8 +202,8 @@ namespace scaledcars {
                             m_eOld = 0;
                         }
 
-                        e = ((right.x - m_image->width/2.0) - distance)/distance; //ERROR VALUE The left on the right and left is 0 ans is save in E
-
+                        //ERROR VALUE The left on the right and left is 0 ans is save in E
+                        e = ((right.x - m_image->width/2.0) - distance)/distance;
                         useRightLaneMarking = true;
                     }
                     else if (left.x > 0) {
@@ -221,7 +224,7 @@ namespace scaledcars {
                 }
             }
 
-            TimeStamp afterImageProcessing;//they are just numbers
+            TimeStamp afterImageProcessing;
             cerr << "Processing time: " << (afterImageProcessing.toMicroseconds() - beforeImageProcessing.toMicroseconds())/1000.0 << "ms." << endl;
 
             // Show resulting features.
@@ -235,7 +238,8 @@ namespace scaledcars {
             TimeStamp currentTime;
             double timeStep = (currentTime.toMicroseconds() - m_previousTime.toMicroseconds()) / (1000.0 * 1000.0);
             m_previousTime = currentTime;
-            //a more soft way to handle instead of resetting to 0 a way to mittigate togling in corners
+            //changing the code a more soft way to handle instead of resetting to 0
+            // a way to mittigate togling in corners
             if (fabs(e) < 1e-1) {
                 m_eSum = m_eSum * 0.01;
             }
