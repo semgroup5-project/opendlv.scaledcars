@@ -28,7 +28,7 @@ namespace scaledcars {
         const uint32_t BAUD_RATE = 9600;
 
         void SerialReceiveListener::nextString(const string &s) {
-            cerr << "Received: " << s << endl;
+            cerr << "Received: " << s << " Contains : " << s.length << " bytes . . " << endl;
         }
 
         SerialSendHandler::SerialSendHandler(const int32_t &argc, char **argv)
@@ -85,8 +85,8 @@ namespace scaledcars {
                     cerr << "speed to arduino : " << speed << endl;
                     // TODO: int odometer = vd.getOdometer();
 
-                string speedMessage = pack(ID_OUT_MOTOR, speed);
-                string angleMessage = pack(ID_OUT_SERVO, angle);
+                    string speedMessage = pack(ID_OUT_MOTOR, speed);
+                    string angleMessage = pack(ID_OUT_SERVO, angle);
 
                     // TODO: string odometerMessage = pack(ID_OUT_ODOMETER, odometer);
 
