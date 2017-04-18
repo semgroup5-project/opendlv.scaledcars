@@ -96,7 +96,7 @@ namespace scaledcars {
                     // TODO: send(odometerMessage);
                 }
             } catch (string &exception) {
-                cerr << "Serial error : " << exception << endl;
+                cerr << "Serial Error : " << exception << endl;
             }
         }
 
