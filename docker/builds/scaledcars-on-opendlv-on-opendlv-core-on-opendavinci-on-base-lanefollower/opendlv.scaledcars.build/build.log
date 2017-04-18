@@ -1,0 +1,25 @@
+Sending build context to Docker daemon  3.485MB
+Step 1/7 : FROM seresearch/opendlv-on-opendlv-core-on-opendavinci-on-base-dev
+ ---> 6178f3b07e58
+Step 2/7 : MAINTAINER Christian Berger "christian.berger@gu.se"
+ ---> Using cache
+ ---> cacb0294a78d
+Step 3/7 : ADD opt /opt
+ ---> c75f04c1f4c6
+Removing intermediate container 36121dc0612f
+Step 4/7 : RUN chown -R 1000:1000 /opt/opendlv.scaledcars
+ ---> Running in 4bc3d88b0b22
+ ---> fd9c5acf1789
+Removing intermediate container 4bc3d88b0b22
+Step 5/7 : ENV QT_X11_NO_MITSHM 1
+ ---> Running in 24bdc5941598
+ ---> 55956d9930fd
+Removing intermediate container 24bdc5941598
+Step 6/7 : ENV LD_LIBRARY_PATH $LD_LIBRARY_PATH:/opt/opendlv.scaledcars/lib
+ ---> Running in ad27f0395855
+ ---> 6b6189dc8154
+Removing intermediate container ad27f0395855
+Step 7/7 : WORKDIR /opt/opendlv.scaledcars/bin
+ ---> 1a1ae4296d46
+Removing intermediate container 0bc152043459
+Successfully built 1a1ae4296d46

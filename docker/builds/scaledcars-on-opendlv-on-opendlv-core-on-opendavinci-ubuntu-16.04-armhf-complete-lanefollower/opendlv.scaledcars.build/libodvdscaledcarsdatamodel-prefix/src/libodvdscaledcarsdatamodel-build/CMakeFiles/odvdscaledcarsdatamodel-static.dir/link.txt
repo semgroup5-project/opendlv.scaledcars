@@ -1,0 +1,2 @@
+/usr/bin/ar qc libodvdscaledcarsdatamodel-static.a  CMakeFiles/odvdscaledcarsdatamodel-core.dir/src/GeneratedHeaders_ODVDScaledCarsDataModel_Helper.cpp.o CMakeFiles/odvdscaledcarsdatamodel-core.dir/src/generated/chalmersrevere/scaledcars/ExampleMessage.cpp.o
+/usr/bin/ranlib libodvdscaledcarsdatamodel-static.a

@@ -1,0 +1,46 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/opt/opendlv.scaledcars.build/CMakeFiles/code"
+		},
+		{
+			"file" : "/opt/opendlv.scaledcars.build/CMakeFiles/code.rule"
+		},
+		{
+			"file" : "/opt/opendlv.scaledcars.build/CMakeFiles/code-complete.rule"
+		},
+		{
+			"file" : "/opt/opendlv.scaledcars.build/code-prefix/src/code-stamp/code-install.rule"
+		},
+		{
+			"file" : "/opt/opendlv.scaledcars.build/code-prefix/src/code-stamp/code-mkdir.rule"
+		},
+		{
+			"file" : "/opt/opendlv.scaledcars.build/code-prefix/src/code-stamp/code-download.rule"
+		},
+		{
+			"file" : "/opt/opendlv.scaledcars.build/code-prefix/src/code-stamp/code-update.rule"
+		},
+		{
+			"file" : "/opt/opendlv.scaledcars.build/code-prefix/src/code-stamp/code-patch.rule"
+		},
+		{
+			"file" : "/opt/opendlv.scaledcars.build/code-prefix/src/code-stamp/code-configure.rule"
+		},
+		{
+			"file" : "/opt/opendlv.scaledcars.build/code-prefix/src/code-stamp/code-build.rule"
+		},
+		{
+			"file" : "/opt/opendlv.scaledcars.build/code-prefix/src/code-stamp/code-test.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"code"
+		],
+		"name" : "code"
+	}
+}

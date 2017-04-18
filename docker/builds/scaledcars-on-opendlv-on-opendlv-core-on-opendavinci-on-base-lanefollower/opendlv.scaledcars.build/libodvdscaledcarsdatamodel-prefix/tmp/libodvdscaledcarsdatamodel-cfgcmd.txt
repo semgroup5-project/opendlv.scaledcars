@@ -1,0 +1,1 @@
+cmd='/usr/bin/cmake;-DCMAKE_INSTALL_PREFIX=/opt/opendlv.scaledcars;-DOPENDAVINCI_DIR=/opt/od4;-DCMAKE_TOOLCHAIN_FILE=;-DCXXTEST_INCLUDE_DIR=/opt/opendlv.scaledcars.sources/thirdparty/cxxtest;-GUnix Makefiles;/opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel'
