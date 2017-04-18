@@ -834,6 +834,12 @@ opendavinci/odcore/opendavinci.h
 opendavinci/odcore/opendavinci.h
 /opt/od4/include/opendavinci/odcore/io/opendavinci/odcore/opendavinci.h
 
+/opt/od4/include/opendavinci/odcore/io/StringSender.h
+string
+-
+opendavinci/odcore/opendavinci.h
+/opt/od4/include/opendavinci/odcore/io/opendavinci/odcore/opendavinci.h
+
 /opt/od4/include/opendavinci/odcore/io/conference/ContainerConference.h
 opendavinci/odcore/opendavinci.h
 /opt/od4/include/opendavinci/odcore/io/conference/opendavinci/odcore/opendavinci.h
@@ -914,6 +920,30 @@ opendavinci/odcore/opendavinci.h
 
 /opt/od4/include/opendavinci/odcore/wrapper/Mutex.h
 
+/opt/od4/include/opendavinci/odcore/wrapper/Runnable.h
+opendavinci/odcore/opendavinci.h
+/opt/od4/include/opendavinci/odcore/wrapper/opendavinci/odcore/opendavinci.h
+
+/opt/od4/include/opendavinci/odcore/wrapper/SerialPort.h
+memory
+-
+string
+-
+opendavinci/odcore/opendavinci.h
+/opt/od4/include/opendavinci/odcore/wrapper/opendavinci/odcore/opendavinci.h
+opendavinci/odcore/io/ConnectionObserver.h
+/opt/od4/include/opendavinci/odcore/wrapper/opendavinci/odcore/io/ConnectionObserver.h
+opendavinci/odcore/io/StringSender.h
+/opt/od4/include/opendavinci/odcore/wrapper/opendavinci/odcore/io/StringSender.h
+opendavinci/odcore/wrapper/Runnable.h
+/opt/od4/include/opendavinci/odcore/wrapper/opendavinci/odcore/wrapper/Runnable.h
+
+/opt/od4/include/opendavinci/odcore/wrapper/SerialPortFactory.h
+string
+-
+opendavinci/odcore/opendavinci.h
+/opt/od4/include/opendavinci/odcore/wrapper/opendavinci/odcore/opendavinci.h
+
 /opt/od4/include/opendavinci/odcore/wrapper/SharedMemory.h
 string
 -
@@ -937,18 +967,22 @@ SerialSendHandler.h
 /opt/opendlv.scaledcars.sources/code/control/serialsendhandler/apps/SerialSendHandler.h
 
 /opt/opendlv.scaledcars.sources/code/control/serialsendhandler/include/SerialSendHandler.h
+automotivedata/GeneratedHeaders_AutomotiveData.h
+-
+opendavinci/GeneratedHeaders_OpenDaVINCI.h
+-
 opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h
 -
 opendavinci/odcore/data/Container.h
 -
 opendavinci/odcore/data/TimeStamp.h
 -
-opendavinci/odcore/wrapper/SharedMemoryFactory.h
+opendavinci/odcore/wrapper/SerialPort.h
+-
+opendavinci/odcore/wrapper/SerialPortFactory.h
 -
 opendavinci/odcore/wrapper/SharedMemory.h
 -
-opendavinci/GeneratedHeaders_OpenDaVINCI.h
--
-automotivedata/GeneratedHeaders_AutomotiveData.h
+opendavinci/odcore/wrapper/SharedMemoryFactory.h
 -
 

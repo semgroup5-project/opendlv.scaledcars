@@ -426,7 +426,7 @@ namespace scaledcars {
                     if (Sim) {
                         m_vehicleControl.setSpeed(1);
                     } else {
-                        m_vehicleControl.setSpeed(104);
+                        m_vehicleControl.setSpeed(99);
                     }
 
                     if (stop) {
@@ -454,7 +454,7 @@ namespace scaledcars {
                         if (Sim) {
                             m_vehicleControl.setSpeed(1);
                         } else {
-                            m_vehicleControl.setSpeed(104);
+                            m_vehicleControl.setSpeed(99);
                         }
                         cerr << "Resuming!" << endl;
                     }

@@ -28,7 +28,7 @@ namespace scaledcars {
         const uint32_t BAUD_RATE = 115200;
 
         void SerialReceiveListener::nextString(const string &s) {
-            cerr << "Received: " << s << " Contains : " << s.length << " bytes . . " << endl;
+            cerr << "Received: " << s << " Contains : " << s.length() << " bytes . . " << endl;
         }
 
         SerialSendHandler::SerialSendHandler(const int32_t &argc, char **argv)

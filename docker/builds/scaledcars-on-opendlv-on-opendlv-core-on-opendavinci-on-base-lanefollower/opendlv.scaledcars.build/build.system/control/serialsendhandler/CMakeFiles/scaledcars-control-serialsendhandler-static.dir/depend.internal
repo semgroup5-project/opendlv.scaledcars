@@ -34,6 +34,8 @@ control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static
  /opt/od4/include/automotivedata/generated/automotive/miniature/SensorBoardData.h
  /opt/od4/include/automotivedata/generated/automotive/miniature/SteeringData.h
  /opt/od4/include/automotivedata/generated/automotive/miniature/UserButtonData.h
+ /opt/od4/include/automotivedata/generated/automotive/vehicle/LightSystem.h
+ /opt/od4/include/automotivedata/generated/automotive/vehicle/WheelSpeed.h
  /opt/od4/include/automotivedata/generated/cartesian/Constants.h
  /opt/od4/include/automotivedata/generated/cartesian/Matrix3x3.h
  /opt/od4/include/automotivedata/generated/cartesian/Point2.h

@@ -384,6 +384,15 @@ scaledcars-control-proxy_BINARY_DIR:STATIC=/opt/opendlv.scaledcars.build/code-pr
 scaledcars-control-proxy_SOURCE_DIR:STATIC=/opt/opendlv.scaledcars.sources/code/control/proxy
 
 //Dependencies for target
+scaledcars-control-serialreceivehandler-static_LIB_DEPENDS:STATIC=
+
+//Value Computed by CMake
+scaledcars-control-serialreceivehandler_BINARY_DIR:STATIC=/opt/opendlv.scaledcars.build/code-prefix/src/code-build/control/serialreceivehandler
+
+//Value Computed by CMake
+scaledcars-control-serialreceivehandler_SOURCE_DIR:STATIC=/opt/opendlv.scaledcars.sources/code/control/serialreceivehandler
+
+//Dependencies for target
 scaledcars-control-serialsendhandler-static_LIB_DEPENDS:STATIC=
 
 //Value Computed by CMake
@@ -516,7 +525,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_NM
 CMAKE_NM-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=8
+CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=9
 //ADVANCED property for variable: CMAKE_OBJCOPY
 CMAKE_OBJCOPY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_OBJDUMP

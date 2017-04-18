@@ -33,6 +33,8 @@ control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static
 control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/src/SerialSendHandler.cpp.o: /opt/od4/include/automotivedata/generated/automotive/miniature/SensorBoardData.h
 control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/src/SerialSendHandler.cpp.o: /opt/od4/include/automotivedata/generated/automotive/miniature/SteeringData.h
 control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/src/SerialSendHandler.cpp.o: /opt/od4/include/automotivedata/generated/automotive/miniature/UserButtonData.h
+control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/src/SerialSendHandler.cpp.o: /opt/od4/include/automotivedata/generated/automotive/vehicle/LightSystem.h
+control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/src/SerialSendHandler.cpp.o: /opt/od4/include/automotivedata/generated/automotive/vehicle/WheelSpeed.h
 control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/src/SerialSendHandler.cpp.o: /opt/od4/include/automotivedata/generated/cartesian/Constants.h
 control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/src/SerialSendHandler.cpp.o: /opt/od4/include/automotivedata/generated/cartesian/Matrix3x3.h
 control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/src/SerialSendHandler.cpp.o: /opt/od4/include/automotivedata/generated/cartesian/Point2.h

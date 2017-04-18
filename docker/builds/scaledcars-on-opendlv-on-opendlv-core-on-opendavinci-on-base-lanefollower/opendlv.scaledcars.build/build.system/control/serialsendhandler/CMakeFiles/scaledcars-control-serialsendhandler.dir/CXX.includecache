@@ -150,6 +150,22 @@ opendavinci/odcore/base/Visitable.h
 opendavinci/odcore/data/SerializableData.h
 /opt/od4/include/automotivedata/generated/automotive/miniature/opendavinci/odcore/data/SerializableData.h
 
+/opt/od4/include/automotivedata/generated/automotive/vehicle/LightSystem.h
+opendavinci/odcore/opendavinci.h
+/opt/od4/include/automotivedata/generated/automotive/vehicle/opendavinci/odcore/opendavinci.h
+opendavinci/odcore/base/Visitable.h
+/opt/od4/include/automotivedata/generated/automotive/vehicle/opendavinci/odcore/base/Visitable.h
+opendavinci/odcore/data/SerializableData.h
+/opt/od4/include/automotivedata/generated/automotive/vehicle/opendavinci/odcore/data/SerializableData.h
+
+/opt/od4/include/automotivedata/generated/automotive/vehicle/WheelSpeed.h
+opendavinci/odcore/opendavinci.h
+/opt/od4/include/automotivedata/generated/automotive/vehicle/opendavinci/odcore/opendavinci.h
+opendavinci/odcore/base/Visitable.h
+/opt/od4/include/automotivedata/generated/automotive/vehicle/opendavinci/odcore/base/Visitable.h
+opendavinci/odcore/data/SerializableData.h
+/opt/od4/include/automotivedata/generated/automotive/vehicle/opendavinci/odcore/data/SerializableData.h
+
 /opt/od4/include/automotivedata/generated/cartesian/Constants.h
 opendavinci/odcore/opendavinci.h
 /opt/od4/include/automotivedata/generated/cartesian/opendavinci/odcore/opendavinci.h

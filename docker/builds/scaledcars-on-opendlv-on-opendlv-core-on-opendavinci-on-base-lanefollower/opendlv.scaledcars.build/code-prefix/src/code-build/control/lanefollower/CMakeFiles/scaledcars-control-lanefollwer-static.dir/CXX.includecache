@@ -1013,6 +1013,8 @@ automotivedata/GeneratedHeaders_AutomotiveData.h
 /opt/opendlv.scaledcars.sources/code/control/lanefollower/src/LaneFollower.cpp
 unistd.h
 -
+math.h
+-
 LaneFollower.h
 /opt/opendlv.scaledcars.sources/code/control/lanefollower/src/LaneFollower.h
 
