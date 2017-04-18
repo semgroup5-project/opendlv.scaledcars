@@ -25,6 +25,9 @@ int main(int argc, const char *argv[])
 
             if (!(protocol_checksum_check(frame))) continue;
 
+            if (!(protocol_get_byte_index(frame.a) == 0)) continue;
+            if (!(protocol_get_byte_index(frame.b) == 1)) continue;
+
             count++;
         }
     }
