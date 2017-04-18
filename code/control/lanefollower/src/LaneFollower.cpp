@@ -40,7 +40,6 @@ namespace scaledcars {
         bool stop = false;
         double stopCounter = 0;
         String state = "moving";
-        double pi = 3.1415926535897;
 
         LaneFollower::LaneFollower(const int32_t &argc, char **argv) :
                 TimeTriggeredConferenceClientModule(argc, argv, "lanefollower"),
@@ -363,16 +362,16 @@ namespace scaledcars {
 
             const double y = p + i + d;
 
-            double desiredSteering = 0, arduino_steering = 0;
+            double desiredSteering = 0;
 
             if (fabs(e) > 1e-2) {
                 desiredSteering = y;
 
                 if (desiredSteering > 25.0) {
-                     desiredSteering = 25.0;
+                    desiredSteering = 25.0;
                 }
                 if (desiredSteering < -25.0) {
-                     desiredSteering = -25.0;
+                    desiredSteering = -25.0;
                 }
 
             }
@@ -380,25 +379,17 @@ namespace scaledcars {
             // Show resulting features.
             if (m_debug) {
                 if (m_image.data != NULL) {
-                    imshow("Debug Image", m_image);  //m_image = image without canny || m_image_new = fully processed image
+                    imshow("Debug Image",
+                           m_image);  //m_image = image without canny || m_image_new = fully processed image
                     waitKey(10);
                 }
             }
 
             // change values if real car to acceptable arduino values: radians to degress
-            if (!Sim){
-                if (desiredSteering < 0){
-                    arduino_steering = 90 + (desiredSteering * (180 / pi));
-                    cerr << " degrees to the left " << arduino_steering << endl;
-                }else if (desiredSteering > 0){
-                    arduino_steering = 90+ (desiredSteering * (180 / pi));
-                    cerr << " degrees to the right " << arduino_steering << endl;
-                }
-            }
-            else {
-                cerr << " steering val  " << desiredSteering << endl;
-                m_vehicleControl.setSteeringWheelAngle(desiredSteering);
-            }
+
+            cerr << " steering val  " << desiredSteering << endl;
+            m_vehicleControl.setSteeringWheelAngle(desiredSteering);
+
 
         }
 
@@ -432,7 +423,11 @@ namespace scaledcars {
 
                 // State control for intersection stop
                 if (state == "moving") {
-                    m_vehicleControl.setSpeed(1);
+                    if (Sim) {
+                        m_vehicleControl.setSpeed(1);
+                    } else {
+                        m_vehicleControl.setSpeed(104);
+                    }
 
                     if (stop) {
                         if (stopCounter < 6.0) {
@@ -446,13 +441,21 @@ namespace scaledcars {
 
                 }
                 if (state == "stop") {
-                    m_vehicleControl.setSpeed(0);
                     m_vehicleControl.setSteeringWheelAngle(0);
+                    if (Sim) {
+                        m_vehicleControl.setSpeed(0);
+                    } else {
+                        m_vehicleControl.setSpeed(200);
+                    }
                     stopCounter += 0.5;
 
                     if (stopCounter > 29.9999) {
                         state = "resume";
-                        m_vehicleControl.setSpeed(1);
+                        if (Sim) {
+                            m_vehicleControl.setSpeed(1);
+                        } else {
+                            m_vehicleControl.setSpeed(104);
+                        }
                         cerr << "Resuming!" << endl;
                     }
                 }
@@ -466,16 +469,11 @@ namespace scaledcars {
                         cerr << "Moving!" << endl;
                     }
                 }
-
-
-
-
                 // Create container for finally sending the set values for the control algorithm.
                 Container c2(m_vehicleControl);
                 // Send container.
                 getConference().send(c2);
             }
-
             return ModuleExitCodeMessage::OKAY;
         }
 
