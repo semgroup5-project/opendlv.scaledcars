@@ -74,17 +74,17 @@ namespace scaledcars {
             double distance = 0;
             double absPathStart = 0;
             double absPathEnd = 0;
+//            double backDist = 0;
+//            double backStart = 0;
+//            double backEnd = 0;
 
-//            double gapStart = 0;
-//            double gapEnd = 0;
-//            double gapSize = 0;
 
             int stageMeasuring = 0;
 
 
             // double irFrontRight = 0;
             double irRear = 0;
-            // double irRearRight = 0;
+            //double irRearRight = 0;
 
 
             int stageMoving = 0;
@@ -103,53 +103,29 @@ namespace scaledcars {
 
                 // Create vehicle control data.
                 VehicleControl vc;
-
-                if (GAP_SIZE < 7 && stageMoving != 1) {
+                irRear=sbd.getValueForKey_MapOfDistances(INFRARED_REAR);
+                if (GAP_SIZE < 7 && stageMoving == 0) {
                     // Go forward.
                     vc.setSpeed(2);
                     vc.setSteeringWheelAngle(0);
                 }
-                if (GAP_SIZE > 7 && stageMoving == 1) {
-                    cerr << "irRear: " << irRear << endl;
-                    cerr << "StageMoving " << stageMoving << endl;
-//                    if ((irRear > 0) && (irRear < 1)) {
-//                        // Stop.
-//                        cerr << "yayy" << endl;
-//                        vc.setSpeed(0);
-//                        vc.setSteeringWheelAngle(0);
-//                    }
-
-                    if ((stageMoving > 0) && (stageMoving < 40)) {
-                        // Move slightly forward.
-                        vc.setSpeed(1);
-                        vc.setSteeringWheelAngle(0);
-                        stageMoving++;
-                    }
-                    if ((stageMoving >= 40) && (stageMoving < 50)) {
-                        // Stop.
-                        vc.setSpeed(0);
-                        vc.setSteeringWheelAngle(0);
-                        stageMoving++;
-                    }
-                    if ((stageMoving >= 50) && (stageMoving < 130)) {
-                        // Backwards, steering wheel to the right.
-                        vc.setSpeed(-2);
-                        vc.setSteeringWheelAngle(25);
-                        stageMoving++;
-                    }
-                    if ((stageMoving >= 130)) {
-                        // Backwards, steering wheel to the left.
-                        vc.setSpeed(-2);
-                        vc.setSteeringWheelAngle(-25);
-                        stageMoving++;
-                    }
-
-
+                if (stageMoving == 1 && (irRear<0)) {
+                    vc.setSpeed(-1);
+                    vc.setSteeringWheelAngle(25);
                 }
-                // Measuring state machine.
+                if(irRear > 0 && irRear < 4){
+                    vc.setSpeed(0);
+                }
+
+
+
+
+                IFFRObstacle = obstacleDetect(sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT));
+
                 switch (stageMeasuring) {
                     case 0: {
                         // Initialize measurement.
+                        cerr << "case 0" << endl;
                         distance = sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT);
                         if ((IFFRObstacle)) {
                             stageMeasuring++;
@@ -157,7 +133,7 @@ namespace scaledcars {
                     }
                         break;
                     case 1: {
-
+                        cerr << "case 1" << endl;
                         // Checking for sequence +, -.
                         if ((distance > 0) && (sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT) < 0)) {
                             // Found sequence +, -.
@@ -169,9 +145,9 @@ namespace scaledcars {
                         break;
                     case 2: {
                         // Checking for sequence -, +.
-                       double PathEnd = vd.getAbsTraveledPath();
-                       double gapSize = (PathEnd - absPathStart);
-
+                        double PathEnd = vd.getAbsTraveledPath();
+                        double gapSize = (PathEnd - absPathStart);
+                        cerr << "case 2" << endl;
                         if ((distance < 0) && (sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT) > 0)) {
                             // Found sequence -, +.
                             stageMeasuring = 1;
@@ -186,8 +162,7 @@ namespace scaledcars {
                                 stageMoving = 1;
                             }
                         }
-                        if ((distance < 0) && (gapSize > 9)) {
-
+                        if ((distance < 1) && (gapSize > 9)) {
                             stageMoving = 1;
                         }
                         distance = sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT);
