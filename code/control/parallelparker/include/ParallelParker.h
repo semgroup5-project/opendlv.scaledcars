@@ -68,6 +68,9 @@ namespace scaledcars {
                 virtual void setUp();
 
                 virtual void tearDown();
+
+                bool obstacleDetect(int i);
+
         };
 
     }

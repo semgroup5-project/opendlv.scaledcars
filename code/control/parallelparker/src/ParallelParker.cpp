@@ -39,7 +39,7 @@ namespace scaledcars {
         using namespace automotive::miniature;
 
         ParallelParker::ParallelParker(const int32_t &argc, char **argv) :
-            TimeTriggeredConferenceClientModule(argc, argv, "ParallelParker") {
+                TimeTriggeredConferenceClientModule(argc, argv, "ParallelParker") {
         }
 
         ParallelParker::~ParallelParker() {}
@@ -52,103 +52,147 @@ namespace scaledcars {
             // This method will be call automatically _after_ return from body().
         }
 
+        bool ParallelParker::obstacleDetect(int i) {
+            bool ifObstacle;
+            if (i < 0) {
+                ifObstacle = false;
+            } else if (i >= 0) {
+                ifObstacle = true;
+            }
+            return ifObstacle;
+        }
+
         // This method will do the main data processing job.
         odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode ParallelParker::body() {
-            const double ULTRASONIC_FRONT_RIGHT = 0;
-            double distanceOld = 0;
+
+            bool IFFRObstacle;
+            //bool IFRRObstacle;
+            const double INFRARED_FRONT_RIGHT = 0;
+            const double INFRARED_REAR = 1;
+            // const double INFRARED_REAR_RIGHT = 2;
+            double GAP_SIZE = 0;
+            double distance = 0;
             double absPathStart = 0;
             double absPathEnd = 0;
 
-            int stageMoving = 0;
+//            double gapStart = 0;
+//            double gapEnd = 0;
+//            double gapSize = 0;
+
             int stageMeasuring = 0;
 
-            while (getModuleStateAndWaitForRemainingTimeInTimeslice() == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
+
+            // double irFrontRight = 0;
+            double irRear = 0;
+            // double irRearRight = 0;
+
+
+            int stageMoving = 0;
+
+
+            while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
+                   odcore::data::dmcp::ModuleStateMessage::RUNNING) {
                 // 1. Get most recent vehicle data:
                 Container containerVehicleData = getKeyValueDataStore().get(automotive::VehicleData::ID());
-                VehicleData vd = containerVehicleData.getData<VehicleData> ();
+                VehicleData vd = containerVehicleData.getData<VehicleData>();
 
                 // 2. Get most recent sensor board data:
-                Container containerSensorBoardData = getKeyValueDataStore().get(automotive::miniature::SensorBoardData::ID());
-                SensorBoardData sbd = containerSensorBoardData.getData<SensorBoardData> ();
+                Container containerSensorBoardData = getKeyValueDataStore().get(
+                        automotive::miniature::SensorBoardData::ID());
+                SensorBoardData sbd = containerSensorBoardData.getData<SensorBoardData>();
 
                 // Create vehicle control data.
                 VehicleControl vc;
 
-                // Moving state machine.
-                if (stageMoving == 0) {
+                if (GAP_SIZE < 7 && stageMoving != 1) {
                     // Go forward.
                     vc.setSpeed(2);
                     vc.setSteeringWheelAngle(0);
                 }
-                if ((stageMoving > 0) && (stageMoving < 40)) {
-                    // Move slightly forward.
-                    vc.setSpeed(1);
-                    vc.setSteeringWheelAngle(0);
-                    stageMoving++;
-                }
-                if ((stageMoving >= 40) && (stageMoving < 50)) {
-                    // Stop.
-                    vc.setSpeed(0);
-                    vc.setSteeringWheelAngle(0);
-                    stageMoving++;
-                }
-                if ((stageMoving >= 50) && (stageMoving < 130)) {
-                    // Backwards, steering wheel to the right.
-                    vc.setSpeed(-2);
-                    vc.setSteeringWheelAngle(25);
-                    stageMoving++;
-                }
-                if ((stageMoving >= 130) && (stageMoving <180)) {
-                    // Backwards, steering wheel to the left.
-                    vc.setSpeed(-2);
-                    vc.setSteeringWheelAngle(-25);
-                    stageMoving++;
-                }
-                if (stageMoving >= 180) {
-                    // Stop.
-                    vc.setSpeed(0);
-                    vc.setSteeringWheelAngle(0);
-                }
+                if (GAP_SIZE > 7 && stageMoving == 1) {
+                    cerr << "irRear: " << irRear << endl;
+                    cerr << "StageMoving " << stageMoving << endl;
+//                    if ((irRear > 0) && (irRear < 1)) {
+//                        // Stop.
+//                        cerr << "yayy" << endl;
+//                        vc.setSpeed(0);
+//                        vc.setSteeringWheelAngle(0);
+//                    }
 
+                    if ((stageMoving > 0) && (stageMoving < 40)) {
+                        // Move slightly forward.
+                        vc.setSpeed(1);
+                        vc.setSteeringWheelAngle(0);
+                        stageMoving++;
+                    }
+                    if ((stageMoving >= 40) && (stageMoving < 50)) {
+                        // Stop.
+                        vc.setSpeed(0);
+                        vc.setSteeringWheelAngle(0);
+                        stageMoving++;
+                    }
+                    if ((stageMoving >= 50) && (stageMoving < 130)) {
+                        // Backwards, steering wheel to the right.
+                        vc.setSpeed(-2);
+                        vc.setSteeringWheelAngle(25);
+                        stageMoving++;
+                    }
+                    if ((stageMoving >= 130)) {
+                        // Backwards, steering wheel to the left.
+                        vc.setSpeed(-2);
+                        vc.setSteeringWheelAngle(-25);
+                        stageMoving++;
+                    }
+
+
+                }
                 // Measuring state machine.
                 switch (stageMeasuring) {
-                    case 0:
-                        {
-                            // Initialize measurement.
-                            distanceOld = sbd.getValueForKey_MapOfDistances(ULTRASONIC_FRONT_RIGHT);
+                    case 0: {
+                        // Initialize measurement.
+                        distance = sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT);
+                        if ((IFFRObstacle)) {
                             stageMeasuring++;
                         }
-                    break;
-                    case 1:
-                        {
-                            // Checking for sequence +, -.
-                            if ((distanceOld > 0) && (sbd.getValueForKey_MapOfDistances(ULTRASONIC_FRONT_RIGHT) < 0)) {
-                                // Found sequence +, -.
-                                stageMeasuring = 2;
-                                absPathStart = vd.getAbsTraveledPath();
-                            }
-                            distanceOld = sbd.getValueForKey_MapOfDistances(ULTRASONIC_FRONT_RIGHT);
+                    }
+                        break;
+                    case 1: {
+
+                        // Checking for sequence +, -.
+                        if ((distance > 0) && (sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT) < 0)) {
+                            // Found sequence +, -.
+                            stageMeasuring = 2;
+                            absPathStart = vd.getAbsTraveledPath();
                         }
-                    break;
-                    case 2:
-                        {
-                            // Checking for sequence -, +.
-                            if ((distanceOld < 0) && (sbd.getValueForKey_MapOfDistances(ULTRASONIC_FRONT_RIGHT) > 0)) {
-                                // Found sequence -, +.
-                                stageMeasuring = 1;
-                                absPathEnd = vd.getAbsTraveledPath();
+                        distance = sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT);
+                    }
+                        break;
+                    case 2: {
+                        // Checking for sequence -, +.
+                       double PathEnd = vd.getAbsTraveledPath();
+                       double gapSize = (PathEnd - absPathStart);
 
-                                const double GAP_SIZE = (absPathEnd - absPathStart);
+                        if ((distance < 0) && (sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT) > 0)) {
+                            // Found sequence -, +.
+                            stageMeasuring = 1;
+                            absPathEnd = vd.getAbsTraveledPath();
 
-                                cerr << "Size = " << GAP_SIZE << endl;
+                            GAP_SIZE = (absPathEnd - absPathStart);
 
-                                if ((stageMoving < 1) && (GAP_SIZE > 7)) {
-                                    stageMoving = 1;
-                                }
+                            cerr << "Size = " << GAP_SIZE << endl;
+
+                            if ((stageMoving < 1) && (GAP_SIZE > 7)) {
+                                cerr << "set stage moving to 1" << endl;
+                                stageMoving = 1;
                             }
-                            distanceOld = sbd.getValueForKey_MapOfDistances(ULTRASONIC_FRONT_RIGHT);
                         }
-                    break;
+                        if ((distance < 0) && (gapSize > 9)) {
+
+                            stageMoving = 1;
+                        }
+                        distance = sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT);
+                    }
+                        break;
                 }
 
                 // Create container for finally sending the data.
