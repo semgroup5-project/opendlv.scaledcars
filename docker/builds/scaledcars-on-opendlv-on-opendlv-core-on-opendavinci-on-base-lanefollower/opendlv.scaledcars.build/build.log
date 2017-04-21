@@ -6,17 +6,17 @@ Step 2/7 : MAINTAINER Christian Berger "christian.berger@gu.se"
  ---> af37f7e0f4a4
 Step 3/7 : ADD opt /opt
  ---> Using cache
- ---> be89d4425897
+ ---> 32683499319c
 Step 4/7 : RUN chown -R 1000:1000 /opt/opendlv.scaledcars
  ---> Using cache
- ---> 6a3af0b543b6
+ ---> fb23c96def99
 Step 5/7 : ENV QT_X11_NO_MITSHM 1
  ---> Using cache
- ---> 5ae29df1d1d5
+ ---> e735387452de
 Step 6/7 : ENV LD_LIBRARY_PATH $LD_LIBRARY_PATH:/opt/opendlv.scaledcars/lib
  ---> Using cache
- ---> c15153bd0cdf
+ ---> 2c8907b4c153
 Step 7/7 : WORKDIR /opt/opendlv.scaledcars/bin
  ---> Using cache
- ---> 27c9a1bc306f
-Successfully built 27c9a1bc306f
+ ---> 6151803e2db4
+Successfully built 6151803e2db4

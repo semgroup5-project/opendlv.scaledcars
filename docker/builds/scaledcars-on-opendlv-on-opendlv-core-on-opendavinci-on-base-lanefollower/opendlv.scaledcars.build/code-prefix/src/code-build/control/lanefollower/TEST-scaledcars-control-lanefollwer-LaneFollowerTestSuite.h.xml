@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <testsuites>
-<testsuite name="scaledcars-control-lanefollwer-LaneFollowerTestSuite.h" tests="1" failures="0" errors="0" time="0" timestamp="Tue Apr 18 10:06:26 2017" file="/opt/opendlv.scaledcars.sources/code/control/lanefollower/testsuites/LaneFollowerTestSuite.h" >
+<testsuite name="scaledcars-control-lanefollwer-LaneFollowerTestSuite.h" tests="1" failures="0" errors="0" time="0" timestamp="Thu Apr 20 18:34:08 2017" file="/opt/opendlv.scaledcars.sources/code/control/lanefollower/testsuites/LaneFollowerTestSuite.h" >
     <testcase name="testLaneFollowerSuccessfullyCreated" classname="LaneFollowerTest" line="101" >    </testcase>
 </testsuite>
 </testsuites>

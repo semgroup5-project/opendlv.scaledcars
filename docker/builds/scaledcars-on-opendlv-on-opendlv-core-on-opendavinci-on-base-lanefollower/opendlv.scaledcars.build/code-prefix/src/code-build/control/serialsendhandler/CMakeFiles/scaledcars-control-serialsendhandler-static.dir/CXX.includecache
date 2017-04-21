@@ -1033,6 +1033,8 @@ opendavinci/odcore/wrapper/SerialPortFactory.h
 -
 protocol.c
 /opt/opendlv.scaledcars.sources/code/control/serialsendhandler/src/protocol.c
+queue
+-
 
 /opt/opendlv.scaledcars.sources/code/control/serialsendhandler/src/protocol.c
 protocol.h

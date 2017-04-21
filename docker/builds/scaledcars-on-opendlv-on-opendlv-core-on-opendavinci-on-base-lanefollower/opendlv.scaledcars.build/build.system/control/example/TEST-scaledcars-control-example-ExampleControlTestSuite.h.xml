@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <testsuites>
-<testsuite name="scaledcars-control-example-ExampleControlTestSuite.h" tests="1" failures="0" errors="0" time="0" timestamp="Tue Apr 18 10:33:25 2017" file="/opt/opendlv.scaledcars.sources/code/control/example/testsuites/ExampleControlTestSuite.h" >
+<testsuite name="scaledcars-control-example-ExampleControlTestSuite.h" tests="1" failures="0" errors="0" time="0" timestamp="Thu Apr 20 19:12:24 2017" file="/opt/opendlv.scaledcars.sources/code/control/example/testsuites/ExampleControlTestSuite.h" >
     <testcase name="testApplication" classname="ExampleControlTest" line="37" >    </testcase>
 </testsuite>
 </testsuites>
