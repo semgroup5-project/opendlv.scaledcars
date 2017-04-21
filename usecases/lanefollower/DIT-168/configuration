@@ -229,7 +229,7 @@ lanefollower.camera_id = 1 # select here the proper camera
 lanefollower.debug = 1      # set to 0 to disable any windows and further output
 lanefollower.sim = 0   # Set simulation true or false
 lanefollower.p = 1.3     #OG val = 1.3
-lanefollower.d = 0.10    #OG val = 0.10
+lanefollower.d = 0.60    #OG val = 0.10
 lanefollower.i= 0.01     #OG val = 0.01
 
 

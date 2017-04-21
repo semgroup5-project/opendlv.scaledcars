@@ -968,10 +968,6 @@ memory
 opendavinci/odcore/opendavinci.h
 /opt/od4/include/opendavinci/odcore/wrapper/opendavinci/odcore/opendavinci.h
 
-/opt/opendlv.scaledcars.sources/code/control/serialsendhandler/include/SerialReceiveBytes.h
-opendavinci/odcore/io/StringListener.h
--
-
 /opt/opendlv.scaledcars.sources/code/control/serialsendhandler/include/SerialSendHandler.h
 automotivedata/GeneratedHeaders_AutomotiveData.h
 -
@@ -995,24 +991,6 @@ opendavinci/odcore/wrapper/SharedMemoryFactory.h
 /opt/opendlv.scaledcars.sources/code/control/serialsendhandler/include/protocol.h
 stdbool.h
 -
-
-/opt/opendlv.scaledcars.sources/code/control/serialsendhandler/src/SerialReceiveBytes.cpp
-stdint.h
--
-iostream
--
-string
--
-memory
--
-opendavinci/odcore/base/Thread.h
--
-opendavinci/odcore/wrapper/SerialPort.h
--
-opendavinci/odcore/wrapper/SerialPortFactory.h
--
-SerialReceiveBytes.h
-/opt/opendlv.scaledcars.sources/code/control/serialsendhandler/src/SerialReceiveBytes.h
 
 /opt/opendlv.scaledcars.sources/code/control/serialsendhandler/src/SerialSendHandler.cpp
 SerialSendHandler.h

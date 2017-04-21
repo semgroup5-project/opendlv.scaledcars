@@ -111,7 +111,7 @@ void Example::nextContainer(odcore::data::Container &c) {
 
 void Example::processImage() {
 
-        static bool useRightLaneMarking = true;
+        static bool inRightLane = true;
     //    double e = 0;
 
         const int32_t CONTROL_SCANLINE = 462; // calibrated length to right: 280px
@@ -167,24 +167,24 @@ void Example::processImage() {
             if (y == CONTROL_SCANLINE) {
                 // Calculate the deviation error.
                 if (right.x > 0) {
-                    if (!useRightLaneMarking) {
+                    if (!inRightLane) {
                         m_eSum = 0;
                         m_eOld = 0;
                     }
 
             //        e = ((right.x - m_image->width/2.0) - distance)/distance;
 
-                    useRightLaneMarking = true;
+                    inRightLane = true;
                 }
                 else if (left.x > 0) {
-                    if (useRightLaneMarking) {
+                    if (inRightLane) {
                         m_eSum = 0;
                         m_eOld = 0;
                     }
 
             //        e = (distance - (m_image->width/2.0 - left.x))/distance;
 
-                    useRightLaneMarking = false;
+                    inRightLane = false;
                 }
                 else {
                     // If no measurements are available, reset PID controller.

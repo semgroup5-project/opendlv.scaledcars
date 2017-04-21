@@ -25,7 +25,7 @@ namespace scaledcars {
 
         int port = 0;
         const string SERIAL_PORTS[] = {"/dev/ttyACM0", "/dev/ttyACM1", "/dev/ttyACM2", "/dev/ttyACM3"};
-        //const uint32_t BAUD_RATE = 115200;
+        const uint32_t BAUD_RATE = 115200;
         FILE *file;
 
         void SerialReceiveListener::nextString(const string &s) {
@@ -41,12 +41,12 @@ namespace scaledcars {
             cerr << "Connecting to port: " << SERIAL_PORTS[port] << " br: " << BAUD_RATE << endl;
 
             try {
-//                shared_ptr <SerialPort> _serialPort(
-//                        SerialPortFactory::createSerialPort(SERIAL_PORTS[port], BAUD_RATE));
-//
-//                this->serialPort = _serialPort;
-//                this->serialPort->setStringListener(&(this->serialListener));
-//                this->serialPort->start();
+                shared_ptr <SerialPort> _serialPort(
+                        SerialPortFactory::createSerialPort(SERIAL_PORTS[port], BAUD_RATE));
+
+                this->serialPort = _serialPort;
+                this->serialPort->setStringListener(&(this->serialListener));
+                this->serialPort->start();
 
                 // Wait for serial port to be ready for communication
                 cerr << "Sleeping for 5 secs" << endl;
@@ -79,11 +79,18 @@ namespace scaledcars {
                     cerr << "angle radius : " << angle << endl;
 
                     arduinoAngle = 90 + (angle * (180 / pi));
+
+                    // introduce top and bottom limits for angle values sent to the car
+                    if (arduinoAngle < 0 ){
+                        arduinoAngle = 10;
+                    }else if (arduinoAngle > 180){
+                        arduinoAngle = 160;
+                    }
                     cerr << "angle degree " << arduinoAngle << endl;
 
                     //(x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
-                    int speed = 105;
-                    //int speed = vd.getSpeed();
+                   // int speed = 105;
+                    int speed = vd.getSpeed();
                     cerr << "speed to arduino : " << speed << endl;
                     // TODO: int odometer = vd.getOdometer();
 
