@@ -348,11 +348,12 @@ namespace scaledcars {
             if (fabs(e) > 1e-2) {
                 desiredSteering = y;
 
-                if (desiredSteering > 25.0) {
-                    desiredSteering = 25.0;
+                // set an upper and lower limit for the desired steering
+                if (desiredSteering > 1.5) {
+                    desiredSteering = 1.5;
                 }
-                if (desiredSteering < -25.0) {
-                    desiredSteering = -25.0;
+                if (desiredSteering < -1.5) {
+                    desiredSteering = -1.5;
                 }
 
             }
@@ -397,7 +398,7 @@ namespace scaledcars {
                     if (Sim) {
                         m_vehicleControl.setSpeed(1);
                     } else {
-                        m_vehicleControl.setSpeed(99);
+                        m_vehicleControl.setSpeed(100);
                     }
 
                     if (stop) {
