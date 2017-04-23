@@ -49,6 +49,16 @@ FIND_PACKAGE (OpenDaVINCI REQUIRED)
 FIND_PACKAGE(OpenCV REQUIRED)
 
 ###########################################################################
+# Find GLib
+FIND_PACKAGE (PkgConfig REQUIRED)
+pkg_check_modules (GLIB REQUIRED glib-2.0)
+
+LINK_DIRECTORIES (${GLIB_LIBRARY_DIRS})
+ADD_DEFINITIONS (${GLIB_CFLAGS_OTHER})
+
+#target_link_libraries (gtk-test ${GLIB_LIBRARIES})
+
+###########################################################################
 # Find AutomotiveData.
 FIND_PACKAGE (AutomotiveData REQUIRED)
 
@@ -59,6 +69,8 @@ find_package(ODVDScaledCarsDataModel REQUIRED)
 ###############################################################################
 # Set header files from OpenCV.
 INCLUDE_DIRECTORIES (SYSTEM ${OpenCV_INCLUDE_DIR})
+# Set header files from GLib.
+INCLUDE_DIRECTORIES (SYSTEM ${GLIB_INCLUDE_DIRS})
 # Set header files from ODVDScaledCarsDataModel.
 INCLUDE_DIRECTORIES (SYSTEM ${ODVDSCALEDCARSDATAMODEL_INCLUDE_DIRS})
 # Set header files from OpenDaVINCI.
@@ -72,7 +84,8 @@ INCLUDE_DIRECTORIES(include)
 set(LIBRARIES ${OPENDAVINCI_LIBRARIES}
               ${AUTOMOTIVEDATA_LIBRARIES}
               ${ODVDSCALEDCARSDATAMODEL_LIBRARIES}
-              ${OpenCV_LIBS})
+              ${OpenCV_LIBS}
+              ${GLIB_LIBRARIES})
 
 ###############################################################################
 # Build this project.

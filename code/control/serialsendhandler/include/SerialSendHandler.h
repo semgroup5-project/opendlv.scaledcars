@@ -1,13 +1,15 @@
 #include <automotivedata/GeneratedHeaders_AutomotiveData.h>
 
 #include <opendavinci/GeneratedHeaders_OpenDaVINCI.h>
-#include <opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h>
+#include <opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h>
 #include <opendavinci/odcore/data/Container.h>
 #include <opendavinci/odcore/data/TimeStamp.h>
 #include <opendavinci/odcore/wrapper/SerialPort.h>
 #include <opendavinci/odcore/wrapper/SerialPortFactory.h>
 #include <opendavinci/odcore/wrapper/SharedMemory.h>
 #include <opendavinci/odcore/wrapper/SharedMemoryFactory.h>
+
+#include "serial.h"
 
 using namespace std;
 
@@ -18,11 +20,13 @@ using namespace odcore::wrapper;
 
 namespace scaledcars {
     namespace control {
-        class SerialReceiveListener : public odcore::io::StringListener {
-            virtual void nextString(const string &s);
-        };
 
-        class SerialSendHandler : public DataTriggeredConferenceClientModule {
+        void __on_read(uint8_t b);
+        void __on_write(uint8_t b);
+
+        class SerialSendHandler :
+            public odcore::base::module::TimeTriggeredConferenceClientModule {
+
             private:
                 /**
                  * "Forbidden" copy constructor.
@@ -47,9 +51,7 @@ namespace scaledcars {
                  */
                 SerialSendHandler& operator=(const SerialSendHandler &/*obj*/);
 
-                shared_ptr<odcore::wrapper::SerialPort> serialPort;
-
-                SerialReceiveListener serialListener;
+                serial_state *serial;
 
             public:
                 /**
@@ -62,11 +64,14 @@ namespace scaledcars {
 
                 virtual ~SerialSendHandler();
 
+                odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
+
                 virtual void nextContainer(odcore::data::Container &c);
 
-                virtual string pack(int id, int value);
+                int motor;
+                int servo;
 
-                virtual void send(string Message);
+                int cycle = 0;
 
             private:
 
