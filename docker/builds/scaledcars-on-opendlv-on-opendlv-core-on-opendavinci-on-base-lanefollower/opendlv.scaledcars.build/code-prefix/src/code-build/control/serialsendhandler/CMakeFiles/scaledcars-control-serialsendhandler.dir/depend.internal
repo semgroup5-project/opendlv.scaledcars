@@ -80,6 +80,7 @@ control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler.dir/ap
  /opt/od4/include/opendavinci/odcore/io/ConnectionObserver.h
  /opt/od4/include/opendavinci/odcore/io/StringListener.h
  /opt/od4/include/opendavinci/odcore/io/StringObserver.h
+ /opt/od4/include/opendavinci/odcore/io/StringSender.h
  /opt/od4/include/opendavinci/odcore/io/conference/ContainerConference.h
  /opt/od4/include/opendavinci/odcore/io/conference/ContainerListener.h
  /opt/od4/include/opendavinci/odcore/io/conference/ContainerObserver.h
@@ -91,6 +92,9 @@ control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler.dir/ap
  /opt/od4/include/opendavinci/odcore/strings/StringComparator.h
  /opt/od4/include/opendavinci/odcore/wrapper/Condition.h
  /opt/od4/include/opendavinci/odcore/wrapper/Mutex.h
+ /opt/od4/include/opendavinci/odcore/wrapper/Runnable.h
+ /opt/od4/include/opendavinci/odcore/wrapper/SerialPort.h
+ /opt/od4/include/opendavinci/odcore/wrapper/SerialPortFactory.h
  /opt/od4/include/opendavinci/odcore/wrapper/SharedMemory.h
  /opt/od4/include/opendavinci/odcore/wrapper/SharedMemoryFactory.h
  /opt/od4/include/opendavinci/odcore/wrapper/Time.h

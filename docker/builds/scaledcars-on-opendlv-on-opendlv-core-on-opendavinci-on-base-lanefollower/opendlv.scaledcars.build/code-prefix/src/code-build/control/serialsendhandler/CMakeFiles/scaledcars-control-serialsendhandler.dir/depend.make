@@ -79,6 +79,7 @@ control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler.dir/ap
 control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler.dir/apps/scaledcars-control-serialsendhandler.cpp.o: /opt/od4/include/opendavinci/odcore/io/ConnectionObserver.h
 control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler.dir/apps/scaledcars-control-serialsendhandler.cpp.o: /opt/od4/include/opendavinci/odcore/io/StringListener.h
 control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler.dir/apps/scaledcars-control-serialsendhandler.cpp.o: /opt/od4/include/opendavinci/odcore/io/StringObserver.h
+control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler.dir/apps/scaledcars-control-serialsendhandler.cpp.o: /opt/od4/include/opendavinci/odcore/io/StringSender.h
 control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler.dir/apps/scaledcars-control-serialsendhandler.cpp.o: /opt/od4/include/opendavinci/odcore/io/conference/ContainerConference.h
 control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler.dir/apps/scaledcars-control-serialsendhandler.cpp.o: /opt/od4/include/opendavinci/odcore/io/conference/ContainerListener.h
 control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler.dir/apps/scaledcars-control-serialsendhandler.cpp.o: /opt/od4/include/opendavinci/odcore/io/conference/ContainerObserver.h
@@ -90,6 +91,9 @@ control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler.dir/ap
 control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler.dir/apps/scaledcars-control-serialsendhandler.cpp.o: /opt/od4/include/opendavinci/odcore/strings/StringComparator.h
 control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler.dir/apps/scaledcars-control-serialsendhandler.cpp.o: /opt/od4/include/opendavinci/odcore/wrapper/Condition.h
 control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler.dir/apps/scaledcars-control-serialsendhandler.cpp.o: /opt/od4/include/opendavinci/odcore/wrapper/Mutex.h
+control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler.dir/apps/scaledcars-control-serialsendhandler.cpp.o: /opt/od4/include/opendavinci/odcore/wrapper/Runnable.h
+control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler.dir/apps/scaledcars-control-serialsendhandler.cpp.o: /opt/od4/include/opendavinci/odcore/wrapper/SerialPort.h
+control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler.dir/apps/scaledcars-control-serialsendhandler.cpp.o: /opt/od4/include/opendavinci/odcore/wrapper/SerialPortFactory.h
 control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler.dir/apps/scaledcars-control-serialsendhandler.cpp.o: /opt/od4/include/opendavinci/odcore/wrapper/SharedMemory.h
 control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler.dir/apps/scaledcars-control-serialsendhandler.cpp.o: /opt/od4/include/opendavinci/odcore/wrapper/SharedMemoryFactory.h
 control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler.dir/apps/scaledcars-control-serialsendhandler.cpp.o: /opt/od4/include/opendavinci/odcore/wrapper/Time.h

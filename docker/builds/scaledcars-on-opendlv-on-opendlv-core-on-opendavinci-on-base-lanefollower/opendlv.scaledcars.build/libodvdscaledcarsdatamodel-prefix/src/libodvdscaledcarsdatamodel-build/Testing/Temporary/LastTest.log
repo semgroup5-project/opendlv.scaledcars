@@ -1,10 +1,10 @@
-Start testing: Apr 15 10:59 UTC
+Start testing: Apr 20 18:33 UTC
 ----------------------------------------------------------
 1/1 Testing: chalmersrevere_scaledcars_ExampleMessageTestSuite.h-TestSuite
 1/1 Test: chalmersrevere_scaledcars_ExampleMessageTestSuite.h-TestSuite
 Command: "/opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/chalmersrevere_scaledcars_ExampleMessageTestSuite.h-TestSuite"
 Directory: /opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build
-"chalmersrevere_scaledcars_ExampleMessageTestSuite.h-TestSuite" start time: Apr 15 10:59 UTC
+"chalmersrevere_scaledcars_ExampleMessageTestSuite.h-TestSuite" start time: Apr 20 18:33 UTC
 Output:
 ----------------------------------------------------------
 Running libodvdscaledcarsdatamodel-chalmersrevere_scaledcars_ExampleMessageTestSuite.h tests (4 tests)....OK!
@@ -12,8 +12,8 @@ Running libodvdscaledcarsdatamodel-chalmersrevere_scaledcars_ExampleMessageTestS
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"chalmersrevere_scaledcars_ExampleMessageTestSuite.h-TestSuite" end time: Apr 15 10:59 UTC
+"chalmersrevere_scaledcars_ExampleMessageTestSuite.h-TestSuite" end time: Apr 20 18:33 UTC
 "chalmersrevere_scaledcars_ExampleMessageTestSuite.h-TestSuite" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-End testing: Apr 15 10:59 UTC
+End testing: Apr 20 18:33 UTC

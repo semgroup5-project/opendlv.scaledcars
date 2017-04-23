@@ -14,6 +14,8 @@ perception/example/CMakeFiles/scaledcars-perception-example-static.dir/src/Examp
 perception/example/CMakeFiles/scaledcars-perception-example-static.dir/src/Example.cpp.o: /opt/od4/include/automotivedata/generated/automotive/miniature/SensorBoardData.h
 perception/example/CMakeFiles/scaledcars-perception-example-static.dir/src/Example.cpp.o: /opt/od4/include/automotivedata/generated/automotive/miniature/SteeringData.h
 perception/example/CMakeFiles/scaledcars-perception-example-static.dir/src/Example.cpp.o: /opt/od4/include/automotivedata/generated/automotive/miniature/UserButtonData.h
+perception/example/CMakeFiles/scaledcars-perception-example-static.dir/src/Example.cpp.o: /opt/od4/include/automotivedata/generated/automotive/vehicle/LightSystem.h
+perception/example/CMakeFiles/scaledcars-perception-example-static.dir/src/Example.cpp.o: /opt/od4/include/automotivedata/generated/automotive/vehicle/WheelSpeed.h
 perception/example/CMakeFiles/scaledcars-perception-example-static.dir/src/Example.cpp.o: /opt/od4/include/automotivedata/generated/cartesian/Constants.h
 perception/example/CMakeFiles/scaledcars-perception-example-static.dir/src/Example.cpp.o: /opt/od4/include/automotivedata/generated/cartesian/Matrix3x3.h
 perception/example/CMakeFiles/scaledcars-perception-example-static.dir/src/Example.cpp.o: /opt/od4/include/automotivedata/generated/cartesian/Point2.h

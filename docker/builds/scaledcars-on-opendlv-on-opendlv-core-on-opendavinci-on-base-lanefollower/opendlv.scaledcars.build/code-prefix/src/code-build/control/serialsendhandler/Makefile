@@ -244,6 +244,33 @@ apps/scaledcars-control-serialsendhandler.cpp.s:
 	cd /opt/opendlv.scaledcars.build/code-prefix/src/code-build && $(MAKE) -f control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler.dir/build.make control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler.dir/apps/scaledcars-control-serialsendhandler.cpp.s
 .PHONY : apps/scaledcars-control-serialsendhandler.cpp.s
 
+src/SerialReceiveBytes.o: src/SerialReceiveBytes.cpp.o
+
+.PHONY : src/SerialReceiveBytes.o
+
+# target to build an object file
+src/SerialReceiveBytes.cpp.o:
+	cd /opt/opendlv.scaledcars.build/code-prefix/src/code-build && $(MAKE) -f control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/build.make control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/src/SerialReceiveBytes.cpp.o
+.PHONY : src/SerialReceiveBytes.cpp.o
+
+src/SerialReceiveBytes.i: src/SerialReceiveBytes.cpp.i
+
+.PHONY : src/SerialReceiveBytes.i
+
+# target to preprocess a source file
+src/SerialReceiveBytes.cpp.i:
+	cd /opt/opendlv.scaledcars.build/code-prefix/src/code-build && $(MAKE) -f control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/build.make control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/src/SerialReceiveBytes.cpp.i
+.PHONY : src/SerialReceiveBytes.cpp.i
+
+src/SerialReceiveBytes.s: src/SerialReceiveBytes.cpp.s
+
+.PHONY : src/SerialReceiveBytes.s
+
+# target to generate assembly for a file
+src/SerialReceiveBytes.cpp.s:
+	cd /opt/opendlv.scaledcars.build/code-prefix/src/code-build && $(MAKE) -f control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/build.make control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/src/SerialReceiveBytes.cpp.s
+.PHONY : src/SerialReceiveBytes.cpp.s
+
 src/SerialSendHandler.o: src/SerialSendHandler.cpp.o
 
 .PHONY : src/SerialSendHandler.o
@@ -291,6 +318,9 @@ help:
 	@echo "... apps/scaledcars-control-serialsendhandler.o"
 	@echo "... apps/scaledcars-control-serialsendhandler.i"
 	@echo "... apps/scaledcars-control-serialsendhandler.s"
+	@echo "... src/SerialReceiveBytes.o"
+	@echo "... src/SerialReceiveBytes.i"
+	@echo "... src/SerialReceiveBytes.s"
 	@echo "... src/SerialSendHandler.o"
 	@echo "... src/SerialSendHandler.i"
 	@echo "... src/SerialSendHandler.s"

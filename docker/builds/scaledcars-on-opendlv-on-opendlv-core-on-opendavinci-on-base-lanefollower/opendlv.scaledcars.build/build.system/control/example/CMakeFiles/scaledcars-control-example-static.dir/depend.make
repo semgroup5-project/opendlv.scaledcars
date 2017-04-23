@@ -14,6 +14,8 @@ control/example/CMakeFiles/scaledcars-control-example-static.dir/src/Example.cpp
 control/example/CMakeFiles/scaledcars-control-example-static.dir/src/Example.cpp.o: /opt/od4/include/automotivedata/generated/automotive/miniature/SensorBoardData.h
 control/example/CMakeFiles/scaledcars-control-example-static.dir/src/Example.cpp.o: /opt/od4/include/automotivedata/generated/automotive/miniature/SteeringData.h
 control/example/CMakeFiles/scaledcars-control-example-static.dir/src/Example.cpp.o: /opt/od4/include/automotivedata/generated/automotive/miniature/UserButtonData.h
+control/example/CMakeFiles/scaledcars-control-example-static.dir/src/Example.cpp.o: /opt/od4/include/automotivedata/generated/automotive/vehicle/LightSystem.h
+control/example/CMakeFiles/scaledcars-control-example-static.dir/src/Example.cpp.o: /opt/od4/include/automotivedata/generated/automotive/vehicle/WheelSpeed.h
 control/example/CMakeFiles/scaledcars-control-example-static.dir/src/Example.cpp.o: /opt/od4/include/automotivedata/generated/cartesian/Constants.h
 control/example/CMakeFiles/scaledcars-control-example-static.dir/src/Example.cpp.o: /opt/od4/include/automotivedata/generated/cartesian/Matrix3x3.h
 control/example/CMakeFiles/scaledcars-control-example-static.dir/src/Example.cpp.o: /opt/od4/include/automotivedata/generated/cartesian/Point2.h

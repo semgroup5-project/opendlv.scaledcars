@@ -40,6 +40,7 @@ namespace scaledcars {
         bool stop = false;
         double stopCounter = 0;
         String state = "moving";
+        bool inRightLane = true;   //the overtaker alters this value to signal a lane change
 
         LaneFollower::LaneFollower(const int32_t &argc, char **argv) :
                 TimeTriggeredConferenceClientModule(argc, argv, "lanefollower"),
@@ -54,11 +55,11 @@ namespace scaledcars {
                 m_eSum(0),
                 m_eOld(0),
                 m_vehicleControl(),
-                m_threshold1(50),
-                m_threshold2(190),
-                m_control_scanline(400),//needs testing with real c
-                m_stop_scanline(250),//needs testing with real car
-                m_distance(190),  //needs testing with real car as well
+                m_threshold1(220),
+                m_threshold2(170),
+                m_control_scanline(280),//needs testing with real c
+                m_stop_scanline(200),//needs testing with real car
+                m_distance(180),  //needs testing with real car as well
                 p_gain(0),       // the gain values can be adjusted here outside of simulation scenario (see @setUp() )
                 i_gain(0),
                 d_gain(0) {}
@@ -116,19 +117,6 @@ namespace scaledcars {
 
                     m_sharedImageMemory = odcore::wrapper::SharedMemoryFactory::attachToSharedMemory(si.getName());
 
-                    if (!Sim) {
-                        m_sharedProcessedImageMemory = SharedMemoryFactory::createSharedMemory("ProcessedImg",
-                                                                                               si.getHeight() *
-                                                                                               si.getWidth());
-                        m_sharedProcessedImage.setName("ProcessedImg");
-                        m_sharedProcessedImage.setHeight(si.getHeight());
-                        m_sharedProcessedImage.setWidth(si.getWidth());
-                        m_sharedProcessedImage.setBytesPerPixel(1);
-                        m_sharedProcessedImage.setSize(si.getHeight() * si.getWidth());
-                        //m_sharedImageMemory = SharedMemoryFactory::attachToSharedMemory("ProcessedImg");
-
-                    }
-
                     m_hasAttachedToSharedImageMemory = true;
 
                 }
@@ -164,25 +152,19 @@ namespace scaledcars {
             // New image
             m_image_new = Mat(m_image.rows, m_image.cols, CV_8UC1);
 
+
+
             // Copy the original image to the new image as greyscale
             cvtColor(m_image, m_image_new, COLOR_BGR2GRAY);
 
-            Canny(m_image_new, m_image_new, m_threshold1, m_threshold2,
-                  3); // see header for algorithm and threshold explanation
 
-            if (!Sim) { //If not in sim mode, copy processed image to shared memory
-                if (m_sharedProcessedImageMemory.get() && m_sharedProcessedImageMemory->isValid()) {
-                    m_sharedProcessedImageMemory->lock();
-                    // cerr << "inside image process and fixing shared process image for display" << endl;
-                    memcpy(m_sharedProcessedImageMemory->getSharedMemory(), m_image_new.data, 640 * 480);
-                    m_sharedProcessedImageMemory->unlock();
-                }
-            }
+
+            Canny(m_image_new, m_image_new, m_threshold1, m_threshold2, 3); // see header for algorithm and threshold explanation
+
         }
 
         // Calculate deviation from goal
         double LaneFollower::errorCalculation() {
-            static bool useRightLaneMarking = true;   // we can the overtaker alter this value to signal a lane change
             double e = 0;
 
             int32_t y = m_control_scanline;
@@ -206,7 +188,7 @@ namespace scaledcars {
             right.y = y;
             right.x = -1;
             // Search from middle to the right
-            for (int x = m_image_new.cols / 2; x < m_image_new.cols; x++) {
+            for (int x = m_image_new.cols / 2; x < m_image_new.cols - 50; x++) {  //cols - 50 to stop it from
                 pixelRight = m_image_new.at<uchar>(Point(x, y));
                 if (pixelRight >= 150) {   //tentative value, might need adjustment: lower it closer to 100
                     right.x = x;
@@ -216,13 +198,12 @@ namespace scaledcars {
 
             if (y == m_control_scanline) {
 
-                if (useRightLaneMarking) {
+                if (inRightLane) {
                     if (right.x > 0) {
                         e = ((right.x - m_image_new.cols / 2.0) - m_distance) / m_distance;
                     } else if (left.x > 0) {
                         e = (m_distance - (m_image_new.cols / 2.0 - left.x)) / m_distance;
                     }
-
                 } else {  //Adapt to following the left lane
                     if (left.x > 0) {
                         m_eSum = 0;
@@ -237,24 +218,24 @@ namespace scaledcars {
             }
 
 
-            //prints the lines for debugging purposes if debug flat is set to true
+            //prints the lines for debugging purposes if debug flag is set to true
             if (m_debug) {
 
                 if (left.x > 0) {
-                    line(m_image, Point(m_image.cols / 2, y), left, Scalar(0, 255, 0));
+                    line(m_image_new, Point(m_image.cols / 2, y), left, Scalar(255, 0, 0), 1, 8);
 
                     stringstream sstr;
-                    sstr << (m_image.cols / 2 - left.x);
+                    sstr << (m_image_new.cols / 2 - left.x);
 
-                    putText(m_image, sstr.str().c_str(), Point(m_image.cols / 2 - 100, y - 2), FONT_HERSHEY_PLAIN, 1,
-                            CV_RGB(0, 255, 0));
+                    putText(m_image_new, sstr.str().c_str(), Point(m_image.cols / 2 - 100, y - 2), FONT_HERSHEY_PLAIN, 1,
+                            CV_RGB(255, 0, 0));
                 }
                 if (right.x > 0) {
-                    line(m_image, cvPoint(m_image.cols / 2, y), right, Scalar(0, 0, 255));
+                    line(m_image_new, cvPoint(m_image.cols / 2, y), right, Scalar(255, 0, 0), 1, 8);
 
                     stringstream sstr;
-                    sstr << (right.x - m_image.cols / 2);
-                    putText(m_image, sstr.str().c_str(), cvPoint(m_image.cols / 2 + 100, y - 2), FONT_HERSHEY_PLAIN, 1,
+                    sstr << (right.x - m_image_new.cols / 2);
+                    putText(m_image_new, sstr.str().c_str(), cvPoint(m_image.cols / 2 + 100, y - 2), FONT_HERSHEY_PLAIN, 1,
                             CV_RGB(255, 0, 0));
                 }
             }
@@ -367,11 +348,12 @@ namespace scaledcars {
             if (fabs(e) > 1e-2) {
                 desiredSteering = y;
 
-                if (desiredSteering > 25.0) {
-                    desiredSteering = 25.0;
+                // set an upper and lower limit for the desired steering
+                if (desiredSteering > 1.5) {
+                    desiredSteering = 1.5;
                 }
-                if (desiredSteering < -25.0) {
-                    desiredSteering = -25.0;
+                if (desiredSteering < -1.5) {
+                    desiredSteering = -1.5;
                 }
 
             }
@@ -380,14 +362,10 @@ namespace scaledcars {
             if (m_debug) {
                 if (m_image.data != NULL) {
                     imshow("Debug Image",
-                           m_image);  //m_image = image without canny || m_image_new = fully processed image
+                           m_image_new);  //m_image = image without canny || m_image_new = fully processed image
                     waitKey(10);
                 }
             }
-
-            // change values if real car to acceptable arduino values: radians to degress
-
-            cerr << " steering val  " << desiredSteering << endl;
             m_vehicleControl.setSteeringWheelAngle(desiredSteering);
 
 
@@ -415,18 +393,12 @@ namespace scaledcars {
                     laneFollower(error);
                 }
 
-                if (!Sim) {
-                    Container processed_image_container(m_sharedProcessedImage);
-                    getConference().send(processed_image_container);
-                }
-
-
                 // State control for intersection stop
                 if (state == "moving") {
                     if (Sim) {
                         m_vehicleControl.setSpeed(1);
                     } else {
-                        m_vehicleControl.setSpeed(104);
+                        m_vehicleControl.setSpeed(100);
                     }
 
                     if (stop) {
@@ -445,7 +417,7 @@ namespace scaledcars {
                     if (Sim) {
                         m_vehicleControl.setSpeed(0);
                     } else {
-                        m_vehicleControl.setSpeed(200);
+                        m_vehicleControl.setSpeed(90);
                     }
                     stopCounter += 0.5;
 
@@ -454,7 +426,7 @@ namespace scaledcars {
                         if (Sim) {
                             m_vehicleControl.setSpeed(1);
                         } else {
-                            m_vehicleControl.setSpeed(104);
+                            m_vehicleControl.setSpeed(99);
                         }
                         cerr << "Resuming!" << endl;
                     }

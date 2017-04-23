@@ -369,6 +369,32 @@ scaledcars-control-serialsendhandler-static/fast:
 	$(MAKE) -f control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/build.make control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/build
 .PHONY : scaledcars-control-serialsendhandler-static/fast
 
+#=============================================================================
+# Target rules for targets named scaledcars-control-serialreceivehandler-static
+
+# Build rule for target.
+scaledcars-control-serialreceivehandler-static: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 scaledcars-control-serialreceivehandler-static
+.PHONY : scaledcars-control-serialreceivehandler-static
+
+# fast build rule for target.
+scaledcars-control-serialreceivehandler-static/fast:
+	$(MAKE) -f control/serialreceivehandler/CMakeFiles/scaledcars-control-serialreceivehandler-static.dir/build.make control/serialreceivehandler/CMakeFiles/scaledcars-control-serialreceivehandler-static.dir/build
+.PHONY : scaledcars-control-serialreceivehandler-static/fast
+
+#=============================================================================
+# Target rules for targets named scaledcars-control-serialreceivehandler
+
+# Build rule for target.
+scaledcars-control-serialreceivehandler: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 scaledcars-control-serialreceivehandler
+.PHONY : scaledcars-control-serialreceivehandler
+
+# fast build rule for target.
+scaledcars-control-serialreceivehandler/fast:
+	$(MAKE) -f control/serialreceivehandler/CMakeFiles/scaledcars-control-serialreceivehandler.dir/build.make control/serialreceivehandler/CMakeFiles/scaledcars-control-serialreceivehandler.dir/build
+.PHONY : scaledcars-control-serialreceivehandler/fast
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -398,6 +424,8 @@ help:
 	@echo "... ProxyTestSuite.h-TestSuite"
 	@echo "... scaledcars-control-serialsendhandler"
 	@echo "... scaledcars-control-serialsendhandler-static"
+	@echo "... scaledcars-control-serialreceivehandler-static"
+	@echo "... scaledcars-control-serialreceivehandler"
 .PHONY : help
 
 

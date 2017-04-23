@@ -17,4 +17,11 @@
 /opt/opendlv.scaledcars/bin/scaledcars-control-serialsendhandler
 /opt/opendlv.scaledcars/lib/libscaledcars-control-serialsendhandler-static.a
 /opt/opendlv.scaledcars/include/scaledcars-control-serialsendhandler/SerialSendHandler.h
+/opt/opendlv.scaledcars/include/scaledcars-control-serialsendhandler/SerialReceiveBytes.h
 /opt/opendlv.scaledcars/include/scaledcars-control-serialsendhandler/protocol.h
+/opt/opendlv.scaledcars/bin/scaledcars-control-serialreceivehandler
+/opt/opendlv.scaledcars/lib/libscaledcars-control-serialreceivehandler-static.a
+/opt/opendlv.scaledcars/include/scaledcars-control-serialreceivehandler/SerialListener.h
+/opt/opendlv.scaledcars/include/scaledcars-control-serialreceivehandler/SerialReceiveHandler.h
+/opt/opendlv.scaledcars/include/scaledcars-control-serialreceivehandler/Filter.h
+/opt/opendlv.scaledcars/include/scaledcars-control-serialreceivehandler/protocol.h

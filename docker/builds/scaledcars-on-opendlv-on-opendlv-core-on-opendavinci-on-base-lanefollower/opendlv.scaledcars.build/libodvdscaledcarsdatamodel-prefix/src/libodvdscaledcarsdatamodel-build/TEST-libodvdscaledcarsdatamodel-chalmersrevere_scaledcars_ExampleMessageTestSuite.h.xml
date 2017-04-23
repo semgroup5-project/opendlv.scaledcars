@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <testsuites>
-<testsuite name="libodvdscaledcarsdatamodel-chalmersrevere_scaledcars_ExampleMessageTestSuite.h" tests="4" failures="0" errors="0" time="0" timestamp="Sat Apr 15 10:59:06 2017" file="/opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel/testsuites/chalmersrevere_scaledcars_ExampleMessageTestSuite.h" >
+<testsuite name="libodvdscaledcarsdatamodel-chalmersrevere_scaledcars_ExampleMessageTestSuite.h" tests="4" failures="0" errors="0" time="0" timestamp="Thu Apr 20 18:33:56 2017" file="/opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel/testsuites/chalmersrevere_scaledcars_ExampleMessageTestSuite.h" >
     <testcase name="testCreateObject" classname="chalmersrevere_scaledcars_ExampleMessage_TestSuite" line="28" >    </testcase>
     <testcase name="testCreateAndCopyObject" classname="chalmersrevere_scaledcars_ExampleMessage_TestSuite" line="39" >    </testcase>
     <testcase name="testCreateAndAssignObject" classname="chalmersrevere_scaledcars_ExampleMessage_TestSuite" line="60" >    </testcase>

@@ -14,6 +14,8 @@ control/lanefollower/CMakeFiles/scaledcars-control-lanefollwer-static.dir/src/La
 control/lanefollower/CMakeFiles/scaledcars-control-lanefollwer-static.dir/src/LaneFollower.cpp.o: /opt/od4/include/automotivedata/generated/automotive/miniature/SensorBoardData.h
 control/lanefollower/CMakeFiles/scaledcars-control-lanefollwer-static.dir/src/LaneFollower.cpp.o: /opt/od4/include/automotivedata/generated/automotive/miniature/SteeringData.h
 control/lanefollower/CMakeFiles/scaledcars-control-lanefollwer-static.dir/src/LaneFollower.cpp.o: /opt/od4/include/automotivedata/generated/automotive/miniature/UserButtonData.h
+control/lanefollower/CMakeFiles/scaledcars-control-lanefollwer-static.dir/src/LaneFollower.cpp.o: /opt/od4/include/automotivedata/generated/automotive/vehicle/LightSystem.h
+control/lanefollower/CMakeFiles/scaledcars-control-lanefollwer-static.dir/src/LaneFollower.cpp.o: /opt/od4/include/automotivedata/generated/automotive/vehicle/WheelSpeed.h
 control/lanefollower/CMakeFiles/scaledcars-control-lanefollwer-static.dir/src/LaneFollower.cpp.o: /opt/od4/include/automotivedata/generated/cartesian/Constants.h
 control/lanefollower/CMakeFiles/scaledcars-control-lanefollwer-static.dir/src/LaneFollower.cpp.o: /opt/od4/include/automotivedata/generated/cartesian/Matrix3x3.h
 control/lanefollower/CMakeFiles/scaledcars-control-lanefollwer-static.dir/src/LaneFollower.cpp.o: /opt/od4/include/automotivedata/generated/cartesian/Point2.h
