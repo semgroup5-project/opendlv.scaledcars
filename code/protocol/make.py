@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import re
+import os
 
 
 NOTICE = '\n'.join([
@@ -11,8 +12,11 @@ NOTICE = '\n'.join([
     ' */',
 ] + [''] * 2)
 
-PATH_IN = 'protocol.14.c'
-PATH_OUT = 'protocol.11.c'
+
+PATH_BASE = 'src/'
+
+PATH_IN = os.path.join(PATH_BASE, 'protocol.14.c')
+PATH_OUT = os.path.join(PATH_BASE, 'protocol.11.c')
 
 
 def main():

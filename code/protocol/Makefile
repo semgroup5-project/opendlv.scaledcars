@@ -8,6 +8,6 @@ clean:
 preprocess:
 	$(PY3) make.py
 compile:
-	gcc protocol.h protocol.c test.c -o out
+	gcc src/protocol.h src/protocol.c src/test.c -o out
 run:
 	./out
