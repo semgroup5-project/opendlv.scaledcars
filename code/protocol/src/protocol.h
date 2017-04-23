@@ -2,6 +2,7 @@
 #define PROTOCOL_H
 
 #include <stdbool.h>
+#include <stdint.h>
 
 #define ID_OUT_MOTOR                1
 #define ID_OUT_SERVO                2
@@ -22,8 +23,8 @@ extern "C" {
  * Data transfer unit
  */
 typedef struct {
-    char a;
-    char b;
+    uint8_t a;
+    uint8_t b;
 } protocol_frame;
 
 /**
@@ -46,7 +47,7 @@ typedef struct {
 /**
  * Calculate the checksum for the specified frame
  */
-char protocol_checksum_calculate(protocol_frame frame);
+uint8_t protocol_checksum_calculate(protocol_frame frame);
 
 /**
  * Validate the checksum included in the specified frame
@@ -66,12 +67,12 @@ protocol_data protocol_decode(protocol_frame frame);
 /**
  * Get the frame index of the specified byte
  */
-char protocol_get_byte_index(char byte);
+uint8_t protocol_get_byte_index(uint8_t b);
 
 /**
  * Handle received byte
  */
-void protocol_receive(protocol_state *state, char byte);
+void protocol_receive(protocol_state *state, uint8_t b);
 
 #ifdef __cplusplus
 }
