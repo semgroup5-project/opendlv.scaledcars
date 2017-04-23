@@ -11,7 +11,7 @@
 
 serial_state *serial_new()
 {
-    serial_state *state = malloc(sizeof(serial_state));
+    serial_state *state = (serial_state *) malloc(sizeof(serial_state));
 
     protocol_state_init(&state->protocol);
 
@@ -58,7 +58,7 @@ void serial_handshake(serial_state *state, uint8_t hb)
 
 void *serial_incoming_thread_routine(void *_state)
 {
-    serial_state *state = _state;
+    serial_state *state = (serial_state *) _state;
 
     do {
         g_mutex_lock(&state->read_mutex);
@@ -70,7 +70,7 @@ void *serial_incoming_thread_routine(void *_state)
 
             protocol_receive(&state->protocol, b);
             if (state->protocol.valid) {
-                protocol_data *_data = malloc(sizeof(protocol_data));
+                protocol_data *_data = (protocol_data *) malloc(sizeof(protocol_data));
                 _data->id = state->protocol.data.id;
                 _data->value = state->protocol.data.value;
 
@@ -83,14 +83,16 @@ void *serial_incoming_thread_routine(void *_state)
         g_mutex_unlock(&state->read_mutex);
 
     } while (state->run);
+
+    return NULL;
 }
 
 void *serial_outgoing_thread_routine(void *_state)
 {
-    serial_state *state = _state;
+    serial_state *state = (serial_state *) _state;
 
     do {
-        protocol_data *data = g_async_queue_try_pop(state->outgoing_queue);
+        protocol_data *data = (protocol_data *) g_async_queue_try_pop(state->outgoing_queue);
         if (data == NULL) {
             continue;
         }
@@ -110,6 +112,8 @@ void *serial_outgoing_thread_routine(void *_state)
         free(data);
 
     } while (state->run);
+
+    return NULL;
 }
 
 void serial_start(serial_state *state)
@@ -137,7 +141,7 @@ void serial_stop(serial_state *state)
 
 bool serial_receive(serial_state *state, protocol_data *data)
 {
-    protocol_data *_data = g_async_queue_try_pop(state->incoming_queue);
+    protocol_data *_data = (protocol_data *) g_async_queue_try_pop(state->incoming_queue);
     if (data == NULL) {
         return false;
     }
@@ -152,7 +156,7 @@ bool serial_receive(serial_state *state, protocol_data *data)
 
 void serial_send(serial_state *state, protocol_data data)
 {
-    protocol_data *_data = malloc(sizeof(protocol_data));
+    protocol_data *_data = (protocol_data *) malloc(sizeof(protocol_data));
     _data->id = data.id;
     _data->value = data.value;
 
