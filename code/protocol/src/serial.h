@@ -16,6 +16,7 @@ typedef struct {
     void (*on_write)(uint8_t b);
 
     protocol_state protocol;
+
     int fd;
 
     bool run;

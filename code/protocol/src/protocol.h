@@ -70,6 +70,11 @@ protocol_data protocol_decode(protocol_frame frame);
 uint8_t protocol_get_byte_index(uint8_t b);
 
 /**
+ * Initialize protocol state
+ */
+void protocol_state_init(protocol_state *state);
+
+/**
  * Handle received byte
  */
 void protocol_receive(protocol_state *state, uint8_t b);

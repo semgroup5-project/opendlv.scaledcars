@@ -6,11 +6,16 @@
 #include <unistd.h>
 #include <glib.h>
 
+#include "protocol.h"
 #include "arduino.h"
 
 serial_state *serial_new()
 {
     serial_state *state = malloc(sizeof(serial_state));
+
+    protocol_state_init(&state->protocol);
+
+    state->fd = -1;
 
     state->run = false;
 
@@ -45,7 +50,7 @@ bool serial_open(serial_state *state, const char *serialport, int baud)
 
 void serial_handshake(serial_state *state, uint8_t hb)
 {
-    uint8_t b;
+    uint8_t b = 0;
     do {
         serialport_readbyte(state->fd, &b);
     } while (b != hb);

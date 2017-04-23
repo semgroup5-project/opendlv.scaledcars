@@ -65,6 +65,17 @@ uint8_t protocol_get_byte_index(uint8_t b)
     return b & 0b1;
 }
 
+void protocol_state_init(protocol_state *state)
+{
+    state->frame.a = 0;
+    state->frame.b = 0;
+
+    state->valid = false;
+
+    state->data.id = 0;
+    state->data.value = 0;
+}
+
 void protocol_receive(protocol_state *state, uint8_t b)
 {
     uint8_t index = protocol_get_byte_index(b);

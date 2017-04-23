@@ -105,6 +105,8 @@ int main(int argc, const char *argv[])
     while (!serial_receive(serial, &echo));
     printf("%d==%d %d==%d \n", _data2.id, echo.id, _data2.value, echo.value);
 
+    sleep(10);
+
     serial_stop(serial);
     serial_free(serial);
 

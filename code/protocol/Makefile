@@ -23,6 +23,7 @@ all: compile run clean
 
 clean:
 	rm out
+	rm vgcore.*
 preprocess:
 	$(PY3) make.py
 compile: preprocess
