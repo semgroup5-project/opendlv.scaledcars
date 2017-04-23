@@ -53,6 +53,10 @@ namespace scaledcars {
             cerr << "serial open" << endl;
             serial_handshake(this->serial, '\n');
             cerr << "serial handshake" << endl;
+
+            const uint32_t ONE_SECOND = 1000 * 1000;
+            odcore::base::Thread::usleepFor(2 * ONE_SECOND);
+
             serial_start(this->serial);
             cerr << "serial start" << endl;
         }
