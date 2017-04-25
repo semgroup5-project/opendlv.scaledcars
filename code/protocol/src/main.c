@@ -7,12 +7,12 @@
 
 void __on_read(uint8_t b)
 {
-    printf(">> read '%c' \n", b);
+    printf(">> read %d \n", b);
 }
 
 void __on_write(uint8_t b)
 {
-    printf("<< write '%c' \n", b);
+    printf("<< write %d \n", b);
 }
 
 int main(int argc, const char *argv[])
@@ -23,18 +23,46 @@ int main(int argc, const char *argv[])
 
     int count = 0;
     int total = 0;
+    float success;
 
-    for (int id = 0; id < 8; id++) {
-        for (int value = 0; value < 256; value++) {
+    int id;
+    int value;
+
+    protocol_frame frame;
+    protocol_data _data, data;
+
+    for (id = 0; id < 4; id++) {
+        for (value = 0; value < 64; value++) {
             total++;
 
-            protocol_data _data = {
-                .id = id,
-                .value = value
-            };
+            _data.id = id;
+            _data.value = value;
 
-            protocol_frame frame = protocol_encode(_data);
-            protocol_data data = protocol_decode(frame);
+            frame = protocol_encode(_data, FRAME_T1);
+            data = protocol_decode(frame);
+
+            if (!(data.id == _data.id)) continue;
+            if (!(data.value == _data.value)) continue;
+
+            count++;
+        }
+    }
+
+    success = count / (float) total;
+    printf("T1: count=%d total=%d success=%f \n", count, total, success);
+
+    count = 0;
+    total = 0;
+
+    for (id = 0; id < 8; id++) {
+        for (value = 0; value < 256; value++) {
+            total++;
+
+            _data.id = id;
+            _data.value = value;
+
+            frame = protocol_encode(_data, FRAME_T2);
+            data = protocol_decode(frame);
 
             if (!(data.id == _data.id)) continue;
             if (!(data.value == _data.value)) continue;
@@ -48,9 +76,8 @@ int main(int argc, const char *argv[])
         }
     }
 
-    float ratio = count / total;
-
-    printf("count=%d total=%d ratio=%f \n", count, total, ratio);
+    success = count / (float) total;
+    printf("T2: count=%d total=%d success=%f \n", count, total, success);
 
     protocol_frame _frame;
     _frame.a = 45;
@@ -68,12 +95,16 @@ int main(int argc, const char *argv[])
         .value = 0
     };
 
-    protocol_frame _frame1 = protocol_encode(_data1);
-    protocol_frame _frame2 = protocol_encode(_data2);
+    protocol_frame _frame1 = protocol_encode(_data1, FRAME_T2);
+    protocol_frame _frame2 = protocol_encode(_data2, FRAME_T2);
 
     protocol_state protocol;
+
     protocol.frame.a = 0;
     protocol.frame.b = 0;
+
+    protocol.frame.t = FRAME_T2;
+
     protocol_receive(&protocol, _frame1.a);
     protocol_receive(&protocol, _frame1.b);
 
@@ -97,15 +128,13 @@ int main(int argc, const char *argv[])
     serial_send(serial, _data1);
     serial_send(serial, _data2);
 
-    sleep(20);
+    sleep(2);
 
     protocol_data echo;
     while (!serial_receive(serial, &echo));
     printf("%d==%d %d==%d \n", _data1.id, echo.id, _data1.value, echo.value);
     while (!serial_receive(serial, &echo));
     printf("%d==%d %d==%d \n", _data2.id, echo.id, _data2.value, echo.value);
-
-    sleep(10);
 
     serial_stop(serial);
     serial_free(serial);

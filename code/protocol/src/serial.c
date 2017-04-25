@@ -68,9 +68,13 @@ void *serial_incoming_thread_routine(void *_state)
         if (n != -1) {
             state->on_read(b);
 
+            state->protocol.frame.t = FRAME_T2;
+
             protocol_receive(&state->protocol, b);
+
             if (state->protocol.valid) {
                 protocol_data *_data = (protocol_data *) malloc(sizeof(protocol_data));
+
                 _data->id = state->protocol.data.id;
                 _data->value = state->protocol.data.value;
 
@@ -81,6 +85,8 @@ void *serial_incoming_thread_routine(void *_state)
         }
 
         g_mutex_unlock(&state->read_mutex);
+
+        sleep(.01);
 
     } while (state->run);
 
@@ -97,7 +103,7 @@ void *serial_outgoing_thread_routine(void *_state)
             continue;
         }
 
-        protocol_frame frame = protocol_encode(*data);
+        protocol_frame frame = protocol_encode(*data, FRAME_T2);
 
         g_mutex_lock(&state->write_mutex);
 
@@ -110,6 +116,8 @@ void *serial_outgoing_thread_routine(void *_state)
         g_mutex_unlock(&state->write_mutex);
 
         free(data);
+
+        sleep(.01);
 
     } while (state->run);
 

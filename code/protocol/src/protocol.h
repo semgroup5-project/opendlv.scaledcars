@@ -4,6 +4,9 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#define FRAME_T1 1
+#define FRAME_T2 2
+
 #define ID_OUT_MOTOR                1
 #define ID_OUT_SERVO                2
 #define ID_OUT_ODOMETER             3
@@ -25,6 +28,8 @@ extern "C" {
 typedef struct {
     uint8_t a;
     uint8_t b;
+
+    uint8_t t;
 } protocol_frame;
 
 /**
@@ -57,12 +62,16 @@ bool protocol_checksum_check(protocol_frame frame);
 /**
  * Encode data into a transferable frame
  */
-protocol_frame protocol_encode(protocol_data data);
+protocol_frame protocol_encode(protocol_data data, uint8_t frame_t);
+protocol_frame protocol_encode_t1(protocol_data data);
+protocol_frame protocol_encode_t2(protocol_data data);
 
 /**
  * Decode data from a transferable frame
  */
 protocol_data protocol_decode(protocol_frame frame);
+protocol_data protocol_decode_t1(protocol_frame frame);
+protocol_data protocol_decode_t2(protocol_frame frame);
 
 /**
  * Get the frame index of the specified byte

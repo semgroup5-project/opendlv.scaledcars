@@ -30,9 +30,36 @@ bool protocol_checksum_check(protocol_frame frame)
     return expected == obtained;
 }
 
-protocol_frame protocol_encode(protocol_data data)
+protocol_frame protocol_encode(protocol_data data, uint8_t frame_t)
+{
+    if (frame_t == FRAME_T1) {
+        return protocol_encode_t1(data);
+    }
+
+    if (frame_t == FRAME_T2) {
+        return protocol_encode_t2(data);
+    }
+}
+
+protocol_frame protocol_encode_t1(protocol_data data)
 {
     protocol_frame frame;
+
+    frame.t = FRAME_T1;
+
+    frame.a = (
+        ((data.id & 0x3) << 0) |
+        ((data.value & 0x3f) << 2)
+    );
+
+    return frame;
+}
+
+protocol_frame protocol_encode_t2(protocol_data data)
+{
+    protocol_frame frame;
+
+    frame.t = FRAME_T2;
 
     frame.a = (
         (0 << 0) |
@@ -53,6 +80,27 @@ protocol_frame protocol_encode(protocol_data data)
 }
 
 protocol_data protocol_decode(protocol_frame frame)
+{
+    if (frame.t == FRAME_T1) {
+        return protocol_decode_t1(frame);
+    }
+
+    if (frame.t == FRAME_T2) {
+        return protocol_decode_t2(frame);
+    }
+}
+
+protocol_data protocol_decode_t1(protocol_frame frame)
+{
+    protocol_data data;
+
+    data.id = (frame.a >> 0) & 0x3;
+    data.value = (frame.a >> 2) & 0x3f;
+
+    return data;
+}
+
+protocol_data protocol_decode_t2(protocol_frame frame)
 {
     protocol_data data;
 
