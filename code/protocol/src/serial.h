@@ -12,6 +12,9 @@ extern "C" {
 
 typedef struct {
 
+    uint8_t incoming_frame_t;
+    uint8_t outgoing_frame_t;
+
     void (*on_read)(uint8_t b);
     void (*on_write)(uint8_t b);
 

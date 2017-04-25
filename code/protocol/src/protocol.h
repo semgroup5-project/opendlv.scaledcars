@@ -28,8 +28,6 @@ extern "C" {
 typedef struct {
     uint8_t a;
     uint8_t b;
-
-    uint8_t t;
 } protocol_frame;
 
 /**
@@ -62,14 +60,12 @@ bool protocol_checksum_check(protocol_frame frame);
 /**
  * Encode data into a transferable frame
  */
-protocol_frame protocol_encode(protocol_data data, uint8_t frame_t);
 protocol_frame protocol_encode_t1(protocol_data data);
 protocol_frame protocol_encode_t2(protocol_data data);
 
 /**
  * Decode data from a transferable frame
  */
-protocol_data protocol_decode(protocol_frame frame);
 protocol_data protocol_decode_t1(protocol_frame frame);
 protocol_data protocol_decode_t2(protocol_frame frame);
 
@@ -86,7 +82,7 @@ void protocol_state_init(protocol_state *state);
 /**
  * Handle received byte
  */
-void protocol_receive(protocol_state *state, uint8_t b);
+void protocol_receive_t2(protocol_state *state, uint8_t b);
 
 #ifdef __cplusplus
 }

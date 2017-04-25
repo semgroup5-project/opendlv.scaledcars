@@ -38,8 +38,8 @@ int main(int argc, const char *argv[])
             _data.id = id;
             _data.value = value;
 
-            frame = protocol_encode(_data, FRAME_T1);
-            data = protocol_decode(frame);
+            frame = protocol_encode_t1(_data);
+            data = protocol_decode_t1(frame);
 
             if (!(data.id == _data.id)) continue;
             if (!(data.value == _data.value)) continue;
@@ -61,8 +61,8 @@ int main(int argc, const char *argv[])
             _data.id = id;
             _data.value = value;
 
-            frame = protocol_encode(_data, FRAME_T2);
-            data = protocol_decode(frame);
+            frame = protocol_encode_t2(_data);
+            data = protocol_decode_t2(frame);
 
             if (!(data.id == _data.id)) continue;
             if (!(data.value == _data.value)) continue;
@@ -95,18 +95,16 @@ int main(int argc, const char *argv[])
         .value = 0
     };
 
-    protocol_frame _frame1 = protocol_encode(_data1, FRAME_T2);
-    protocol_frame _frame2 = protocol_encode(_data2, FRAME_T2);
+    protocol_frame _frame1 = protocol_encode_t2(_data1);
+    protocol_frame _frame2 = protocol_encode_t2(_data2);
 
     protocol_state protocol;
 
     protocol.frame.a = 0;
     protocol.frame.b = 0;
 
-    protocol.frame.t = FRAME_T2;
-
-    protocol_receive(&protocol, _frame1.a);
-    protocol_receive(&protocol, _frame1.b);
+    protocol_receive_t2(&protocol, _frame1.a);
+    protocol_receive_t2(&protocol, _frame1.b);
 
     printf("%d==%d \n", true, protocol.valid);
     printf("%d==%d \n", _data1.id, protocol.data.id);
@@ -118,7 +116,8 @@ int main(int argc, const char *argv[])
 
     serial_state *serial = serial_new();
 
-    serial->protocol.frame.t = FRAME_T2;
+    serial->incoming_frame_t = FRAME_T2;
+    serial->outgoing_frame_t = FRAME_T1;
 
     serial->on_write = &__on_write;
     serial->on_read = &__on_read;

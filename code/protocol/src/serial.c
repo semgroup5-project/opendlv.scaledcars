@@ -68,19 +68,33 @@ void *serial_incoming_thread_routine(void *_state)
         if (n != -1) {
             state->on_read(b);
 
-            state->protocol.frame.t = FRAME_T2;
+            if (state->incoming_frame_t == FRAME_T1) {
+                protocol_frame _frame;
+                _frame.a = b;
 
-            protocol_receive(&state->protocol, b);
-
-            if (state->protocol.valid) {
+                protocol_data data = protocol_decode_t1(_frame);
                 protocol_data *_data = (protocol_data *) malloc(sizeof(protocol_data));
 
-                _data->id = state->protocol.data.id;
-                _data->value = state->protocol.data.value;
+                _data->id = data.id;
+                _data->value = data.value;
 
                 g_async_queue_push(state->incoming_queue, _data);
+            }
 
-                state->protocol.valid = false;
+            if (state->incoming_frame_t == FRAME_T2) {
+
+                protocol_receive_t2(&state->protocol, b);
+
+                if (state->protocol.valid) {
+                    protocol_data *_data = (protocol_data *) malloc(sizeof(protocol_data));
+
+                    _data->id = state->protocol.data.id;
+                    _data->value = state->protocol.data.value;
+
+                    g_async_queue_push(state->incoming_queue, _data);
+
+                    state->protocol.valid = false;
+                }
             }
         }
 
@@ -103,19 +117,19 @@ void *serial_outgoing_thread_routine(void *_state)
             continue;
         }
 
-        uint8_t frame_t = state->protocol.frame.t;
-
-        protocol_frame frame = protocol_encode(*data, frame_t);
-
         g_mutex_lock(&state->write_mutex);
 
-        if (frame_t == FRAME_T1) {
+        if (state->outgoing_frame_t == FRAME_T1) {
+            protocol_frame frame = protocol_encode_t1(*data);
+
             serialport_writebyte(state->fd, frame.a);
 
             state->on_write(frame.a);
         }
 
-        if (frame_t == FRAME_T2) {
+        if (state->outgoing_frame_t == FRAME_T2) {
+            protocol_frame frame = protocol_encode_t2(*data);
+
             serialport_writebyte(state->fd, frame.a);
             serialport_writebyte(state->fd, frame.b);
 
