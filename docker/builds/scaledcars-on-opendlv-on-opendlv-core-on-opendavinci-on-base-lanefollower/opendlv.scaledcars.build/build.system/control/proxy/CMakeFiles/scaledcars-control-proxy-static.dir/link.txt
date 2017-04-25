@@ -1,2 +1,2 @@
-/usr/bin/ar qc libscaledcars-control-proxy-static.a  CMakeFiles/scaledcars-control-proxy-static.dir/src/Proxy.cpp.o CMakeFiles/scaledcars-control-proxy-static.dir/src/Camera.cpp.o CMakeFiles/scaledcars-control-proxy-static.dir/src/OpenCVCamera.cpp.o
+/usr/bin/ar qc libscaledcars-control-proxy-static.a  CMakeFiles/scaledcars-control-proxy-static.dir/src/Proxy.cpp.o CMakeFiles/scaledcars-control-proxy-static.dir/src/OpenCVCamera.cpp.o CMakeFiles/scaledcars-control-proxy-static.dir/src/Camera.cpp.o
 /usr/bin/ranlib libscaledcars-control-proxy-static.a

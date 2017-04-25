@@ -184,3 +184,6 @@ control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static
 control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/src/SerialSendHandler.cpp.o: /usr/include/glib-2.0/glib/gwin32.h
 control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/src/SerialSendHandler.cpp.o: /usr/lib/x86_64-linux-gnu/glib-2.0/include/glibconfig.h
 
+control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/src/netstrings.cpp.o: /opt/opendlv.scaledcars.sources/code/control/serialsendhandler/include/netstrings.hpp
+control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/src/netstrings.cpp.o: /opt/opendlv.scaledcars.sources/code/control/serialsendhandler/src/netstrings.cpp
+

@@ -81,33 +81,9 @@ control/proxy/CMakeFiles/scaledcars-control-proxy-static.dir/src/Proxy.cpp.o.pro
 control/proxy/CMakeFiles/scaledcars-control-proxy-static.dir/src/Proxy.cpp.o.provides.build: control/proxy/CMakeFiles/scaledcars-control-proxy-static.dir/src/Proxy.cpp.o
 
 
-control/proxy/CMakeFiles/scaledcars-control-proxy-static.dir/src/Camera.cpp.o: control/proxy/CMakeFiles/scaledcars-control-proxy-static.dir/flags.make
-control/proxy/CMakeFiles/scaledcars-control-proxy-static.dir/src/Camera.cpp.o: /opt/opendlv.scaledcars.sources/code/control/proxy/src/Camera.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/opt/opendlv.scaledcars.build/build.system/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object control/proxy/CMakeFiles/scaledcars-control-proxy-static.dir/src/Camera.cpp.o"
-	cd /opt/opendlv.scaledcars.build/build.system/control/proxy && /usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/scaledcars-control-proxy-static.dir/src/Camera.cpp.o -c /opt/opendlv.scaledcars.sources/code/control/proxy/src/Camera.cpp
-
-control/proxy/CMakeFiles/scaledcars-control-proxy-static.dir/src/Camera.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/scaledcars-control-proxy-static.dir/src/Camera.cpp.i"
-	cd /opt/opendlv.scaledcars.build/build.system/control/proxy && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /opt/opendlv.scaledcars.sources/code/control/proxy/src/Camera.cpp > CMakeFiles/scaledcars-control-proxy-static.dir/src/Camera.cpp.i
-
-control/proxy/CMakeFiles/scaledcars-control-proxy-static.dir/src/Camera.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/scaledcars-control-proxy-static.dir/src/Camera.cpp.s"
-	cd /opt/opendlv.scaledcars.build/build.system/control/proxy && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /opt/opendlv.scaledcars.sources/code/control/proxy/src/Camera.cpp -o CMakeFiles/scaledcars-control-proxy-static.dir/src/Camera.cpp.s
-
-control/proxy/CMakeFiles/scaledcars-control-proxy-static.dir/src/Camera.cpp.o.requires:
-
-.PHONY : control/proxy/CMakeFiles/scaledcars-control-proxy-static.dir/src/Camera.cpp.o.requires
-
-control/proxy/CMakeFiles/scaledcars-control-proxy-static.dir/src/Camera.cpp.o.provides: control/proxy/CMakeFiles/scaledcars-control-proxy-static.dir/src/Camera.cpp.o.requires
-	$(MAKE) -f control/proxy/CMakeFiles/scaledcars-control-proxy-static.dir/build.make control/proxy/CMakeFiles/scaledcars-control-proxy-static.dir/src/Camera.cpp.o.provides.build
-.PHONY : control/proxy/CMakeFiles/scaledcars-control-proxy-static.dir/src/Camera.cpp.o.provides
-
-control/proxy/CMakeFiles/scaledcars-control-proxy-static.dir/src/Camera.cpp.o.provides.build: control/proxy/CMakeFiles/scaledcars-control-proxy-static.dir/src/Camera.cpp.o
-
-
 control/proxy/CMakeFiles/scaledcars-control-proxy-static.dir/src/OpenCVCamera.cpp.o: control/proxy/CMakeFiles/scaledcars-control-proxy-static.dir/flags.make
 control/proxy/CMakeFiles/scaledcars-control-proxy-static.dir/src/OpenCVCamera.cpp.o: /opt/opendlv.scaledcars.sources/code/control/proxy/src/OpenCVCamera.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/opt/opendlv.scaledcars.build/build.system/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object control/proxy/CMakeFiles/scaledcars-control-proxy-static.dir/src/OpenCVCamera.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/opt/opendlv.scaledcars.build/build.system/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object control/proxy/CMakeFiles/scaledcars-control-proxy-static.dir/src/OpenCVCamera.cpp.o"
 	cd /opt/opendlv.scaledcars.build/build.system/control/proxy && /usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/scaledcars-control-proxy-static.dir/src/OpenCVCamera.cpp.o -c /opt/opendlv.scaledcars.sources/code/control/proxy/src/OpenCVCamera.cpp
 
 control/proxy/CMakeFiles/scaledcars-control-proxy-static.dir/src/OpenCVCamera.cpp.i: cmake_force
@@ -129,18 +105,42 @@ control/proxy/CMakeFiles/scaledcars-control-proxy-static.dir/src/OpenCVCamera.cp
 control/proxy/CMakeFiles/scaledcars-control-proxy-static.dir/src/OpenCVCamera.cpp.o.provides.build: control/proxy/CMakeFiles/scaledcars-control-proxy-static.dir/src/OpenCVCamera.cpp.o
 
 
+control/proxy/CMakeFiles/scaledcars-control-proxy-static.dir/src/Camera.cpp.o: control/proxy/CMakeFiles/scaledcars-control-proxy-static.dir/flags.make
+control/proxy/CMakeFiles/scaledcars-control-proxy-static.dir/src/Camera.cpp.o: /opt/opendlv.scaledcars.sources/code/control/proxy/src/Camera.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/opt/opendlv.scaledcars.build/build.system/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object control/proxy/CMakeFiles/scaledcars-control-proxy-static.dir/src/Camera.cpp.o"
+	cd /opt/opendlv.scaledcars.build/build.system/control/proxy && /usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/scaledcars-control-proxy-static.dir/src/Camera.cpp.o -c /opt/opendlv.scaledcars.sources/code/control/proxy/src/Camera.cpp
+
+control/proxy/CMakeFiles/scaledcars-control-proxy-static.dir/src/Camera.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/scaledcars-control-proxy-static.dir/src/Camera.cpp.i"
+	cd /opt/opendlv.scaledcars.build/build.system/control/proxy && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /opt/opendlv.scaledcars.sources/code/control/proxy/src/Camera.cpp > CMakeFiles/scaledcars-control-proxy-static.dir/src/Camera.cpp.i
+
+control/proxy/CMakeFiles/scaledcars-control-proxy-static.dir/src/Camera.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/scaledcars-control-proxy-static.dir/src/Camera.cpp.s"
+	cd /opt/opendlv.scaledcars.build/build.system/control/proxy && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /opt/opendlv.scaledcars.sources/code/control/proxy/src/Camera.cpp -o CMakeFiles/scaledcars-control-proxy-static.dir/src/Camera.cpp.s
+
+control/proxy/CMakeFiles/scaledcars-control-proxy-static.dir/src/Camera.cpp.o.requires:
+
+.PHONY : control/proxy/CMakeFiles/scaledcars-control-proxy-static.dir/src/Camera.cpp.o.requires
+
+control/proxy/CMakeFiles/scaledcars-control-proxy-static.dir/src/Camera.cpp.o.provides: control/proxy/CMakeFiles/scaledcars-control-proxy-static.dir/src/Camera.cpp.o.requires
+	$(MAKE) -f control/proxy/CMakeFiles/scaledcars-control-proxy-static.dir/build.make control/proxy/CMakeFiles/scaledcars-control-proxy-static.dir/src/Camera.cpp.o.provides.build
+.PHONY : control/proxy/CMakeFiles/scaledcars-control-proxy-static.dir/src/Camera.cpp.o.provides
+
+control/proxy/CMakeFiles/scaledcars-control-proxy-static.dir/src/Camera.cpp.o.provides.build: control/proxy/CMakeFiles/scaledcars-control-proxy-static.dir/src/Camera.cpp.o
+
+
 # Object files for target scaledcars-control-proxy-static
 scaledcars__control__proxy__static_OBJECTS = \
 "CMakeFiles/scaledcars-control-proxy-static.dir/src/Proxy.cpp.o" \
-"CMakeFiles/scaledcars-control-proxy-static.dir/src/Camera.cpp.o" \
-"CMakeFiles/scaledcars-control-proxy-static.dir/src/OpenCVCamera.cpp.o"
+"CMakeFiles/scaledcars-control-proxy-static.dir/src/OpenCVCamera.cpp.o" \
+"CMakeFiles/scaledcars-control-proxy-static.dir/src/Camera.cpp.o"
 
 # External object files for target scaledcars-control-proxy-static
 scaledcars__control__proxy__static_EXTERNAL_OBJECTS =
 
 control/proxy/libscaledcars-control-proxy-static.a: control/proxy/CMakeFiles/scaledcars-control-proxy-static.dir/src/Proxy.cpp.o
-control/proxy/libscaledcars-control-proxy-static.a: control/proxy/CMakeFiles/scaledcars-control-proxy-static.dir/src/Camera.cpp.o
 control/proxy/libscaledcars-control-proxy-static.a: control/proxy/CMakeFiles/scaledcars-control-proxy-static.dir/src/OpenCVCamera.cpp.o
+control/proxy/libscaledcars-control-proxy-static.a: control/proxy/CMakeFiles/scaledcars-control-proxy-static.dir/src/Camera.cpp.o
 control/proxy/libscaledcars-control-proxy-static.a: control/proxy/CMakeFiles/scaledcars-control-proxy-static.dir/build.make
 control/proxy/libscaledcars-control-proxy-static.a: control/proxy/CMakeFiles/scaledcars-control-proxy-static.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/opt/opendlv.scaledcars.build/build.system/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking CXX static library libscaledcars-control-proxy-static.a"
@@ -153,8 +153,8 @@ control/proxy/CMakeFiles/scaledcars-control-proxy-static.dir/build: control/prox
 .PHONY : control/proxy/CMakeFiles/scaledcars-control-proxy-static.dir/build
 
 control/proxy/CMakeFiles/scaledcars-control-proxy-static.dir/requires: control/proxy/CMakeFiles/scaledcars-control-proxy-static.dir/src/Proxy.cpp.o.requires
-control/proxy/CMakeFiles/scaledcars-control-proxy-static.dir/requires: control/proxy/CMakeFiles/scaledcars-control-proxy-static.dir/src/Camera.cpp.o.requires
 control/proxy/CMakeFiles/scaledcars-control-proxy-static.dir/requires: control/proxy/CMakeFiles/scaledcars-control-proxy-static.dir/src/OpenCVCamera.cpp.o.requires
+control/proxy/CMakeFiles/scaledcars-control-proxy-static.dir/requires: control/proxy/CMakeFiles/scaledcars-control-proxy-static.dir/src/Camera.cpp.o.requires
 
 .PHONY : control/proxy/CMakeFiles/scaledcars-control-proxy-static.dir/requires
 

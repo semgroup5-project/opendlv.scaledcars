@@ -23,7 +23,32 @@ void Car::setUp() {
 
     Serial.begin(BAUD); //start the serial
     waitConnection();
+    while (Serial.available()) { //empty any rubbish value from the buffer
+        red = 255;
+        green = 0;
+        blue = 0;
+#ifdef COMMON_ANODE
+        red = 255 - red;
+        green = 255 - green;
+        blue = 255 - blue;
+#endif
+        analogWrite(redPin, red);
+        analogWrite(greenPin, green);
+        analogWrite(bluePin, blue);
+        byte clean = Serial.read();
+    }
     establishContact('\n');
+}
+
+void Car::run() {
+    if (!isRCControllerOn()) {
+        automatedDrive();
+    } else {
+        rcControl();
+    }
+    provideSensorsData();
+
+
 }
 
 void Car::provideSensorsData() {
@@ -31,18 +56,17 @@ void Car::provideSensorsData() {
     infraredSideFront.encodeAndWrite(ID_IN_INFRARED_SIDE_FRONT, infraredSideFront.getDistance());
     infraredSideBack.encodeAndWrite(ID_IN_INFRARED_SIDE_BACK, infraredSideBack.getDistance());
 
+    odometer = wheelEncoder.getDistance() - encoderPos;
+    if (odometer > 255) {
+        encoderPos = wheelEncoder.getDistance();
+        odometer -= 255;
+    }
+    if (odometerStart) {
+        wheelEncoder.encodeAndWrite(ID_IN_ENCODER, odometer);
+    }
 
-//    odometer = wheelEncoder.getDistance() - encoderPos;
-//    if (odometer > 255) {
-//        encoderPos = wheelEncoder.getDistance();
-//        odometer -= 255;
-//    }
-//    if (odometerStart) {
-//        wheelEncoder.encodeAndWrite(ID_IN_ENCODER, odometer);
-//    }
-//
-//    ultrasonicFront.encodeAndWrite(ID_IN_ULTRASONIC_CENTER, ultrasonicFront.getDistance());
-//    ultrasonicRight.encodeAndWrite(ID_IN_ULTRASONIC_SIDE_FRONT, ultrasonicRight.getDistance());
+    ultrasonicFront.encodeAndWrite(ID_IN_ULTRASONIC_CENTER, ultrasonicFront.getDistance());
+    ultrasonicRight.encodeAndWrite(ID_IN_ULTRASONIC_SIDE_FRONT, ultrasonicRight.getDistance());
 }
 
 void Car::rcControl() {
@@ -51,10 +75,15 @@ void Car::rcControl() {
     }
 
     func_is_changed = 1;
+    Serial.read();
+
+    red = 0;
+    green = 255;
+    blue = 0;
 #ifdef COMMON_ANODE
-    red = 255;
-    green = 0;
-    blue = 255;
+    red = 255 - red;
+    green = 255 - green;
+    blue = 255 - blue;
 #endif
     analogWrite(redPin, red);
     analogWrite(greenPin, green);
@@ -65,36 +94,64 @@ void Car::rcControl() {
 }
 
 void Car::automatedDrive() {
-//    if (isRCControllerOn()) {
-//        escMotor.brake();
-//    }
-//
-//    func_is_changed = 0;
-    int value;
-    while (!Serial.available());
-    byte in = Serial.read();
+    if (isFunctionChanged()) {
+        escMotor.brake();
+    }
+
+    func_is_changed = 0;
+
+    red = 0;
+    green = 0;
+    blue = 255;
+#ifdef COMMON_ANODE
+    red = 255 - red;
+    green = 255 - green;
+    blue = 255 - blue;
+#endif
+    analogWrite(redPin, red);
+    analogWrite(greenPin, green);
+    analogWrite(bluePin, blue);
+
+    int value = 90, serial_size = 0, count = 0;
+    byte in;
+    while ((serial_size = Serial.available()) <= 0 && !isRCControllerOn());
+
+    while (count++ < serial_size) {
+        in = Serial.read();
+    }
 
     protocol_frame frame;
     frame.a = in;
     protocol_data data = protocol_decode_t1(frame);
+//    Serial.print(data.id);
+//    Serial.print(" ");
+//    Serial.println(data.value);
 
     if (data.id == ID_OUT_SERVO) {
         value = data.value * 3;
-        steeringMotor.setAngle(value, 0);
+        if (value >= 0 && value <= 180) {
+            steeringMotor.setAngle(value, 0);
+        }
     }
 
     if (data.id == ID_OUT_MOTOR) {
         value = data.value * 3;
-        if (value > 190)
-            escMotor.brake(); //applying values greater than 180 will be our indicative to brake
-        else {
-            escMotor.setSpeed(value);
+        if (value > 180){
+            escMotor.brake();//applying values greater than 180 will be our indicative to brake
         }
+        else {
+            if (value >= 0 && value <= 180) {
+                escMotor.setSpeed(value);
+            }
+        }
+    }
+    if (isRCControllerOn()) {
+        escMotor.brake();
     }
 }
 
 int Car::readChannel1() {
-    return pulseIn(CH_1, HIGH, 1000); // steer
+    return pulseIn(CH_1, HIGH); // steer
 }
 
 int Car::readChannel2() {
@@ -111,10 +168,13 @@ int Car::isRCControllerOn() {
 
 void Car::establishContact(char toSend) {
     while (Serial.available() <= 0) {
-#ifdef COMMON_ANODE
         red = 0;
         green = 255;
         blue = 255;
+#ifdef COMMON_ANODE
+        red = 255 - red;
+        green = 255 - green;
+        blue = 255 - blue;
 #endif
         analogWrite(redPin, red);
         analogWrite(greenPin, green);

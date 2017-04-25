@@ -41,7 +41,7 @@ bool serial_open(serial_state *state, const char *serialport, int baud)
     int fd = serialport_init(serialport, baud);
 
     if (fd == -1) {
-        return false;
+        throw "No Port Created!";
     } else {
         state->fd = fd;
         return true;

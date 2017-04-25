@@ -7,8 +7,5 @@ void setup() {
 }
 
 void loop() {
-  if (!myCar.isRCControllerOn()) {
-    myCar.automatedDrive();
-  }
-  myCar.provideSensorsData();
+  myCar.run();
 }
