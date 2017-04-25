@@ -46,6 +46,10 @@ namespace scaledcars {
             cerr << "Setting up serial handler"<< endl;
 
             this->serial = serial_new();
+
+            this->serial->incoming_frame_t = FRAME_T2;
+            this->serial->outgoing_frame_t = FRAME_T1;
+
             this->serial->on_write = &__on_write;
             this->serial->on_read = &__on_read;
 
@@ -77,11 +81,11 @@ namespace scaledcars {
 
                 protocol_data d_motor;
                 d_motor.id = ID_OUT_MOTOR;
-                d_motor.value = this->motor;
+                d_motor.value = this->motor / 3;
 
                 protocol_data d_servo;
                 d_servo.id = ID_OUT_SERVO;
-                d_servo.value = this->servo;
+                d_servo.value = this->servo / 3;
 
                 serial_send(this->serial, d_motor);
                 serial_send(this->serial, d_servo);
