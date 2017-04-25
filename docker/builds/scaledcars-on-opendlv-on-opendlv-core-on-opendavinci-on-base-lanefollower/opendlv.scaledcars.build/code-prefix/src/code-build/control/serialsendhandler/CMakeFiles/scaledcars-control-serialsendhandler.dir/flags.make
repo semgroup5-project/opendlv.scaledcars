@@ -6,5 +6,5 @@ CXX_FLAGS = -fstack-protector-all -fPIC -ggdb -Wall -Weffc++ -Werror -Wextra -Ws
 
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/opt/opendlv.scaledcars.sources/thirdparty/cxxtest -isystem /opt/od4/include -I/usr/include/opencv -isystem /opt/opendlv.scaledcars/include -I/opt/opendlv.scaledcars.sources/code/control/serialsendhandler/include 
+CXX_INCLUDES = -I/opt/opendlv.scaledcars.sources/thirdparty/cxxtest -isystem /opt/od4/include -I/usr/include/opencv -isystem /usr/include/glib-2.0 -isystem /usr/lib/x86_64-linux-gnu/glib-2.0/include -isystem /opt/opendlv.scaledcars/include -I/opt/opendlv.scaledcars.sources/code/control/serialsendhandler/include 
 

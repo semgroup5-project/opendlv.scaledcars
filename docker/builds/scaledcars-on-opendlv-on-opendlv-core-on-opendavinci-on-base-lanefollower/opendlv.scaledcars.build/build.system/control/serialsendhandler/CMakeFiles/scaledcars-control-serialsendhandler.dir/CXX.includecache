@@ -592,6 +592,12 @@ memory
 opendavinci/odcore/wrapper/Mutex.h
 /opt/od4/include/opendavinci/odcore/base/opendavinci/odcore/wrapper/Mutex.h
 
+/opt/od4/include/opendavinci/odcore/base/Thread.h
+opendavinci/odcore/opendavinci.h
+/opt/od4/include/opendavinci/odcore/base/opendavinci/odcore/opendavinci.h
+opendavinci/odcore/data/TimeStamp.h
+/opt/od4/include/opendavinci/odcore/base/opendavinci/odcore/data/TimeStamp.h
+
 /opt/od4/include/opendavinci/odcore/base/Visitable.h
 opendavinci/odcore/opendavinci.h
 /opt/od4/include/opendavinci/odcore/base/opendavinci/odcore/opendavinci.h
@@ -969,6 +975,16 @@ SerialSendHandler.h
 /opt/opendlv.scaledcars.sources/code/control/serialsendhandler/include/SerialSendHandler.h
 automotivedata/GeneratedHeaders_AutomotiveData.h
 -
+iostream
+-
+memory
+-
+stdint.h
+-
+string
+-
+opendavinci/odcore/base/Thread.h
+-
 opendavinci/GeneratedHeaders_OpenDaVINCI.h
 -
 opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h
@@ -984,5 +1000,13 @@ opendavinci/odcore/wrapper/SerialPortFactory.h
 opendavinci/odcore/wrapper/SharedMemory.h
 -
 opendavinci/odcore/wrapper/SharedMemoryFactory.h
+-
+protocol.h
+/opt/opendlv.scaledcars.sources/code/control/serialsendhandler/include/protocol.h
+
+/opt/opendlv.scaledcars.sources/code/control/serialsendhandler/include/protocol.h
+stdbool.h
+-
+stdint.h
 -
 

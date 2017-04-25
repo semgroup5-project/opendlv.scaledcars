@@ -15,6 +15,7 @@ void SteeringMotor::arm() {
 }
 
 void SteeringMotor::setAngle(int degrees, int isRC) { // receives some degrees in the scale of MAX_LEFT_ANGLE, MAX_RIGHT_ANGLE
+    //write(degrees);
     if (degrees == 0 && isRC) {
         _angle = STRAIGHT_DEGREES;
     } else{
@@ -24,7 +25,8 @@ void SteeringMotor::setAngle(int degrees, int isRC) { // receives some degrees i
             _angle = filterAngle(degrees, 1); //_angle now holds a value between MAX_LEFT_RAW_DEGREES and MAX_RIGHT_RAW_DEGREES
         }
         write(_angle); //writes the angle to the servo motor
-    }}
+    }
+ }
 
 void SteeringMotor::setDegrees() {
     STRAIGHT_DEGREES = 90;

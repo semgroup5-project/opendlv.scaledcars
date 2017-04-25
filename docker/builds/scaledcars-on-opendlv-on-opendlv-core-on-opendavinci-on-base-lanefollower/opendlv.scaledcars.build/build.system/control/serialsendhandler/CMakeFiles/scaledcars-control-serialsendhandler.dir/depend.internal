@@ -57,6 +57,7 @@ control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler.dir/ap
  /opt/od4/include/opendavinci/odcore/base/Condition.h
  /opt/od4/include/opendavinci/odcore/base/KeyValueConfiguration.h
  /opt/od4/include/opendavinci/odcore/base/Mutex.h
+ /opt/od4/include/opendavinci/odcore/base/Thread.h
  /opt/od4/include/opendavinci/odcore/base/Visitable.h
  /opt/od4/include/opendavinci/odcore/base/Visitor.h
  /opt/od4/include/opendavinci/odcore/base/module/AbstractCIDModule.h
@@ -100,3 +101,4 @@ control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler.dir/ap
  /opt/od4/include/opendavinci/odcore/wrapper/Time.h
  /opt/opendlv.scaledcars.sources/code/control/serialsendhandler/apps/scaledcars-control-serialsendhandler.cpp
  /opt/opendlv.scaledcars.sources/code/control/serialsendhandler/include/SerialSendHandler.h
+ /opt/opendlv.scaledcars.sources/code/control/serialsendhandler/include/protocol.h

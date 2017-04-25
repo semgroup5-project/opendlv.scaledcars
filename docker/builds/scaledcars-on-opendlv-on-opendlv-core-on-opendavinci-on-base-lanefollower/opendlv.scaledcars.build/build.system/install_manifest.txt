@@ -16,9 +16,11 @@
 /opt/opendlv.scaledcars/include/scaledcars-control-proxy/Proxy.h
 /opt/opendlv.scaledcars/bin/scaledcars-control-serialsendhandler
 /opt/opendlv.scaledcars/lib/libscaledcars-control-serialsendhandler-static.a
+/opt/opendlv.scaledcars/include/scaledcars-control-serialsendhandler/serial.h
 /opt/opendlv.scaledcars/include/scaledcars-control-serialsendhandler/SerialSendHandler.h
-/opt/opendlv.scaledcars/include/scaledcars-control-serialsendhandler/SerialReceiveBytes.h
 /opt/opendlv.scaledcars/include/scaledcars-control-serialsendhandler/protocol.h
+/opt/opendlv.scaledcars/include/scaledcars-control-serialsendhandler/netstrings.hpp
+/opt/opendlv.scaledcars/include/scaledcars-control-serialsendhandler/arduino.h
 /opt/opendlv.scaledcars/bin/scaledcars-control-serialreceivehandler
 /opt/opendlv.scaledcars/lib/libscaledcars-control-serialreceivehandler-static.a
 /opt/opendlv.scaledcars/include/scaledcars-control-serialreceivehandler/SerialListener.h

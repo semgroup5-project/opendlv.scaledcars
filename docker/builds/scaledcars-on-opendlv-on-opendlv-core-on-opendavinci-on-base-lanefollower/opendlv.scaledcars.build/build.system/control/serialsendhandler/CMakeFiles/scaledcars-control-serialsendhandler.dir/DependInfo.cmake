@@ -13,6 +13,8 @@ set(CMAKE_CXX_TARGET_INCLUDE_PATH
   "/opt/opendlv.scaledcars.sources/thirdparty/cxxtest"
   "/opt/od4/include"
   "/usr/include/opencv"
+  "/usr/include/glib-2.0"
+  "/usr/lib/x86_64-linux-gnu/glib-2.0/include"
   "/opt/opendlv.scaledcars/include"
   "/opt/opendlv.scaledcars.sources/code/control/serialsendhandler/include"
   )

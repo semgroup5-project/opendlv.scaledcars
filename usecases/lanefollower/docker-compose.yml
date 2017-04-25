@@ -65,7 +65,7 @@ services:
             - odsupercomponent
         devices:
         - "/dev/ttyACM0"
-        command: bash -c "sleep 10; /opt/opendlv.scaledcars/bin/scaledcars-control-serialsendhandler --verbose=1 --cid=${CID} --rm=true --device=/dev/ttyACM0 --freq=10"
+        command: bash -c "sleep 10; /opt/opendlv.scaledcars/bin/scaledcars-control-serialsendhandler --verbose=1 --cid=${CID} --rm=true --device=/dev/ttyACM0 --freq=20"
     #odcockpit
     odcockpit:
         build: .

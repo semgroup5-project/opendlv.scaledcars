@@ -26,6 +26,29 @@ void ESCMotor::arm() {
 }
 
 void ESCMotor::setSpeed(int speed) { //receives a speed in the scale of -100 to 100
+//    if (speed < 90) {
+//        _direction = 0;
+//#ifdef COMMON_ANODE
+//        red = 95;
+//        green = 255;
+//        blue = 95;
+//#endif
+//        analogWrite(redPin, red);
+//        analogWrite(greenPin, green);
+//        analogWrite(bluePin, blue);
+//    } else if (speed > 90) {
+//        _direction = 1;
+//#ifdef COMMON_ANODE
+//        red = 0;
+//        green = 0;
+//        blue = 255;
+//#endif
+//        analogWrite(redPin, red);
+//        analogWrite(greenPin, green);
+//        analogWrite(bluePin, blue);
+//    }
+//    write(speed);
+
     int s = IDLE_SPEED;
     if (speed <= FULL_FORWARD && speed >= FULL_BACKWARD) {
         s = filterSpeed(speed, 0);
@@ -34,6 +57,7 @@ void ESCMotor::setSpeed(int speed) { //receives a speed in the scale of -100 to 
     }
     if (s != _speed) {
         _speed = s;
+
         write(_speed); //write the appropriate pwm signal to the servo
     }
 }
@@ -50,11 +74,11 @@ void ESCMotor::brake() {
 
     if (_direction && _speed != IDLE_SPEED) {
         write(IDLE_SPEED + 15);
-        wait(0.5);
+//        wait(0.3);
         write(IDLE_SPEED);
     } else if (_speed != IDLE_SPEED && !_direction) {
         write(IDLE_SPEED - 55);
-        wait(0.5);
+//        wait(0.3);
         write(IDLE_SPEED);
     }
     _speed = IDLE_SPEED;
@@ -104,7 +128,6 @@ int ESCMotor::filterSpeed(int speed, int isRC) {
         }
     } else {
         if (speed >= FULL_BACKWARD && speed < IDLE_SPEED) {
-            filtered = map(speed, FULL_BACKWARD, IDLE_SPEED, FULL_BACKWARD + 25, IDLE_SPEED - 1);
             _direction = 0;
 #ifdef COMMON_ANODE
             red = 95;
@@ -115,9 +138,8 @@ int ESCMotor::filterSpeed(int speed, int isRC) {
             analogWrite(greenPin, green);
             analogWrite(bluePin, blue);
         } else if (speed == IDLE_SPEED) {
-            filtered = IDLE_SPEED;
+
         } else if (speed > IDLE_SPEED && speed <= FULL_FORWARD) {
-            filtered = map(speed, IDLE_SPEED, FULL_FORWARD, IDLE_SPEED + 1, FULL_FORWARD - 30);
             _direction = 1;
 #ifdef COMMON_ANODE
             red = 0;
@@ -128,11 +150,12 @@ int ESCMotor::filterSpeed(int speed, int isRC) {
             analogWrite(greenPin, green);
             analogWrite(bluePin, blue);
         }
+        filtered = speed;
     }
     return filtered;
 }
 
-void ESCMotor::wait(double seconds){
+void ESCMotor::wait(double seconds) {
     interval = seconds * 1000;
     currentMillis = millis();
     while (millis() - currentMillis <= interval);

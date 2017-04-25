@@ -7,6 +7,7 @@
 #include <Wire.h>
 #include <Servo.h>
 #include "protocol.h"
+#include "Netstrings.h"
 
 #define BAUD 115200
 #define US_C 0x73 //front ultrasonic pin
@@ -39,7 +40,9 @@ public:
     virtual unsigned int getDistance() = 0; //to be implemented by the child classes
     unsigned int getMedianDistance(short iterations = DEFAULT_ITERATIONS);
     void encodeAndWrite(int id, int value);
-
+    void wait(long milliseconds);
+    unsigned long currentMillis;
+    long interval;
 private:
     static const short DEFAULT_ITERATIONS;
 protected:

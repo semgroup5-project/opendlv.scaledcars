@@ -55,9 +55,9 @@ namespace scaledcars {
                 m_eSum(0),
                 m_eOld(0),
                 m_vehicleControl(),
-                m_threshold1(220),
-                m_threshold2(170),
-                m_control_scanline(280),//needs testing with real c
+                m_threshold1(50),
+                m_threshold2(150),
+                m_control_scanline(400),//needs testing with real c
                 m_stop_scanline(200),//needs testing with real car
                 m_distance(180),  //needs testing with real car as well
                 p_gain(0),       // the gain values can be adjusted here outside of simulation scenario (see @setUp() )

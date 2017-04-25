@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <testsuites>
-<testsuite name="scaledcars-control-proxy-ProxyTestSuite.h" tests="1" failures="0" errors="0" time="0" timestamp="Fri Apr 21 11:35:03 2017" file="/opt/opendlv.scaledcars.sources/code/control/proxy/testsuites/ProxyTestSuite.h" >
+<testsuite name="scaledcars-control-proxy-ProxyTestSuite.h" tests="1" failures="0" errors="0" time="0" timestamp="Tue Apr 25 10:41:15 2017" file="/opt/opendlv.scaledcars.sources/code/control/proxy/testsuites/ProxyTestSuite.h" >
     <testcase name="testApplication" classname="ProxyTest" line="37" >    </testcase>
 </testsuite>
 </testsuites>

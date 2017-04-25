@@ -56,6 +56,7 @@ control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler.dir/ap
 control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler.dir/apps/scaledcars-control-serialsendhandler.cpp.o: /opt/od4/include/opendavinci/odcore/base/Condition.h
 control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler.dir/apps/scaledcars-control-serialsendhandler.cpp.o: /opt/od4/include/opendavinci/odcore/base/KeyValueConfiguration.h
 control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler.dir/apps/scaledcars-control-serialsendhandler.cpp.o: /opt/od4/include/opendavinci/odcore/base/Mutex.h
+control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler.dir/apps/scaledcars-control-serialsendhandler.cpp.o: /opt/od4/include/opendavinci/odcore/base/Thread.h
 control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler.dir/apps/scaledcars-control-serialsendhandler.cpp.o: /opt/od4/include/opendavinci/odcore/base/Visitable.h
 control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler.dir/apps/scaledcars-control-serialsendhandler.cpp.o: /opt/od4/include/opendavinci/odcore/base/Visitor.h
 control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler.dir/apps/scaledcars-control-serialsendhandler.cpp.o: /opt/od4/include/opendavinci/odcore/base/module/AbstractCIDModule.h
@@ -99,4 +100,5 @@ control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler.dir/ap
 control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler.dir/apps/scaledcars-control-serialsendhandler.cpp.o: /opt/od4/include/opendavinci/odcore/wrapper/Time.h
 control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler.dir/apps/scaledcars-control-serialsendhandler.cpp.o: /opt/opendlv.scaledcars.sources/code/control/serialsendhandler/apps/scaledcars-control-serialsendhandler.cpp
 control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler.dir/apps/scaledcars-control-serialsendhandler.cpp.o: /opt/opendlv.scaledcars.sources/code/control/serialsendhandler/include/SerialSendHandler.h
+control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler.dir/apps/scaledcars-control-serialsendhandler.cpp.o: /opt/opendlv.scaledcars.sources/code/control/serialsendhandler/include/protocol.h
 

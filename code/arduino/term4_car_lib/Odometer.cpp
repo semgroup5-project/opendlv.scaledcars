@@ -131,12 +131,11 @@ void updateCounter2() {
 }
 
 void Odometer::encodeAndWrite(int id, int value) {
-    protocol_data data =
-            {
-                    .id = id,
-                    .value = value
-            };
-    protocol_frame frame = protocol_encode(data);
-    Serial.write(frame.a);//send byte 1
-    Serial.write(frame.b);//send byte 2
+    protocol_data outdata1;
+    outdata1.id = id;
+    outdata1.value = value;
+
+    protocol_frame outframe1 = protocol_encode_t2(outdata1);
+    Serial.write(outframe1.a);
+    Serial.write(outframe1.b);
 }

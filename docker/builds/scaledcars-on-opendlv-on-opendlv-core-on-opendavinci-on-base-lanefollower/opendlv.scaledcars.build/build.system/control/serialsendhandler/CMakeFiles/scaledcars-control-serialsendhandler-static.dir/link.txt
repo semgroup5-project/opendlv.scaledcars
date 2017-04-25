@@ -1,2 +1,2 @@
-/usr/bin/ar qc libscaledcars-control-serialsendhandler-static.a  CMakeFiles/scaledcars-control-serialsendhandler-static.dir/src/SerialReceiveBytes.cpp.o CMakeFiles/scaledcars-control-serialsendhandler-static.dir/src/SerialSendHandler.cpp.o
+/usr/bin/ar qc libscaledcars-control-serialsendhandler-static.a  CMakeFiles/scaledcars-control-serialsendhandler-static.dir/src/netstrings.cpp.o CMakeFiles/scaledcars-control-serialsendhandler-static.dir/src/SerialSendHandler.cpp.o
 /usr/bin/ranlib libscaledcars-control-serialsendhandler-static.a

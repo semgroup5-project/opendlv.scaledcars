@@ -49,7 +49,7 @@ unsigned int UltrasonicSensor::getDistance() {
     Wire.write(byte(0x51));
     Wire.endTransmission();
 
-    delay(_delay);
+    wait(_delay);
     Wire.beginTransmission(_address);
     Wire.write(byte(0x02));
     Wire.endTransmission();
@@ -68,7 +68,7 @@ unsigned short UltrasonicSensor::getLightReading() {
     Wire.write(byte(0x00));
     Wire.write(byte(0x51));
     Wire.endTransmission();
-    delay(_delay);
+    wait(_delay);
     Wire.beginTransmission(_address);
     Wire.write(byte(0x01));
     Wire.endTransmission();

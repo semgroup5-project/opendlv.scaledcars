@@ -28,15 +28,15 @@ The CXX compiler identification is GNU, found in "/opt/opendlv.scaledcars.build/
 Determining if the C compiler works passed with the following output:
 Change Dir: /opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_aacaa/fast"
+Run Build Command:"/usr/bin/make" "cmTC_19a51/fast"
 make[3]: Entering directory '/opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_aacaa.dir/build.make CMakeFiles/cmTC_aacaa.dir/build
+/usr/bin/make -f CMakeFiles/cmTC_19a51.dir/build.make CMakeFiles/cmTC_19a51.dir/build
 make[4]: Entering directory '/opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_aacaa.dir/testCCompiler.c.o
-/usr/bin/cc     -o CMakeFiles/cmTC_aacaa.dir/testCCompiler.c.o   -c /opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp/testCCompiler.c
-Linking C executable cmTC_aacaa
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_aacaa.dir/link.txt --verbose=1
-/usr/bin/cc       CMakeFiles/cmTC_aacaa.dir/testCCompiler.c.o  -o cmTC_aacaa -rdynamic 
+Building C object CMakeFiles/cmTC_19a51.dir/testCCompiler.c.o
+/usr/bin/cc     -o CMakeFiles/cmTC_19a51.dir/testCCompiler.c.o   -c /opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp/testCCompiler.c
+Linking C executable cmTC_19a51
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_19a51.dir/link.txt --verbose=1
+/usr/bin/cc       CMakeFiles/cmTC_19a51.dir/testCCompiler.c.o  -o cmTC_19a51 -rdynamic 
 make[4]: Leaving directory '/opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp'
 make[3]: Leaving directory '/opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp'
 
@@ -44,15 +44,15 @@ make[3]: Leaving directory '/opt/opendlv.scaledcars.build/libodvdscaledcarsdatam
 Detecting C compiler ABI info compiled with the following output:
 Change Dir: /opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_9c626/fast"
+Run Build Command:"/usr/bin/make" "cmTC_9d8b6/fast"
 make[3]: Entering directory '/opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_9c626.dir/build.make CMakeFiles/cmTC_9c626.dir/build
+/usr/bin/make -f CMakeFiles/cmTC_9d8b6.dir/build.make CMakeFiles/cmTC_9d8b6.dir/build
 make[4]: Entering directory '/opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_9c626.dir/CMakeCCompilerABI.c.o
-/usr/bin/cc     -o CMakeFiles/cmTC_9c626.dir/CMakeCCompilerABI.c.o   -c /usr/share/cmake-3.5/Modules/CMakeCCompilerABI.c
-Linking C executable cmTC_9c626
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_9c626.dir/link.txt --verbose=1
-/usr/bin/cc      -v CMakeFiles/cmTC_9c626.dir/CMakeCCompilerABI.c.o  -o cmTC_9c626 -rdynamic  
+Building C object CMakeFiles/cmTC_9d8b6.dir/CMakeCCompilerABI.c.o
+/usr/bin/cc     -o CMakeFiles/cmTC_9d8b6.dir/CMakeCCompilerABI.c.o   -c /usr/share/cmake-3.5/Modules/CMakeCCompilerABI.c
+Linking C executable cmTC_9d8b6
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_9d8b6.dir/link.txt --verbose=1
+/usr/bin/cc      -v CMakeFiles/cmTC_9d8b6.dir/CMakeCCompilerABI.c.o  -o cmTC_9d8b6 -rdynamic  
 Using built-in specs.
 COLLECT_GCC=/usr/bin/cc
 COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-linux-gnu/5/lto-wrapper
@@ -62,8 +62,8 @@ Thread model: posix
 gcc version 5.4.0 20160609 (Ubuntu 5.4.0-6ubuntu1~16.04.4) 
 COMPILER_PATH=/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/
 LIBRARY_PATH=/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../../lib/:/lib/x86_64-linux-gnu/:/lib/../lib/:/usr/lib/x86_64-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../:/lib/:/usr/lib/
-COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_9c626' '-rdynamic' '-mtune=generic' '-march=x86-64'
- /usr/lib/gcc/x86_64-linux-gnu/5/collect2 -plugin /usr/lib/gcc/x86_64-linux-gnu/5/liblto_plugin.so -plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/5/lto-wrapper -plugin-opt=-fresolution=/tmp/ccDRaTrP.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s --sysroot=/ --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -export-dynamic -dynamic-linker /lib64/ld-linux-x86-64.so.2 -z relro -o cmTC_9c626 /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crt1.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/5/crtbegin.o -L/usr/lib/gcc/x86_64-linux-gnu/5 -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/5/../../.. CMakeFiles/cmTC_9c626.dir/CMakeCCompilerABI.c.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /usr/lib/gcc/x86_64-linux-gnu/5/crtend.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crtn.o
+COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_9d8b6' '-rdynamic' '-mtune=generic' '-march=x86-64'
+ /usr/lib/gcc/x86_64-linux-gnu/5/collect2 -plugin /usr/lib/gcc/x86_64-linux-gnu/5/liblto_plugin.so -plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/5/lto-wrapper -plugin-opt=-fresolution=/tmp/cc0N8S3n.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s --sysroot=/ --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -export-dynamic -dynamic-linker /lib64/ld-linux-x86-64.so.2 -z relro -o cmTC_9d8b6 /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crt1.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/5/crtbegin.o -L/usr/lib/gcc/x86_64-linux-gnu/5 -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/5/../../.. CMakeFiles/cmTC_9d8b6.dir/CMakeCCompilerABI.c.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /usr/lib/gcc/x86_64-linux-gnu/5/crtend.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crtn.o
 make[4]: Leaving directory '/opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp'
 make[3]: Leaving directory '/opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp'
 
@@ -72,15 +72,15 @@ Parsed C implicit link information from above output:
   link line regex: [^( *|.*[/\])(ld|([^/\]+-)?ld|collect2)[^/\]*( |$)]
   ignore line: [Change Dir: /opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp]
   ignore line: []
-  ignore line: [Run Build Command:"/usr/bin/make" "cmTC_9c626/fast"]
+  ignore line: [Run Build Command:"/usr/bin/make" "cmTC_9d8b6/fast"]
   ignore line: [make[3]: Entering directory '/opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp']
-  ignore line: [/usr/bin/make -f CMakeFiles/cmTC_9c626.dir/build.make CMakeFiles/cmTC_9c626.dir/build]
+  ignore line: [/usr/bin/make -f CMakeFiles/cmTC_9d8b6.dir/build.make CMakeFiles/cmTC_9d8b6.dir/build]
   ignore line: [make[4]: Entering directory '/opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp']
-  ignore line: [Building C object CMakeFiles/cmTC_9c626.dir/CMakeCCompilerABI.c.o]
-  ignore line: [/usr/bin/cc     -o CMakeFiles/cmTC_9c626.dir/CMakeCCompilerABI.c.o   -c /usr/share/cmake-3.5/Modules/CMakeCCompilerABI.c]
-  ignore line: [Linking C executable cmTC_9c626]
-  ignore line: [/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_9c626.dir/link.txt --verbose=1]
-  ignore line: [/usr/bin/cc      -v CMakeFiles/cmTC_9c626.dir/CMakeCCompilerABI.c.o  -o cmTC_9c626 -rdynamic  ]
+  ignore line: [Building C object CMakeFiles/cmTC_9d8b6.dir/CMakeCCompilerABI.c.o]
+  ignore line: [/usr/bin/cc     -o CMakeFiles/cmTC_9d8b6.dir/CMakeCCompilerABI.c.o   -c /usr/share/cmake-3.5/Modules/CMakeCCompilerABI.c]
+  ignore line: [Linking C executable cmTC_9d8b6]
+  ignore line: [/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_9d8b6.dir/link.txt --verbose=1]
+  ignore line: [/usr/bin/cc      -v CMakeFiles/cmTC_9d8b6.dir/CMakeCCompilerABI.c.o  -o cmTC_9d8b6 -rdynamic  ]
   ignore line: [Using built-in specs.]
   ignore line: [COLLECT_GCC=/usr/bin/cc]
   ignore line: [COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-linux-gnu/5/lto-wrapper]
@@ -90,13 +90,13 @@ Parsed C implicit link information from above output:
   ignore line: [gcc version 5.4.0 20160609 (Ubuntu 5.4.0-6ubuntu1~16.04.4) ]
   ignore line: [COMPILER_PATH=/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/]
   ignore line: [LIBRARY_PATH=/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../../lib/:/lib/x86_64-linux-gnu/:/lib/../lib/:/usr/lib/x86_64-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../:/lib/:/usr/lib/]
-  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_9c626' '-rdynamic' '-mtune=generic' '-march=x86-64']
-  link line: [ /usr/lib/gcc/x86_64-linux-gnu/5/collect2 -plugin /usr/lib/gcc/x86_64-linux-gnu/5/liblto_plugin.so -plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/5/lto-wrapper -plugin-opt=-fresolution=/tmp/ccDRaTrP.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s --sysroot=/ --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -export-dynamic -dynamic-linker /lib64/ld-linux-x86-64.so.2 -z relro -o cmTC_9c626 /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crt1.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/5/crtbegin.o -L/usr/lib/gcc/x86_64-linux-gnu/5 -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/5/../../.. CMakeFiles/cmTC_9c626.dir/CMakeCCompilerABI.c.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /usr/lib/gcc/x86_64-linux-gnu/5/crtend.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crtn.o]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_9d8b6' '-rdynamic' '-mtune=generic' '-march=x86-64']
+  link line: [ /usr/lib/gcc/x86_64-linux-gnu/5/collect2 -plugin /usr/lib/gcc/x86_64-linux-gnu/5/liblto_plugin.so -plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/5/lto-wrapper -plugin-opt=-fresolution=/tmp/cc0N8S3n.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s --sysroot=/ --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -export-dynamic -dynamic-linker /lib64/ld-linux-x86-64.so.2 -z relro -o cmTC_9d8b6 /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crt1.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/5/crtbegin.o -L/usr/lib/gcc/x86_64-linux-gnu/5 -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/5/../../.. CMakeFiles/cmTC_9d8b6.dir/CMakeCCompilerABI.c.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /usr/lib/gcc/x86_64-linux-gnu/5/crtend.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crtn.o]
     arg [/usr/lib/gcc/x86_64-linux-gnu/5/collect2] ==> ignore
     arg [-plugin] ==> ignore
     arg [/usr/lib/gcc/x86_64-linux-gnu/5/liblto_plugin.so] ==> ignore
     arg [-plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/5/lto-wrapper] ==> ignore
-    arg [-plugin-opt=-fresolution=/tmp/ccDRaTrP.res] ==> ignore
+    arg [-plugin-opt=-fresolution=/tmp/cc0N8S3n.res] ==> ignore
     arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
     arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
     arg [-plugin-opt=-pass-through=-lc] ==> ignore
@@ -114,7 +114,7 @@ Parsed C implicit link information from above output:
     arg [/lib64/ld-linux-x86-64.so.2] ==> ignore
     arg [-zrelro] ==> ignore
     arg [-o] ==> ignore
-    arg [cmTC_9c626] ==> ignore
+    arg [cmTC_9d8b6] ==> ignore
     arg [/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crt1.o] ==> ignore
     arg [/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crti.o] ==> ignore
     arg [/usr/lib/gcc/x86_64-linux-gnu/5/crtbegin.o] ==> ignore
@@ -126,7 +126,7 @@ Parsed C implicit link information from above output:
     arg [-L/usr/lib/x86_64-linux-gnu] ==> dir [/usr/lib/x86_64-linux-gnu]
     arg [-L/usr/lib/../lib] ==> dir [/usr/lib/../lib]
     arg [-L/usr/lib/gcc/x86_64-linux-gnu/5/../../..] ==> dir [/usr/lib/gcc/x86_64-linux-gnu/5/../../..]
-    arg [CMakeFiles/cmTC_9c626.dir/CMakeCCompilerABI.c.o] ==> ignore
+    arg [CMakeFiles/cmTC_9d8b6.dir/CMakeCCompilerABI.c.o] ==> ignore
     arg [-lgcc] ==> lib [gcc]
     arg [--as-needed] ==> ignore
     arg [-lgcc_s] ==> lib [gcc_s]
@@ -160,15 +160,15 @@ Parsed C implicit link information from above output:
 Detecting C [-std=c11] compiler features compiled with the following output:
 Change Dir: /opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_3f0d8/fast"
+Run Build Command:"/usr/bin/make" "cmTC_e594c/fast"
 make[3]: Entering directory '/opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_3f0d8.dir/build.make CMakeFiles/cmTC_3f0d8.dir/build
+/usr/bin/make -f CMakeFiles/cmTC_e594c.dir/build.make CMakeFiles/cmTC_e594c.dir/build
 make[4]: Entering directory '/opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_3f0d8.dir/feature_tests.c.o
-/usr/bin/cc    -std=c11 -o CMakeFiles/cmTC_3f0d8.dir/feature_tests.c.o   -c /opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/feature_tests.c
-Linking C executable cmTC_3f0d8
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_3f0d8.dir/link.txt --verbose=1
-/usr/bin/cc       CMakeFiles/cmTC_3f0d8.dir/feature_tests.c.o  -o cmTC_3f0d8 -rdynamic 
+Building C object CMakeFiles/cmTC_e594c.dir/feature_tests.c.o
+/usr/bin/cc    -std=c11 -o CMakeFiles/cmTC_e594c.dir/feature_tests.c.o   -c /opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/feature_tests.c
+Linking C executable cmTC_e594c
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_e594c.dir/link.txt --verbose=1
+/usr/bin/cc       CMakeFiles/cmTC_e594c.dir/feature_tests.c.o  -o cmTC_e594c -rdynamic 
 make[4]: Leaving directory '/opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp'
 make[3]: Leaving directory '/opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp'
 
@@ -182,15 +182,15 @@ make[3]: Leaving directory '/opt/opendlv.scaledcars.build/libodvdscaledcarsdatam
 Detecting C [-std=c99] compiler features compiled with the following output:
 Change Dir: /opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_d56dc/fast"
+Run Build Command:"/usr/bin/make" "cmTC_481c2/fast"
 make[3]: Entering directory '/opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_d56dc.dir/build.make CMakeFiles/cmTC_d56dc.dir/build
+/usr/bin/make -f CMakeFiles/cmTC_481c2.dir/build.make CMakeFiles/cmTC_481c2.dir/build
 make[4]: Entering directory '/opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_d56dc.dir/feature_tests.c.o
-/usr/bin/cc    -std=c99 -o CMakeFiles/cmTC_d56dc.dir/feature_tests.c.o   -c /opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/feature_tests.c
-Linking C executable cmTC_d56dc
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_d56dc.dir/link.txt --verbose=1
-/usr/bin/cc       CMakeFiles/cmTC_d56dc.dir/feature_tests.c.o  -o cmTC_d56dc -rdynamic 
+Building C object CMakeFiles/cmTC_481c2.dir/feature_tests.c.o
+/usr/bin/cc    -std=c99 -o CMakeFiles/cmTC_481c2.dir/feature_tests.c.o   -c /opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/feature_tests.c
+Linking C executable cmTC_481c2
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_481c2.dir/link.txt --verbose=1
+/usr/bin/cc       CMakeFiles/cmTC_481c2.dir/feature_tests.c.o  -o cmTC_481c2 -rdynamic 
 make[4]: Leaving directory '/opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp'
 make[3]: Leaving directory '/opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp'
 
@@ -204,15 +204,15 @@ make[3]: Leaving directory '/opt/opendlv.scaledcars.build/libodvdscaledcarsdatam
 Detecting C [-std=c90] compiler features compiled with the following output:
 Change Dir: /opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_6eca7/fast"
+Run Build Command:"/usr/bin/make" "cmTC_4519b/fast"
 make[3]: Entering directory '/opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_6eca7.dir/build.make CMakeFiles/cmTC_6eca7.dir/build
+/usr/bin/make -f CMakeFiles/cmTC_4519b.dir/build.make CMakeFiles/cmTC_4519b.dir/build
 make[4]: Entering directory '/opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_6eca7.dir/feature_tests.c.o
-/usr/bin/cc    -std=c90 -o CMakeFiles/cmTC_6eca7.dir/feature_tests.c.o   -c /opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/feature_tests.c
-Linking C executable cmTC_6eca7
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_6eca7.dir/link.txt --verbose=1
-/usr/bin/cc       CMakeFiles/cmTC_6eca7.dir/feature_tests.c.o  -o cmTC_6eca7 -rdynamic 
+Building C object CMakeFiles/cmTC_4519b.dir/feature_tests.c.o
+/usr/bin/cc    -std=c90 -o CMakeFiles/cmTC_4519b.dir/feature_tests.c.o   -c /opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/feature_tests.c
+Linking C executable cmTC_4519b
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_4519b.dir/link.txt --verbose=1
+/usr/bin/cc       CMakeFiles/cmTC_4519b.dir/feature_tests.c.o  -o cmTC_4519b -rdynamic 
 make[4]: Leaving directory '/opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp'
 make[3]: Leaving directory '/opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp'
 
@@ -224,15 +224,15 @@ make[3]: Leaving directory '/opt/opendlv.scaledcars.build/libodvdscaledcarsdatam
 Determining if the CXX compiler works passed with the following output:
 Change Dir: /opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_81515/fast"
+Run Build Command:"/usr/bin/make" "cmTC_a4cbf/fast"
 make[3]: Entering directory '/opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_81515.dir/build.make CMakeFiles/cmTC_81515.dir/build
+/usr/bin/make -f CMakeFiles/cmTC_a4cbf.dir/build.make CMakeFiles/cmTC_a4cbf.dir/build
 make[4]: Entering directory '/opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp'
-Building CXX object CMakeFiles/cmTC_81515.dir/testCXXCompiler.cxx.o
-/usr/bin/c++      -o CMakeFiles/cmTC_81515.dir/testCXXCompiler.cxx.o -c /opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp/testCXXCompiler.cxx
-Linking CXX executable cmTC_81515
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_81515.dir/link.txt --verbose=1
-/usr/bin/c++        CMakeFiles/cmTC_81515.dir/testCXXCompiler.cxx.o  -o cmTC_81515 -rdynamic 
+Building CXX object CMakeFiles/cmTC_a4cbf.dir/testCXXCompiler.cxx.o
+/usr/bin/c++      -o CMakeFiles/cmTC_a4cbf.dir/testCXXCompiler.cxx.o -c /opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp/testCXXCompiler.cxx
+Linking CXX executable cmTC_a4cbf
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_a4cbf.dir/link.txt --verbose=1
+/usr/bin/c++        CMakeFiles/cmTC_a4cbf.dir/testCXXCompiler.cxx.o  -o cmTC_a4cbf -rdynamic 
 make[4]: Leaving directory '/opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp'
 make[3]: Leaving directory '/opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp'
 
@@ -240,15 +240,15 @@ make[3]: Leaving directory '/opt/opendlv.scaledcars.build/libodvdscaledcarsdatam
 Detecting CXX compiler ABI info compiled with the following output:
 Change Dir: /opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_13340/fast"
+Run Build Command:"/usr/bin/make" "cmTC_41ea4/fast"
 make[3]: Entering directory '/opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_13340.dir/build.make CMakeFiles/cmTC_13340.dir/build
+/usr/bin/make -f CMakeFiles/cmTC_41ea4.dir/build.make CMakeFiles/cmTC_41ea4.dir/build
 make[4]: Entering directory '/opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp'
-Building CXX object CMakeFiles/cmTC_13340.dir/CMakeCXXCompilerABI.cpp.o
-/usr/bin/c++      -o CMakeFiles/cmTC_13340.dir/CMakeCXXCompilerABI.cpp.o -c /usr/share/cmake-3.5/Modules/CMakeCXXCompilerABI.cpp
-Linking CXX executable cmTC_13340
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_13340.dir/link.txt --verbose=1
-/usr/bin/c++       -v CMakeFiles/cmTC_13340.dir/CMakeCXXCompilerABI.cpp.o  -o cmTC_13340 -rdynamic  
+Building CXX object CMakeFiles/cmTC_41ea4.dir/CMakeCXXCompilerABI.cpp.o
+/usr/bin/c++      -o CMakeFiles/cmTC_41ea4.dir/CMakeCXXCompilerABI.cpp.o -c /usr/share/cmake-3.5/Modules/CMakeCXXCompilerABI.cpp
+Linking CXX executable cmTC_41ea4
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_41ea4.dir/link.txt --verbose=1
+/usr/bin/c++       -v CMakeFiles/cmTC_41ea4.dir/CMakeCXXCompilerABI.cpp.o  -o cmTC_41ea4 -rdynamic  
 Using built-in specs.
 COLLECT_GCC=/usr/bin/c++
 COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-linux-gnu/5/lto-wrapper
@@ -258,8 +258,8 @@ Thread model: posix
 gcc version 5.4.0 20160609 (Ubuntu 5.4.0-6ubuntu1~16.04.4) 
 COMPILER_PATH=/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/
 LIBRARY_PATH=/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../../lib/:/lib/x86_64-linux-gnu/:/lib/../lib/:/usr/lib/x86_64-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../:/lib/:/usr/lib/
-COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_13340' '-rdynamic' '-shared-libgcc' '-mtune=generic' '-march=x86-64'
- /usr/lib/gcc/x86_64-linux-gnu/5/collect2 -plugin /usr/lib/gcc/x86_64-linux-gnu/5/liblto_plugin.so -plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/5/lto-wrapper -plugin-opt=-fresolution=/tmp/ccRwWfP4.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --sysroot=/ --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -export-dynamic -dynamic-linker /lib64/ld-linux-x86-64.so.2 -z relro -o cmTC_13340 /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crt1.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/5/crtbegin.o -L/usr/lib/gcc/x86_64-linux-gnu/5 -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/5/../../.. CMakeFiles/cmTC_13340.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/lib/gcc/x86_64-linux-gnu/5/crtend.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crtn.o
+COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_41ea4' '-rdynamic' '-shared-libgcc' '-mtune=generic' '-march=x86-64'
+ /usr/lib/gcc/x86_64-linux-gnu/5/collect2 -plugin /usr/lib/gcc/x86_64-linux-gnu/5/liblto_plugin.so -plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/5/lto-wrapper -plugin-opt=-fresolution=/tmp/cctxS7fM.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --sysroot=/ --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -export-dynamic -dynamic-linker /lib64/ld-linux-x86-64.so.2 -z relro -o cmTC_41ea4 /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crt1.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/5/crtbegin.o -L/usr/lib/gcc/x86_64-linux-gnu/5 -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/5/../../.. CMakeFiles/cmTC_41ea4.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/lib/gcc/x86_64-linux-gnu/5/crtend.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crtn.o
 make[4]: Leaving directory '/opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp'
 make[3]: Leaving directory '/opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp'
 
@@ -268,15 +268,15 @@ Parsed CXX implicit link information from above output:
   link line regex: [^( *|.*[/\])(ld|([^/\]+-)?ld|collect2)[^/\]*( |$)]
   ignore line: [Change Dir: /opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp]
   ignore line: []
-  ignore line: [Run Build Command:"/usr/bin/make" "cmTC_13340/fast"]
+  ignore line: [Run Build Command:"/usr/bin/make" "cmTC_41ea4/fast"]
   ignore line: [make[3]: Entering directory '/opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp']
-  ignore line: [/usr/bin/make -f CMakeFiles/cmTC_13340.dir/build.make CMakeFiles/cmTC_13340.dir/build]
+  ignore line: [/usr/bin/make -f CMakeFiles/cmTC_41ea4.dir/build.make CMakeFiles/cmTC_41ea4.dir/build]
   ignore line: [make[4]: Entering directory '/opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp']
-  ignore line: [Building CXX object CMakeFiles/cmTC_13340.dir/CMakeCXXCompilerABI.cpp.o]
-  ignore line: [/usr/bin/c++      -o CMakeFiles/cmTC_13340.dir/CMakeCXXCompilerABI.cpp.o -c /usr/share/cmake-3.5/Modules/CMakeCXXCompilerABI.cpp]
-  ignore line: [Linking CXX executable cmTC_13340]
-  ignore line: [/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_13340.dir/link.txt --verbose=1]
-  ignore line: [/usr/bin/c++       -v CMakeFiles/cmTC_13340.dir/CMakeCXXCompilerABI.cpp.o  -o cmTC_13340 -rdynamic  ]
+  ignore line: [Building CXX object CMakeFiles/cmTC_41ea4.dir/CMakeCXXCompilerABI.cpp.o]
+  ignore line: [/usr/bin/c++      -o CMakeFiles/cmTC_41ea4.dir/CMakeCXXCompilerABI.cpp.o -c /usr/share/cmake-3.5/Modules/CMakeCXXCompilerABI.cpp]
+  ignore line: [Linking CXX executable cmTC_41ea4]
+  ignore line: [/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_41ea4.dir/link.txt --verbose=1]
+  ignore line: [/usr/bin/c++       -v CMakeFiles/cmTC_41ea4.dir/CMakeCXXCompilerABI.cpp.o  -o cmTC_41ea4 -rdynamic  ]
   ignore line: [Using built-in specs.]
   ignore line: [COLLECT_GCC=/usr/bin/c++]
   ignore line: [COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-linux-gnu/5/lto-wrapper]
@@ -286,13 +286,13 @@ Parsed CXX implicit link information from above output:
   ignore line: [gcc version 5.4.0 20160609 (Ubuntu 5.4.0-6ubuntu1~16.04.4) ]
   ignore line: [COMPILER_PATH=/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/]
   ignore line: [LIBRARY_PATH=/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../../lib/:/lib/x86_64-linux-gnu/:/lib/../lib/:/usr/lib/x86_64-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../:/lib/:/usr/lib/]
-  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_13340' '-rdynamic' '-shared-libgcc' '-mtune=generic' '-march=x86-64']
-  link line: [ /usr/lib/gcc/x86_64-linux-gnu/5/collect2 -plugin /usr/lib/gcc/x86_64-linux-gnu/5/liblto_plugin.so -plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/5/lto-wrapper -plugin-opt=-fresolution=/tmp/ccRwWfP4.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --sysroot=/ --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -export-dynamic -dynamic-linker /lib64/ld-linux-x86-64.so.2 -z relro -o cmTC_13340 /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crt1.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/5/crtbegin.o -L/usr/lib/gcc/x86_64-linux-gnu/5 -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/5/../../.. CMakeFiles/cmTC_13340.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/lib/gcc/x86_64-linux-gnu/5/crtend.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crtn.o]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_41ea4' '-rdynamic' '-shared-libgcc' '-mtune=generic' '-march=x86-64']
+  link line: [ /usr/lib/gcc/x86_64-linux-gnu/5/collect2 -plugin /usr/lib/gcc/x86_64-linux-gnu/5/liblto_plugin.so -plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/5/lto-wrapper -plugin-opt=-fresolution=/tmp/cctxS7fM.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --sysroot=/ --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -export-dynamic -dynamic-linker /lib64/ld-linux-x86-64.so.2 -z relro -o cmTC_41ea4 /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crt1.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/5/crtbegin.o -L/usr/lib/gcc/x86_64-linux-gnu/5 -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/5/../../.. CMakeFiles/cmTC_41ea4.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/lib/gcc/x86_64-linux-gnu/5/crtend.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crtn.o]
     arg [/usr/lib/gcc/x86_64-linux-gnu/5/collect2] ==> ignore
     arg [-plugin] ==> ignore
     arg [/usr/lib/gcc/x86_64-linux-gnu/5/liblto_plugin.so] ==> ignore
     arg [-plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/5/lto-wrapper] ==> ignore
-    arg [-plugin-opt=-fresolution=/tmp/ccRwWfP4.res] ==> ignore
+    arg [-plugin-opt=-fresolution=/tmp/cctxS7fM.res] ==> ignore
     arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
     arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
     arg [-plugin-opt=-pass-through=-lc] ==> ignore
@@ -310,7 +310,7 @@ Parsed CXX implicit link information from above output:
     arg [/lib64/ld-linux-x86-64.so.2] ==> ignore
     arg [-zrelro] ==> ignore
     arg [-o] ==> ignore
-    arg [cmTC_13340] ==> ignore
+    arg [cmTC_41ea4] ==> ignore
     arg [/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crt1.o] ==> ignore
     arg [/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crti.o] ==> ignore
     arg [/usr/lib/gcc/x86_64-linux-gnu/5/crtbegin.o] ==> ignore
@@ -322,7 +322,7 @@ Parsed CXX implicit link information from above output:
     arg [-L/usr/lib/x86_64-linux-gnu] ==> dir [/usr/lib/x86_64-linux-gnu]
     arg [-L/usr/lib/../lib] ==> dir [/usr/lib/../lib]
     arg [-L/usr/lib/gcc/x86_64-linux-gnu/5/../../..] ==> dir [/usr/lib/gcc/x86_64-linux-gnu/5/../../..]
-    arg [CMakeFiles/cmTC_13340.dir/CMakeCXXCompilerABI.cpp.o] ==> ignore
+    arg [CMakeFiles/cmTC_41ea4.dir/CMakeCXXCompilerABI.cpp.o] ==> ignore
     arg [-lstdc++] ==> lib [stdc++]
     arg [-lm] ==> lib [m]
     arg [-lgcc_s] ==> lib [gcc_s]
@@ -354,15 +354,15 @@ Parsed CXX implicit link information from above output:
 Detecting CXX [-std=c++14] compiler features compiled with the following output:
 Change Dir: /opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_30e39/fast"
+Run Build Command:"/usr/bin/make" "cmTC_c74cd/fast"
 make[3]: Entering directory '/opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_30e39.dir/build.make CMakeFiles/cmTC_30e39.dir/build
+/usr/bin/make -f CMakeFiles/cmTC_c74cd.dir/build.make CMakeFiles/cmTC_c74cd.dir/build
 make[4]: Entering directory '/opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp'
-Building CXX object CMakeFiles/cmTC_30e39.dir/feature_tests.cxx.o
-/usr/bin/c++     -std=c++14 -o CMakeFiles/cmTC_30e39.dir/feature_tests.cxx.o -c /opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/feature_tests.cxx
-Linking CXX executable cmTC_30e39
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_30e39.dir/link.txt --verbose=1
-/usr/bin/c++        CMakeFiles/cmTC_30e39.dir/feature_tests.cxx.o  -o cmTC_30e39 -rdynamic 
+Building CXX object CMakeFiles/cmTC_c74cd.dir/feature_tests.cxx.o
+/usr/bin/c++     -std=c++14 -o CMakeFiles/cmTC_c74cd.dir/feature_tests.cxx.o -c /opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/feature_tests.cxx
+Linking CXX executable cmTC_c74cd
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_c74cd.dir/link.txt --verbose=1
+/usr/bin/c++        CMakeFiles/cmTC_c74cd.dir/feature_tests.cxx.o  -o cmTC_c74cd -rdynamic 
 make[4]: Leaving directory '/opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp'
 make[3]: Leaving directory '/opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp'
 
@@ -429,15 +429,15 @@ make[3]: Leaving directory '/opt/opendlv.scaledcars.build/libodvdscaledcarsdatam
 Detecting CXX [-std=c++11] compiler features compiled with the following output:
 Change Dir: /opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_2ac29/fast"
+Run Build Command:"/usr/bin/make" "cmTC_badc2/fast"
 make[3]: Entering directory '/opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_2ac29.dir/build.make CMakeFiles/cmTC_2ac29.dir/build
+/usr/bin/make -f CMakeFiles/cmTC_badc2.dir/build.make CMakeFiles/cmTC_badc2.dir/build
 make[4]: Entering directory '/opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp'
-Building CXX object CMakeFiles/cmTC_2ac29.dir/feature_tests.cxx.o
-/usr/bin/c++     -std=c++11 -o CMakeFiles/cmTC_2ac29.dir/feature_tests.cxx.o -c /opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/feature_tests.cxx
-Linking CXX executable cmTC_2ac29
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_2ac29.dir/link.txt --verbose=1
-/usr/bin/c++        CMakeFiles/cmTC_2ac29.dir/feature_tests.cxx.o  -o cmTC_2ac29 -rdynamic 
+Building CXX object CMakeFiles/cmTC_badc2.dir/feature_tests.cxx.o
+/usr/bin/c++     -std=c++11 -o CMakeFiles/cmTC_badc2.dir/feature_tests.cxx.o -c /opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/feature_tests.cxx
+Linking CXX executable cmTC_badc2
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_badc2.dir/link.txt --verbose=1
+/usr/bin/c++        CMakeFiles/cmTC_badc2.dir/feature_tests.cxx.o  -o cmTC_badc2 -rdynamic 
 make[4]: Leaving directory '/opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp'
 make[3]: Leaving directory '/opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp'
 
@@ -504,15 +504,15 @@ make[3]: Leaving directory '/opt/opendlv.scaledcars.build/libodvdscaledcarsdatam
 Detecting CXX [-std=c++98] compiler features compiled with the following output:
 Change Dir: /opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_c5534/fast"
+Run Build Command:"/usr/bin/make" "cmTC_13dd3/fast"
 make[3]: Entering directory '/opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_c5534.dir/build.make CMakeFiles/cmTC_c5534.dir/build
+/usr/bin/make -f CMakeFiles/cmTC_13dd3.dir/build.make CMakeFiles/cmTC_13dd3.dir/build
 make[4]: Entering directory '/opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp'
-Building CXX object CMakeFiles/cmTC_c5534.dir/feature_tests.cxx.o
-/usr/bin/c++     -std=c++98 -o CMakeFiles/cmTC_c5534.dir/feature_tests.cxx.o -c /opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/feature_tests.cxx
-Linking CXX executable cmTC_c5534
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_c5534.dir/link.txt --verbose=1
-/usr/bin/c++        CMakeFiles/cmTC_c5534.dir/feature_tests.cxx.o  -o cmTC_c5534 -rdynamic 
+Building CXX object CMakeFiles/cmTC_13dd3.dir/feature_tests.cxx.o
+/usr/bin/c++     -std=c++98 -o CMakeFiles/cmTC_13dd3.dir/feature_tests.cxx.o -c /opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/feature_tests.cxx
+Linking CXX executable cmTC_13dd3
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_13dd3.dir/link.txt --verbose=1
+/usr/bin/c++        CMakeFiles/cmTC_13dd3.dir/feature_tests.cxx.o  -o cmTC_13dd3 -rdynamic 
 make[4]: Leaving directory '/opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp'
 make[3]: Leaving directory '/opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp'
 
@@ -577,15 +577,15 @@ make[3]: Leaving directory '/opt/opendlv.scaledcars.build/libodvdscaledcarsdatam
 Determining if the include file pthread.h exists passed with the following output:
 Change Dir: /opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_43b60/fast"
+Run Build Command:"/usr/bin/make" "cmTC_23b9b/fast"
 make[3]: Entering directory '/opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_43b60.dir/build.make CMakeFiles/cmTC_43b60.dir/build
+/usr/bin/make -f CMakeFiles/cmTC_23b9b.dir/build.make CMakeFiles/cmTC_23b9b.dir/build
 make[4]: Entering directory '/opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_43b60.dir/CheckIncludeFile.c.o
-/usr/bin/cc    -fPIC    -o CMakeFiles/cmTC_43b60.dir/CheckIncludeFile.c.o   -c /opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp/CheckIncludeFile.c
-Linking C executable cmTC_43b60
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_43b60.dir/link.txt --verbose=1
-/usr/bin/cc    -fPIC     CMakeFiles/cmTC_43b60.dir/CheckIncludeFile.c.o  -o cmTC_43b60 -rdynamic 
+Building C object CMakeFiles/cmTC_23b9b.dir/CheckIncludeFile.c.o
+/usr/bin/cc    -fPIC    -o CMakeFiles/cmTC_23b9b.dir/CheckIncludeFile.c.o   -c /opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+Linking C executable cmTC_23b9b
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_23b9b.dir/link.txt --verbose=1
+/usr/bin/cc    -fPIC     CMakeFiles/cmTC_23b9b.dir/CheckIncludeFile.c.o  -o cmTC_23b9b -rdynamic 
 make[4]: Leaving directory '/opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp'
 make[3]: Leaving directory '/opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp'
 
@@ -593,15 +593,15 @@ make[3]: Leaving directory '/opt/opendlv.scaledcars.build/libodvdscaledcarsdatam
 Determining if the function pthread_create exists in the pthread passed with the following output:
 Change Dir: /opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_cca3f/fast"
+Run Build Command:"/usr/bin/make" "cmTC_974d4/fast"
 make[3]: Entering directory '/opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_cca3f.dir/build.make CMakeFiles/cmTC_cca3f.dir/build
+/usr/bin/make -f CMakeFiles/cmTC_974d4.dir/build.make CMakeFiles/cmTC_974d4.dir/build
 make[4]: Entering directory '/opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_cca3f.dir/CheckFunctionExists.c.o
-/usr/bin/cc    -fPIC -DCHECK_FUNCTION_EXISTS=pthread_create   -o CMakeFiles/cmTC_cca3f.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.5/Modules/CheckFunctionExists.c
-Linking C executable cmTC_cca3f
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_cca3f.dir/link.txt --verbose=1
-/usr/bin/cc    -fPIC -DCHECK_FUNCTION_EXISTS=pthread_create    CMakeFiles/cmTC_cca3f.dir/CheckFunctionExists.c.o  -o cmTC_cca3f -rdynamic -lpthread 
+Building C object CMakeFiles/cmTC_974d4.dir/CheckFunctionExists.c.o
+/usr/bin/cc    -fPIC -DCHECK_FUNCTION_EXISTS=pthread_create   -o CMakeFiles/cmTC_974d4.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.5/Modules/CheckFunctionExists.c
+Linking C executable cmTC_974d4
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_974d4.dir/link.txt --verbose=1
+/usr/bin/cc    -fPIC -DCHECK_FUNCTION_EXISTS=pthread_create    CMakeFiles/cmTC_974d4.dir/CheckFunctionExists.c.o  -o cmTC_974d4 -rdynamic -lpthread 
 make[4]: Leaving directory '/opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp'
 make[3]: Leaving directory '/opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel-prefix/src/libodvdscaledcarsdatamodel-build/CMakeFiles/CMakeTmp'
 
