@@ -121,7 +121,9 @@ namespace scaledcars {
                 for (int i = 0; i < pending; i++) {
                     if (serial_receive(this->serial, &incoming)) {
                         cerr << "RECEIVED : id=" << incoming.id << " value=" << incoming.value << endl;
-                        filterData(incoming);
+                        
+                        // Send to filter
+                        filterData(incoming); 
                     }
                 }
                 
@@ -165,12 +167,14 @@ namespace scaledcars {
                 }
         }
         
-        /*
+        /**
         * Devides the protocol_data according to what sensor it represents.
         *
         * Send as
         * 	SensorBoardData -> Ultrasonic sensor and IR-sensor
         * 	VehicleData	->	Odometer
+        *
+        * @param data to filter
         */
         void SerialSendHandler::filterData(protocol_data data){
 				
@@ -186,33 +190,44 @@ namespace scaledcars {
 				} else if (data.id == 6 && data.value >= 0 && data.value <= 255){ 
 					sendVehicleData(data.value);	
 				}
+				cerr << "[Filter no sensor] ID: " << data.id << " VALUE: " << data.value << endl;
         }
         
-        /*
-      	*	Pack a sensor id and a sensor value as a SensorBoardData.
-      	*	Then put the SensorBoardData into a Container and send the
-      	*	Container to the Conference.
+        /**
+      	* Pack a sensor id and a sensor value as a SensorBoardData.
+      	* Then put the SensorBoardData into a Container and send the
+      	* Container to the Conference.
+      	*
+      	* @param id and value of either a ultrasonic or ir-sensor
 			*/        
         void SerialSendHandler::sendSensorBoardData(int id, int value){
         		SensorBoardData sbd;
         		map<uint32_t, double> sensor;
+        		
         		sensor[id - 1] = value;
 				sbd.setMapOfDistances(sensor);
+				
 				Container c(sbd);
 				getConference().send(c);
-				cerr << "[SensorBoardData to conference] ID: " << id << " VALUE: " << value << endl;
+				
+				cout << "[SensorBoardData to conference] ID: " << id << " VALUE: " << value << endl;
         }
           
-        /*
-      	*	Pack a sensor value as a VehicleData. Then put the VehicleData 
-      	*	into a Container and send the Container to the Conference.
+        /**
+      	* Pack a sensor value as a VehicleData. Then put the VehicleData 
+      	* into a Container and send the Container to the Conference.
+      	*
+      	* @param value of a odometer sensor
 			*/      
         void SerialSendHandler::sendVehicleData(int value){
         		VehicleData vd;
+        		
         		vd.setAbsTraveledPath(value);
+        		
 				Container c(vd);
 				getConference().send(c);
-				cerr << "[VehicleData to conference] VALUE: " << value << endl;
+				
+				cout << "[VehicleData to conference] VALUE: " << value << endl;
         }
     }
 }
