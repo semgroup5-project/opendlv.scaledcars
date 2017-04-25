@@ -78,6 +78,12 @@ namespace scaledcars {
                 virtual void setUp();
 
                 virtual void tearDown();
+                
+                void filterData(protocol_data data);
+                
+                void sendSensorBoardData(int id, int value);
+                
+                void sendVehicleData(int value);
         };
     }
 }
