@@ -36,7 +36,7 @@ namespace scaledcars {
         using namespace odcore::data::dmcp;
         using namespace automotive::miniature;
 
-        Mat m_image_new;
+        Mat m_image_new, m_image_equ, m_image_processed;
         bool stop = false;
         double stopCounter = 0;
         String state = "moving";
@@ -158,6 +158,9 @@ namespace scaledcars {
             cvtColor(m_image, m_image_new, COLOR_BGR2GRAY);
 
 
+           equalizeHist(m_image_new,  m_image_equ);
+
+
 
             Canny(m_image_new, m_image_new, m_threshold1, m_threshold2, 3); // see header for algorithm and threshold explanation
 
@@ -222,7 +225,7 @@ namespace scaledcars {
             if (m_debug) {
 
                 if (left.x > 0) {
-                    line(m_image_new, Point(m_image.cols / 2, y), left, Scalar(255, 0, 0), 1, 8);
+                    line(m_image_equ, Point(m_image.cols / 2, y), left, Scalar(255, 0, 0), 1, 8);
 
                     stringstream sstr;
                     sstr << (m_image_new.cols / 2 - left.x);
@@ -231,7 +234,7 @@ namespace scaledcars {
                             CV_RGB(255, 0, 0));
                 }
                 if (right.x > 0) {
-                    line(m_image_new, cvPoint(m_image.cols / 2, y), right, Scalar(255, 0, 0), 1, 8);
+                    line(m_image_equ, cvPoint(m_image.cols / 2, y), right, Scalar(255, 0, 0), 1, 8);
 
                     stringstream sstr;
                     sstr << (right.x - m_image_new.cols / 2);
@@ -362,7 +365,7 @@ namespace scaledcars {
             if (m_debug) {
                 if (m_image.data != NULL) {
                     imshow("Debug Image",
-                           m_image_new);  //m_image = image without canny || m_image_new = fully processed image
+                           m_image_equ);  //m_image = image without canny || m_image_new = fully processed image
                     waitKey(10);
                 }
             }

@@ -1000,8 +1000,8 @@ opendavinci/odcore/wrapper/SharedMemoryFactory.h
 protocol.h
 /opt/opendlv.scaledcars.sources/code/control/serialsendhandler/include/protocol.h
 
-/opt/opendlv.scaledcars.sources/code/control/serialsendhandler/include/netstrings.hpp
-string
+/opt/opendlv.scaledcars.sources/code/control/serialsendhandler/include/arduino.h
+stdint.h
 -
 
 /opt/opendlv.scaledcars.sources/code/control/serialsendhandler/include/protocol.h
@@ -1042,9 +1042,29 @@ serial.c
 arduino.c
 /opt/opendlv.scaledcars.sources/code/control/serialsendhandler/src/arduino.c
 
-/opt/opendlv.scaledcars.sources/code/control/serialsendhandler/src/netstrings.cpp
-netstrings.hpp
-/opt/opendlv.scaledcars.sources/code/control/serialsendhandler/src/netstrings.hpp
+/opt/opendlv.scaledcars.sources/code/control/serialsendhandler/src/arduino.c
+arduino.h
+/opt/opendlv.scaledcars.sources/code/control/serialsendhandler/src/arduino.h
+stdio.h
+-
+stdlib.h
+-
+stdint.h
+-
+string.h
+-
+unistd.h
+-
+fcntl.h
+-
+errno.h
+-
+termios.h
+-
+sys/ioctl.h
+-
+getopt.h
+-
 
 /opt/opendlv.scaledcars.sources/code/control/serialsendhandler/src/protocol.c
 protocol.h

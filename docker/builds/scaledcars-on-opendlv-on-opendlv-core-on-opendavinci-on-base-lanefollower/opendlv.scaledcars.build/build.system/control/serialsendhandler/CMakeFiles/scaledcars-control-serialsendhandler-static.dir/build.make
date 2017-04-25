@@ -57,33 +57,9 @@ include control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandle
 # Include the compile flags for this target's objects.
 include control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/flags.make
 
-control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/src/netstrings.cpp.o: control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/flags.make
-control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/src/netstrings.cpp.o: /opt/opendlv.scaledcars.sources/code/control/serialsendhandler/src/netstrings.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/opt/opendlv.scaledcars.build/build.system/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/src/netstrings.cpp.o"
-	cd /opt/opendlv.scaledcars.build/build.system/control/serialsendhandler && /usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/scaledcars-control-serialsendhandler-static.dir/src/netstrings.cpp.o -c /opt/opendlv.scaledcars.sources/code/control/serialsendhandler/src/netstrings.cpp
-
-control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/src/netstrings.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/scaledcars-control-serialsendhandler-static.dir/src/netstrings.cpp.i"
-	cd /opt/opendlv.scaledcars.build/build.system/control/serialsendhandler && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /opt/opendlv.scaledcars.sources/code/control/serialsendhandler/src/netstrings.cpp > CMakeFiles/scaledcars-control-serialsendhandler-static.dir/src/netstrings.cpp.i
-
-control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/src/netstrings.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/scaledcars-control-serialsendhandler-static.dir/src/netstrings.cpp.s"
-	cd /opt/opendlv.scaledcars.build/build.system/control/serialsendhandler && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /opt/opendlv.scaledcars.sources/code/control/serialsendhandler/src/netstrings.cpp -o CMakeFiles/scaledcars-control-serialsendhandler-static.dir/src/netstrings.cpp.s
-
-control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/src/netstrings.cpp.o.requires:
-
-.PHONY : control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/src/netstrings.cpp.o.requires
-
-control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/src/netstrings.cpp.o.provides: control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/src/netstrings.cpp.o.requires
-	$(MAKE) -f control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/build.make control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/src/netstrings.cpp.o.provides.build
-.PHONY : control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/src/netstrings.cpp.o.provides
-
-control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/src/netstrings.cpp.o.provides.build: control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/src/netstrings.cpp.o
-
-
 control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/src/SerialSendHandler.cpp.o: control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/flags.make
 control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/src/SerialSendHandler.cpp.o: /opt/opendlv.scaledcars.sources/code/control/serialsendhandler/src/SerialSendHandler.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/opt/opendlv.scaledcars.build/build.system/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/src/SerialSendHandler.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/opt/opendlv.scaledcars.build/build.system/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/src/SerialSendHandler.cpp.o"
 	cd /opt/opendlv.scaledcars.build/build.system/control/serialsendhandler && /usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/scaledcars-control-serialsendhandler-static.dir/src/SerialSendHandler.cpp.o -c /opt/opendlv.scaledcars.sources/code/control/serialsendhandler/src/SerialSendHandler.cpp
 
 control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/src/SerialSendHandler.cpp.i: cmake_force
@@ -107,17 +83,15 @@ control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static
 
 # Object files for target scaledcars-control-serialsendhandler-static
 scaledcars__control__serialsendhandler__static_OBJECTS = \
-"CMakeFiles/scaledcars-control-serialsendhandler-static.dir/src/netstrings.cpp.o" \
 "CMakeFiles/scaledcars-control-serialsendhandler-static.dir/src/SerialSendHandler.cpp.o"
 
 # External object files for target scaledcars-control-serialsendhandler-static
 scaledcars__control__serialsendhandler__static_EXTERNAL_OBJECTS =
 
-control/serialsendhandler/libscaledcars-control-serialsendhandler-static.a: control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/src/netstrings.cpp.o
 control/serialsendhandler/libscaledcars-control-serialsendhandler-static.a: control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/src/SerialSendHandler.cpp.o
 control/serialsendhandler/libscaledcars-control-serialsendhandler-static.a: control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/build.make
 control/serialsendhandler/libscaledcars-control-serialsendhandler-static.a: control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/opt/opendlv.scaledcars.build/build.system/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking CXX static library libscaledcars-control-serialsendhandler-static.a"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/opt/opendlv.scaledcars.build/build.system/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX static library libscaledcars-control-serialsendhandler-static.a"
 	cd /opt/opendlv.scaledcars.build/build.system/control/serialsendhandler && $(CMAKE_COMMAND) -P CMakeFiles/scaledcars-control-serialsendhandler-static.dir/cmake_clean_target.cmake
 	cd /opt/opendlv.scaledcars.build/build.system/control/serialsendhandler && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/scaledcars-control-serialsendhandler-static.dir/link.txt --verbose=$(VERBOSE)
 
@@ -126,7 +100,6 @@ control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static
 
 .PHONY : control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/build
 
-control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/requires: control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/src/netstrings.cpp.o.requires
 control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/requires: control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/src/SerialSendHandler.cpp.o.requires
 
 .PHONY : control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/requires

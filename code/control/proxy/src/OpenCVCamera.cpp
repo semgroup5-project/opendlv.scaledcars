@@ -37,6 +37,7 @@ namespace control {
             if (m_capture) {
                 cvSetCaptureProperty(m_capture, CV_CAP_PROP_FRAME_WIDTH, width);
                 cvSetCaptureProperty(m_capture, CV_CAP_PROP_FRAME_HEIGHT, height);
+                cvSetCaptureProperty(m_capture, CV_CAP_PROP_SETTINGS, 1);
             }
             else {
                 cerr << "proxy: Could not open camera '" << name << "' with ID: " << id << endl;

@@ -99,9 +99,11 @@ control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static
 control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/src/SerialSendHandler.cpp.o: /opt/od4/include/opendavinci/odcore/wrapper/SharedMemoryFactory.h
 control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/src/SerialSendHandler.cpp.o: /opt/od4/include/opendavinci/odcore/wrapper/Time.h
 control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/src/SerialSendHandler.cpp.o: /opt/opendlv.scaledcars.sources/code/control/serialsendhandler/include/SerialSendHandler.h
+control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/src/SerialSendHandler.cpp.o: /opt/opendlv.scaledcars.sources/code/control/serialsendhandler/include/arduino.h
 control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/src/SerialSendHandler.cpp.o: /opt/opendlv.scaledcars.sources/code/control/serialsendhandler/include/protocol.h
 control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/src/SerialSendHandler.cpp.o: /opt/opendlv.scaledcars.sources/code/control/serialsendhandler/include/serial.h
 control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/src/SerialSendHandler.cpp.o: /opt/opendlv.scaledcars.sources/code/control/serialsendhandler/src/SerialSendHandler.cpp
+control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/src/SerialSendHandler.cpp.o: /opt/opendlv.scaledcars.sources/code/control/serialsendhandler/src/arduino.c
 control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/src/SerialSendHandler.cpp.o: /opt/opendlv.scaledcars.sources/code/control/serialsendhandler/src/protocol.c
 control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/src/SerialSendHandler.cpp.o: /opt/opendlv.scaledcars.sources/code/control/serialsendhandler/src/serial.c
 control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/src/SerialSendHandler.cpp.o: /usr/include/glib-2.0/glib.h
@@ -181,7 +183,4 @@ control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static
 control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/src/SerialSendHandler.cpp.o: /usr/include/glib-2.0/glib/gversionmacros.h
 control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/src/SerialSendHandler.cpp.o: /usr/include/glib-2.0/glib/gwin32.h
 control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/src/SerialSendHandler.cpp.o: /usr/lib/x86_64-linux-gnu/glib-2.0/include/glibconfig.h
-
-control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/src/netstrings.cpp.o: /opt/opendlv.scaledcars.sources/code/control/serialsendhandler/include/netstrings.hpp
-control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/src/netstrings.cpp.o: /opt/opendlv.scaledcars.sources/code/control/serialsendhandler/src/netstrings.cpp
 

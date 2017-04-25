@@ -100,9 +100,11 @@ control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static
  /opt/od4/include/opendavinci/odcore/wrapper/SharedMemoryFactory.h
  /opt/od4/include/opendavinci/odcore/wrapper/Time.h
  /opt/opendlv.scaledcars.sources/code/control/serialsendhandler/include/SerialSendHandler.h
+ /opt/opendlv.scaledcars.sources/code/control/serialsendhandler/include/arduino.h
  /opt/opendlv.scaledcars.sources/code/control/serialsendhandler/include/protocol.h
  /opt/opendlv.scaledcars.sources/code/control/serialsendhandler/include/serial.h
  /opt/opendlv.scaledcars.sources/code/control/serialsendhandler/src/SerialSendHandler.cpp
+ /opt/opendlv.scaledcars.sources/code/control/serialsendhandler/src/arduino.c
  /opt/opendlv.scaledcars.sources/code/control/serialsendhandler/src/protocol.c
  /opt/opendlv.scaledcars.sources/code/control/serialsendhandler/src/serial.c
  /usr/include/glib-2.0/glib.h
@@ -182,6 +184,3 @@ control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static
  /usr/include/glib-2.0/glib/gversionmacros.h
  /usr/include/glib-2.0/glib/gwin32.h
  /usr/lib/x86_64-linux-gnu/glib-2.0/include/glibconfig.h
-control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/src/netstrings.cpp.o
- /opt/opendlv.scaledcars.sources/code/control/serialsendhandler/include/netstrings.hpp
- /opt/opendlv.scaledcars.sources/code/control/serialsendhandler/src/netstrings.cpp
