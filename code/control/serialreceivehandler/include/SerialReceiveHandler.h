@@ -1,11 +1,16 @@
 #include <opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h>
 #include "protocol.h"
+#include "automotivedata/generated/automotive/VehicleControl.h"
 
 namespace scaledcars {
 	namespace control {
 
+
 // This class will handle the bytes received via a serial link.
-class SerialReceiveHandler : public odcore::base::module::TimeTriggeredConferenceClientModule {
+class SerialReceiveHandler : public odcore::base::module::TimeTriggeredConferenceClientModule,
+										public odcore::io::StringListener {
+										 
+		virtual void nextString(const std::string &s);
 	
 		private:
         /**
@@ -37,11 +42,16 @@ class SerialReceiveHandler : public odcore::base::module::TimeTriggeredConferenc
         SerialReceiveHandler(const int32_t &argc, char **argv);
 
         virtual ~SerialReceiveHandler();
+        
+        void filterData(protocol_state *state);
+        
+        void filterIntData(int id, int value);
 
         odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
-
+        
     private:
-    
+    		
+    		
         	virtual void setUp();
 
         	virtual void tearDown();

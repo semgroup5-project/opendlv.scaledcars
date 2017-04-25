@@ -5,6 +5,10 @@
 #include <opendavinci/odcore/wrapper/SerialPort.h>
 #include <opendavinci/odcore/wrapper/SerialPortFactory.h>
 #include <iostream>
+#include "automotivedata/generated/automotive/VehicleControl.h"
+#include "automotivedata/generated/automotive/VehicleData.h"
+#include "automotivedata/generated/automotive/miniature/SensorBoardData.h"
+#include "opendavinci/odcore/data/Container.h"
 
 #include "SerialSendHandler.h"
 #include "protocol.c"
@@ -35,20 +39,30 @@ void SerialSendHandler::tearDown() {
 }
 
 void SerialSendHandler::nextContainer(Container &c) {	
-   if (c.getDataType() == automotive::VehicleControl::ID()) {
+   if (c.getDataType() == automotive::VehicleData::ID()) {
+   	send("VD");
+   	cout << "This is VehicleData: " << c.getData<automotive::VehicleData>().getAbsTraveledPath() << endl;
+   	
+   } else if (c.getDataType() == automotive::miniature::SensorBoardData::ID()) {
+   	send("SBD");
+   	cout << "This is SensorBoardData: " << c.getData<automotive::miniature::SensorBoardData>().getValueForKey_MapOfDistances(0) << endl;
+   
+   } else if (c.getDataType() == automotive::VehicleControl::ID()) {
       const automotive::VehicleControl vd = c.getData<automotive::VehicleControl>();
-      int angle = vd.getSteeringWheelAngle();
-      int speed = vd.getSpeed();
+      int angle = 180; //vd.getSteeringWheelAngle();
+    	int speed = 105; //vd.getSpeed();
       //int odometer = TODO ;
       
-      string speedMessage = pack(1, speed);
+    	string speedMessage = pack(1, speed);
       string angleMessage = pack(2, angle);
      	//string odometerMessage = pack(3, odometer); TODO
      
     	send(speedMessage);
     	send(angleMessage);
     	//send(odometerMessage); TODO
+    	cerr << "Yay" << endl;
 	}
+//	cerr << "Nay" << endl;
 }
 
 string SerialSendHandler::pack(int id, int value){  
@@ -93,12 +107,13 @@ void SerialSendHandler::simpleMessage(automotive::VehicleControl vd){
 }
 
 void SerialSendHandler::send(string message){
-	const string SERIAL_PORT = "/dev/ttyACM0";
-	const uint32_t BAUD_RATE = 115200;
+//	const string SERIAL_PORT = "/dev/ttyACM1";
+//	const uint32_t BAUD_RATE = 115200;
 	
 	try {
 		std::shared_ptr <SerialPort> serial(SerialPortFactory::createSerialPort(SERIAL_PORT, BAUD_RATE));
 		serial->send(message);
+		cerr << "I'm " << message << endl;
 	}
    catch (string &exception) {
    	cerr << "Serial port could not be created: " << exception << endl;
