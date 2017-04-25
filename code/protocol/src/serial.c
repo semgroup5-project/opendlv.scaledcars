@@ -103,15 +103,25 @@ void *serial_outgoing_thread_routine(void *_state)
             continue;
         }
 
-        protocol_frame frame = protocol_encode(*data, FRAME_T2);
+        uint8_t frame_t = state->protocol.frame.t;
+
+        protocol_frame frame = protocol_encode(*data, frame_t);
 
         g_mutex_lock(&state->write_mutex);
 
-        serialport_writebyte(state->fd, frame.a);
-        serialport_writebyte(state->fd, frame.b);
+        if (frame_t == FRAME_T1) {
+            serialport_writebyte(state->fd, frame.a);
 
-        state->on_write(frame.a);
-        state->on_write(frame.b);
+            state->on_write(frame.a);
+        }
+
+        if (frame_t == FRAME_T2) {
+            serialport_writebyte(state->fd, frame.a);
+            serialport_writebyte(state->fd, frame.b);
+
+            state->on_write(frame.a);
+            state->on_write(frame.b);
+        }
 
         g_mutex_unlock(&state->write_mutex);
 

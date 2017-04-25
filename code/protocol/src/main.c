@@ -118,6 +118,8 @@ int main(int argc, const char *argv[])
 
     serial_state *serial = serial_new();
 
+    serial->protocol.frame.t = FRAME_T2;
+
     serial->on_write = &__on_write;
     serial->on_read = &__on_read;
 
