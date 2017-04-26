@@ -142,6 +142,7 @@ class Car {
 public:
     explicit Car();
     void setUp();
+    void run();
     void provideSensorsData();
     void rcControl();
     void automatedDrive();

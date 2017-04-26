@@ -5,6 +5,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
   "/opt/opendlv.scaledcars.sources/code/control/serialsendhandler/src/SerialSendHandler.cpp" "/opt/opendlv.scaledcars.build/build.system/control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/src/SerialSendHandler.cpp.o"
+  "/opt/opendlv.scaledcars.sources/code/control/serialsendhandler/src/netstrings.cpp" "/opt/opendlv.scaledcars.build/build.system/control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/src/netstrings.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 
