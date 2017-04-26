@@ -36,10 +36,10 @@ namespace scaledcars {
         using namespace odcore::data::dmcp;
         using namespace automotive::miniature;
 
-        Mat m_image_new, m_image_hist;
+        Mat m_image_new;
         bool stop = false;
         double stopCounter = 0;
-        String state = "moving";
+        String state = "moving", oldState ="stop";
         bool inRightLane = true;   //the overtaker alters this value to signal a lane change
 
         LaneFollower::LaneFollower(const int32_t &argc, char **argv) :
@@ -55,11 +55,11 @@ namespace scaledcars {
                 m_eSum(0),
                 m_eOld(0),
                 m_vehicleControl(),
-                m_threshold1(50),  //50
-                m_threshold2(150),  // 150
+                m_threshold1(140),  //50
+                m_threshold2(220),  // 150
                 m_control_scanline(400),//needs testing with real c
                 m_stop_scanline(200),//needs testing with real car
-                m_distance(150),  //needs testing with real car as well
+                m_distance(160),  //needs testing with real car as well
                 p_gain(0),       // the gain values can be adjusted here outside of simulation scenario (see @setUp() )
                 i_gain(0),
                 d_gain(0) {}
@@ -151,15 +151,24 @@ namespace scaledcars {
         void LaneFollower::processImage() {
             // New image
             m_image_new = Mat(m_image.rows, m_image.cols, CV_8UC1);
-            m_image_hist = Mat(m_image.rows, m_image.cols, CV_8UC1);
+
+
+            uchar pixel;
+
+
 
             // Copy the original image to the new image as greyscale
             cvtColor(m_image, m_image_new, COLOR_BGR2GRAY);
 
+            for (int x = m_image_new.cols; x < 0; x--) {
+                pixel = m_image_new.at<uchar>(Point(x, m_control_scanline));
+                if (pixel < 150) {   //tentative value, might need adjustment: lower it closer to 100
+                    pixel = 1;
+                    break;
+                }
+            }
 
-            equalizeHist(m_image_new,  m_image_hist);   //apply a histogram
-
-            Canny(m_image_hist, m_image_hist, m_threshold1, m_threshold2, 3); // see header for algorithm and threshold explanation
+            Canny(m_image_new, m_image_new, m_threshold1, m_threshold2, 3); // see header for algorithm and threshold explanation
 
         }
 
@@ -176,8 +185,8 @@ namespace scaledcars {
             left.x = -1;
 
             // Search from middle to the left
-            for (int x = m_image_hist.cols / 2; x > 0; x--) {//from the middle to the left
-                pixelLeft = m_image_hist.at<uchar>(Point(x, y));
+            for (int x = m_image_new.cols / 2; x > 0; x--) {//from the middle to the left
+                pixelLeft = m_image_new.at<uchar>(Point(x, y));
                 if (pixelLeft >= 150) {   //tentative value, might need adjustment: lower it closer to 100
                     left.x = x;
                     break;
@@ -188,31 +197,40 @@ namespace scaledcars {
             right.y = y;
             right.x = -1;
             // Search from middle to the right
-            for (int x = m_image_hist.cols / 2; x < m_image_hist.cols - 50; x++) {  //cols - 50 to stop it from finding the wall
-                pixelRight = m_image_hist.at<uchar>(Point(x, y));
+            for (int x = m_image_new.cols / 2; x < m_image_new.cols - 50; x++) {  //cols - 50 to stop it from finding the wall
+                pixelRight = m_image_new.at<uchar>(Point(x, y));
                 if (pixelRight >= 150) {   //tentative value, might need adjustment: lower it closer to 100
                     right.x = x;
                     break;
                 }
             }
 
+            if ( right.x == -1 && left.x == -1 ){  //setting state if the car does not see any line
+                state = "danger";
+                if (oldState = "moving"){
+                    oldState = "danger";
+                }
+            }else{
+                state = "moving";
+            }
+
             if (y == m_control_scanline) {
 
                 if (inRightLane) {
                     if (right.x > 0) {
-                        e = ((right.x - m_image_hist.cols / 2.0) - m_distance) / m_distance;
+                        e = ((right.x - m_image_new.cols / 2.0) - m_distance) / m_distance;
                     } else if (left.x > 0) {
-                        e = (m_distance - (m_image_hist.cols / 2.0 - left.x)) / m_distance;
+                        e = (m_distance - (m_image_new.cols / 2.0 - left.x)) / m_distance;
                     }
                 } else {  //Adapt to following the left lane
                     if (left.x > 0) {
 //                        m_eSum = 0;
 //                        m_eOld = 0;
-                        e = (m_distance - (m_image_hist.cols / 2.0 - left.x)) / m_distance;
+                        e = (m_distance - (m_image_new.cols / 2.0 - left.x)) / m_distance;
                     } else if (right.x > 0) {
 //                        m_eSum = 0;
 //                        m_eOld = 0;
-                        e = ((right.x - m_image_hist.cols / 2.0) - m_distance) / m_distance;
+                        e = ((right.x - m_image_new.cols / 2.0) - m_distance) / m_distance;
                     }
                 }
             }
@@ -222,20 +240,20 @@ namespace scaledcars {
             if (m_debug) {
 
                 if (left.x > 0) {
-                    line(m_image_hist, Point(m_image.cols / 2, y), left, Scalar(255, 0, 0), 1, 8);
+                    line(m_image_new, Point(m_image.cols / 2, y), left, Scalar(255, 0, 0), 1, 8);
 
                     stringstream sstr;
-                    sstr << (m_image_hist.cols / 2 - left.x);
+                    sstr << (m_image_new.cols / 2 - left.x);
 
-                    putText(m_image_hist, sstr.str().c_str(), Point(m_image_hist.cols / 2 - 100, y - 2), FONT_HERSHEY_PLAIN, 1,
+                    putText(m_image_new, sstr.str().c_str(), Point(m_image_new.cols / 2 - 100, y - 2), FONT_HERSHEY_PLAIN, 1,
                             CV_RGB(255, 0, 0));
                 }
                 if (right.x > 0) {
-                    line(m_image_hist, cvPoint(m_image.cols / 2, y), right, Scalar(255, 0, 0), 1, 8);
+                    line(m_image_new, cvPoint(m_image.cols / 2, y), right, Scalar(255, 0, 0), 1, 8);
 
                     stringstream sstr;
-                    sstr << (right.x - m_image_hist.cols / 2);
-                    putText(m_image_hist, sstr.str().c_str(), cvPoint(m_image_hist.cols / 2 + 100, y - 2), FONT_HERSHEY_PLAIN, 1,
+                    sstr << (right.x - m_image_new.cols / 2);
+                    putText(m_image_new, sstr.str().c_str(), cvPoint(m_image_new.cols / 2 + 100, y - 2), FONT_HERSHEY_PLAIN, 1,
                             CV_RGB(255, 0, 0));
                 }
             }
@@ -248,12 +266,12 @@ namespace scaledcars {
 
             int left_dist = 0;
 
-            stop_left.x = (m_image_hist.cols / 2) - 50;
+            stop_left.x = (m_image_new.cols / 2) - 50;
             stop_left.y = m_control_scanline;
 
             // Find first grey pixel in the front of the car
             for (int i = m_control_scanline; i > m_stop_scanline; i--) {
-                front_left = m_image_hist.at<uchar>(Point(stop_left.x, i));
+                front_left = m_image_new.at<uchar>(Point(stop_left.x, i));
                 if (front_left > 150) {
                     stop_left.y = i;
                     left_dist = m_control_scanline - stop_left.y;
@@ -263,12 +281,12 @@ namespace scaledcars {
 
             int right_dist = 0;
 
-            stop_right.x = (m_image_hist.cols / 2) + 50;
+            stop_right.x = (m_image_new.cols / 2) + 50;
             stop_right.y = m_control_scanline;
 
             // Find first grey pixel in front of the car
             for (int i = m_control_scanline; i > m_stop_scanline; i--) {
-                front_right = m_image_hist.at<uchar>(Point(stop_right.x, i));
+                front_right = m_image_new.at<uchar>(Point(stop_right.x, i));
                 if (front_right > 150) {
                     stop_right.y = i;
                     right_dist = m_control_scanline - stop_right.y;
@@ -279,11 +297,11 @@ namespace scaledcars {
             // Draw lines if debug true
             if (m_debug) {
                 if (stop_left.y < m_control_scanline) {
-                    line(m_image_hist, Point(stop_left.x, m_control_scanline), stop_left, Scalar(255, 0, 0));
+                    line(m_image_new, Point(stop_left.x, m_control_scanline), stop_left, Scalar(255, 0, 0));
                 }
 
                 if (stop_right.y < m_control_scanline) {
-                    line(m_image_hist, Point(stop_right.x, m_control_scanline), stop_right, Scalar(255, 0, 0));
+                    line(m_image_new, Point(stop_right.x, m_control_scanline), stop_right, Scalar(255, 0, 0));
                 }
             }
 
@@ -362,7 +380,7 @@ namespace scaledcars {
             if (m_debug) {
                 if (m_image.data != NULL) {
                     imshow("Debug Image",
-                           m_image_hist);  //m_image = image without canny || m_image_new = fully processed image
+                           m_image_new);  //m_image = image without canny || m_image_new = fully processed image
                     waitKey(10);
                 }
             }
@@ -398,18 +416,15 @@ namespace scaledcars {
                     if (Sim) {
                         m_vehicleControl.setSpeed(1);
                     } else {
-                        m_vehicleControl.setSpeed(100);
-                    }
-
-                    if (stop) {
-                        if (stopCounter < 6.0) {
-                            stopCounter += 0.5;
-                            cerr << stopCounter << endl;
-                        } else {
+                        if (stop) {
                             state = "stop";
-                            cerr << "Stopline found ! " << endl;
+                        }
+                        else {
+                            m_vehicleControl.setSpeed(100);
+                            oldState = "moving";
                         }
                     }
+
 
                 }
                 if (state == "stop") {
@@ -417,30 +432,33 @@ namespace scaledcars {
                     if (Sim) {
                         m_vehicleControl.setSpeed(0);
                     } else {
-                        m_vehicleControl.setSpeed(90);
+                        m_vehicleControl.setSpeed(190);
                     }
+
                     stopCounter += 0.5;
 
-                    if (stopCounter > 29.9999) {
-                        state = "resume";
+                    if (stopCounter > 4.9999) {
+                        state = "moving";
+                        oldState = "stopLine";
                         if (Sim) {
                             m_vehicleControl.setSpeed(1);
                         } else {
-                            m_vehicleControl.setSpeed(99);
+                            m_vehicleControl.setSpeed(100);
                         }
                         cerr << "Resuming!" << endl;
                     }
                 }
-                if (state == "resume") {
-                    if (stopCounter < 50) {
-                        stopCounter += 0.5;
-                        cerr << "counter " << stopCounter << endl;
-                    } else {
-                        stopCounter = 0;
-                        state = "moving";
-                        cerr << "Moving!" << endl;
+                if (state == "danger") {
+                    if (oldState == "stopLine") {  // The idea here is, after a stop line, go forward and dont steer at all, it is exepcted to not find any reference line markings
+                        m_vehicleControl.setSpeed(100);
+                        m_vehicleControl.setSteeringWheelAngle(0);
+                    }else{
+                        m_vehicleControl.setSpeed(190);
                     }
+
                 }
+
+
                 // Create container for finally sending the set values for the control algorithm.
                 Container c2(m_vehicleControl);
                 // Send container.
