@@ -79,11 +79,11 @@ namespace scaledcars {
 
                 virtual void tearDown();
                 
-                void filterData(protocol_data data);
+                void filterData(protocol_data *list, int size);
                 
-                void sendSensorBoardData(int id, int value);
+                void sendSensorBoardData(protocol_data data);
                 
-                void sendVehicleData(int value);
+                void sendVehicleData(protocol_data data);
         };
     }
 }

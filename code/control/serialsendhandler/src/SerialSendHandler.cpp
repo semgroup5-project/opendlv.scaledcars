@@ -117,16 +117,16 @@ namespace scaledcars {
                 serial_send(this->serial, d_servo);
 
                 int pending = g_async_queue_length(this->serial->incoming_queue);
+                protocol_data m_list[10]; // TODO fix this shit
                 protocol_data incoming;
                 for (int i = 0; i < pending; i++) {
                     if (serial_receive(this->serial, &incoming)) {
                         cerr << "RECEIVED : id=" << incoming.id << " value=" << incoming.value << endl;
-                        
-                        // Send to filter
-                        filterData(incoming); 
+                        m_list[i] = incoming;
                     }
                 }
-                
+                // Send to filter
+                filterData(m_list, pending);
             }
 
             return ModuleExitCodeMessage::OKAY;
@@ -176,22 +176,65 @@ namespace scaledcars {
         *
         * @param data to filter
         */
-        void SerialSendHandler::filterData(protocol_data data){
+        void SerialSendHandler::filterData(protocol_data *list, int size){
+				double us1, us2, ir3, ir4, ir5;
+				int us1_size, us2_size, ir3_size, ir4_size, ir5_size;
 				
-				//US-SENSOR [ID 1] [ID 2] with value between 1 - 70
-        		if((data.id == 1 || data.id == 2) && data.value >= 1 && data.value <= 70){
-        			sendSensorBoardData(data.id, data.value);
+				for(int i = 0; i < size; i++){
+					//US-SENSOR [ID 1] [ID 2] with value between 1 - 70
+        			if(list[i].id == 1 && list[i].value >= 1 && list[i].value <= 70){
+        				us1 += list[i].value;
+        				us1_size++;
+        				
+        			} else if (list[i].id == 2 && list[i].value >= 1 && list[i].value <= 70){
+						us2 += list[i].value;
+						us2_size++;
 						
-				//IR-SENSOR [ID 3] [ID 4] with value between 3 - 40
-				} else if ((data.id == 3 || data.id == 4 || data.id == 5) && data.value >= 3 && data.value <= 40){
-					sendSensorBoardData(data.id, data.value);
+					//IR-SENSOR [ID 3] [ID 4] with value between 3 - 40
+					} else if (list[i].id == 3 && list[i].value >= 3 && list[i].value <= 40){
+						ir3 += list[i].value;
+						ir3_size++;
+					
+					} else if (list[i].id == 4 && list[i].value >= 3 && list[i].value <= 40){
+						ir4 += list[i].value;
+						ir4_size++;
+					
+					} else if (list[i].id == 5 && list[i].value >= 3 && list[i].value <= 40){
+						ir5 += list[i].value;
+						ir5_size++;
 							
-				//ODOMETER [ID 6] with value between 0 - 255
-				} else if (data.id == 6 && data.value >= 0 && data.value <= 255){ 
-					sendVehicleData(data.value);	
+					//ODOMETER [ID 6] with value between 0 - 255
+					} else if (list[i].id == 6 && list[i].value >= 0 && list[i].value <= 255){ 
+						sendVehicleData(list[i]);	
+						
+					} else {
+						cerr << "[Filter no sensor] ID: " << list[i].id << " VALUE: " << list[i].value << endl;
+        			}
 				}
-				cerr << "[Filter no sensor] ID: " << data.id << " VALUE: " << data.value << endl;
-        }
+				
+				protocol_data one, two, three, four, five;
+				
+				one.id = 1;
+				one.value = us1/us1_size;
+				
+				two.id = 2;
+				two.value = us2/us2_size;
+				
+				three.id = 3;
+				three.value = ir3/ir3_size;
+				
+				four.id = 4;
+				four.value = ir4/ir4_size;
+				
+				five.id = 5;
+				five.value = ir5/ir5_size;
+				
+				sendSensorBoardData(one);
+				sendSensorBoardData(two);
+				sendSensorBoardData(three);
+				sendSensorBoardData(four);
+				sendSensorBoardData(five);
+			}
         
         /**
       	* Pack a sensor id and a sensor value as a SensorBoardData.
@@ -200,17 +243,17 @@ namespace scaledcars {
       	*
       	* @param id and value of either a ultrasonic or ir-sensor
 			*/        
-        void SerialSendHandler::sendSensorBoardData(int id, int value){
+        void SerialSendHandler::sendSensorBoardData(protocol_data data){
         		SensorBoardData sbd;
         		map<uint32_t, double> sensor;
         		
-        		sensor[id - 1] = value;
+        		sensor[data.id] = data.value;
 				sbd.setMapOfDistances(sensor);
 				
 				Container c(sbd);
 				getConference().send(c);
 				
-				cout << "[SensorBoardData to conference] ID: " << id << " VALUE: " << value << endl;
+				cout << "[SensorBoardData to conference] ID: " << data.id << " VALUE: " << data.value << endl;
         }
           
         /**
@@ -219,15 +262,15 @@ namespace scaledcars {
       	*
       	* @param value of a odometer sensor
 			*/      
-        void SerialSendHandler::sendVehicleData(int value){
+        void SerialSendHandler::sendVehicleData(protocol_data data){
         		VehicleData vd;
         		
-        		vd.setAbsTraveledPath(value);
+        		vd.setAbsTraveledPath(data.value);
         		
 				Container c(vd);
 				getConference().send(c);
 				
-				cout << "[VehicleData to conference] VALUE: " << value << endl;
+				cout << "[VehicleData to conference] VALUE: " << data.value << endl;
         }
     }
 }
