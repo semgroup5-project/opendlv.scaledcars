@@ -65,7 +65,7 @@ namespace scaledcars {
                                                                        m_vehicleControl() {}
                 // Initialize fonts.
         const double hscale = 0.4;
-        const double vscale = 5;//0.3;
+        const double vscale = 0.3;//0.3;
         const double shear = 0.2;
         const int thickness = 1;
         const int lineType = 6;
@@ -98,6 +98,10 @@ namespace scaledcars {
         // State counter for dynamically moving back to right lane.
         int32_t stageToRightLaneRightTurn = 0;
         int32_t stageToRightLaneLeftTurn = 0;
+
+        //int32_t distance = 0;
+        //int32_t stageToRightLaneRightTurn2= 88;
+        //int32_t stageToRightLaneLeftTurn2 = 44;
 
         // Distance variables to ensure we are overtaking only stationary or slowly driving obstacles.
         double distanceToObstacle = 0;
@@ -343,10 +347,11 @@ namespace scaledcars {
             const int32_t INFRARED_FRONT_RIGHT = 0;
             const int32_t INFRARED_REAR_RIGHT = 2;
             //const int32_t INFRARED_BACK = 1;
+            //const int32_t WHEEL_ENCODER = 5;
 
             const double OVERTAKING_DISTANCE = 5.0;
             const double HEADING_PARALLEL = 0.04;
-
+            //int32_t covered_distance = 0;
             //Get most recent vehicle data:
             Container containerVehicleData = getKeyValueDataStore().get(VehicleData::ID());
             VehicleData vd = containerVehicleData.getData<VehicleData> ();
@@ -359,6 +364,9 @@ namespace scaledcars {
                 stageMeasuring = FIND_OBJECT;
             } else if (stageMeasuring == FIND_OBJECT) {
                 distanceToObstacle = sbd.getValueForKey_MapOfDistances(ULTRASONIC_FRONT_CENTER);
+                //covered_distance =sbd.getValueForKey_MapOfDistances(WHEEL_ENCODER);
+                //cerr << "Distance  " << covered_distance << endl;
+
 
                 // Approaching an obstacle (stationary or driving slower than us).
                 if ((distanceToObstacle > 0) && (((distanceToObstacleOld - distanceToObstacle) > 0) ||
@@ -425,7 +433,7 @@ namespace scaledcars {
             SensorBoardData sbd = containerSensorBoardData.getData<SensorBoardData>();
             overtake = false;
             // Moving state machine.
-            if (stageMoving == FORWARD && has_next_frame == true) {
+            if (stageMoving == FORWARD && has_next_frame) {
                 // Use m_vehicleControl data from image processing.
                 //processImage();
 
@@ -444,22 +452,17 @@ namespace scaledcars {
                 cout << "StageToRightLaneRightTurn is" << stageToRightLaneRightTurn << endl;
             } else if (stageMoving == TO_LEFT_LANE_RIGHT_TURN) {
                 // Move to the left lane: Turn right part until both IRs have the same distance to obstacle.
-
-
-
-
                 // State machine measuring: Both IRs need to have the same distance before leaving this moving state.
                 stageMeasuring = HAVE_BOTH_IR_SAME_DISTANCE;
                 if(stageToRightLaneLeftTurn <150) {
                     m_vehicleControl.setSpeed(0.5);
-                    m_vehicleControl.setSteeringWheelAngle(5);
+                    m_vehicleControl.setSteeringWheelAngle(15);
                     stageToRightLaneLeftTurn++;
                 }
 
                 cout << "Stage RightLanelLeftTurn is" << stageToRightLaneLeftTurn << endl;
             } else if (stageMoving == CONTINUE_ON_LEFT_LANE) {
-                // Move to the left lane: Passing stage.
-          //      processImage();
+                // Move to the left lane: Passing stag
                 // Use m_vehicleControl data from image processing.
 
                 // Find end of object.
@@ -483,8 +486,6 @@ namespace scaledcars {
                 // Move to the left lane: Turn left part.
                 m_vehicleControl.setSpeed(0.5);
                 m_vehicleControl.setSteeringWheelAngle(-10);
-
-
 
                 stageToRightLaneLeftTurn--;
                 cout << "Stage  is" << stageToRightLaneLeftTurn << endl;
