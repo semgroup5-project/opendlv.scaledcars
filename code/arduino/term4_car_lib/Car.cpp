@@ -3,6 +3,10 @@
 Car::Car() {}
 
 void Car::setUp() {
+    pinMode(RELAY_PIN, OUTPUT);
+
+    digitalWrite(RELAY_PIN, HIGH);
+
     pinMode(CH_1, INPUT);
     pinMode(CH_2, INPUT);
 
@@ -151,7 +155,7 @@ void Car::automatedDrive() {
 }
 
 int Car::readChannel1() {
-    return pulseIn(CH_1, HIGH); // steer
+    return pulseIn(CH_1, HIGH, 10000); // steer
 }
 
 int Car::readChannel2() {

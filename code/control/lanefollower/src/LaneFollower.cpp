@@ -40,7 +40,7 @@ namespace scaledcars {
         bool stop = false;
         double stopCounter = 0;
         String state = "moving";
-        bool inRightLane = false;   //the overtaker alters this value to signal a lane change
+        bool inRightLane = true;   //the overtaker alters this value to signal a lane change
 
         LaneFollower::LaneFollower(const int32_t &argc, char **argv) :
                 TimeTriggeredConferenceClientModule(argc, argv, "lanefollower"),

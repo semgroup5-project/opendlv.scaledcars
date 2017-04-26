@@ -25,6 +25,7 @@
 #define greenPin 24 //LED green pin
 #define bluePin 26 //LED blue pin
 #define COMMON_ANODE //LED common
+#define RELAY_PIN 12
 
 //Signal Conditioning limits for RC controller
 #define lo 1000
