@@ -51,7 +51,7 @@ services:
         volumes:
         - ./DIT-168:/opt/configuration
         - /tmp/.X11-unix:/tmp/.X11-unix
-        - /dev/video0:/dev/video0
+        - /dev/video0:/dev/video0 
         depends_on:
             - odsupercomponent
         devices:
@@ -65,21 +65,21 @@ services:
             - odsupercomponent
         devices:
         - "/dev/ttyACM0"
-        command: "/opt/opendlv.scaledcars/bin/scaledcars-control-serialsendhandler --cid=${CID} --rm=true --device=/dev/ttyACM0 --freq=20"
+        command: bash -c "sleep 10; /opt/opendlv.scaledcars/bin/scaledcars-control-serialsendhandler --verbose=1 --cid=${CID} --rm=true --device=/dev/ttyACM0 --freq=1"
     #odcockpit
-    #odcockpit:
-    #   build: .
-    #    network_mode: host
-    #    environment:
-    #    - DISPLAY=$DISPLAY
-    #    volumes:
-    #    - ./DIT-168:/opt/configuration
-    #    - /tmp/.X11-unix:/tmp/.X11-unix
-    #    - ~/CsvData/Overtaking:/opt/Datacsv
-    #    ipc: host
-    #    depends_on:
-    #        - odsupercomponent
-    #    command: "/opt/od4/bin/odcockpit --cid=${CID} --configuration=/opt/configuration/configuration --freq=20"
+    odcockpit:
+        build: .
+        network_mode: host
+        environment:
+        - DISPLAY=$DISPLAY
+        volumes:
+        - ./DIT-168:/opt/configuration
+        - /tmp/.X11-unix:/tmp/.X11-unix
+        - ~/CsvData/Overtaking:/opt/Datacsv
+        ipc: host
+        depends_on:
+            - odsupercomponent
+        command: "/opt/od4/bin/odcockpit --cid=${CID} --configuration=/opt/configuration/configuration --freq=20"
    #Micro-service for lanedtecter scenario.
     lanefollower:
         build: .

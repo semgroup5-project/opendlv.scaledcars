@@ -7,7 +7,6 @@
 #include <Wire.h>
 #include <Servo.h>
 #include "protocol.h"
-#include "Netstrings.h"
 
 #define BAUD 115200
 #define US_C 0x73 //front ultrasonic pin

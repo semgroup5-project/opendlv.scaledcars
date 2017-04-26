@@ -207,7 +207,7 @@ namespace scaledcars {
 
             if ( right.x == -1 && left.x == -1 ){  //setting state if the car does not see any line
                 state = "danger";
-                if (oldState = "moving"){
+                if (oldState == "moving"){
                     oldState = "danger";
                 }
             }else{
