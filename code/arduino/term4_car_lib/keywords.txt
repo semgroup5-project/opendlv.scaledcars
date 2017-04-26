@@ -1,0 +1,96 @@
+#######################################
+# Syntax Coloring Map
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+protocol	KEYWORD1
+protocol_frame	KEYWORD1
+protocol_data	KEYWORD1
+protocol_state	KEYWORD1
+Car	KEYWORD1
+term4_car_lib	KEYWORD1
+Odometer	KEYWORD1
+UltrasonicSensor	KEYWORD1
+InfraredSensor	KEYWORD1
+ESCMotor	KEYWORD1
+SteeringMotor	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+protocol_encode	KEYWORD2
+protocol_decode	KEYWORD2
+protocol_receive	KEYWORD2
+setUp	KEYWORD2
+rcControl	KEYWORD2
+automatedDrive	KEYWORD2
+provideSensorsData	KEYWORD2
+isRCControllerOn	KEYWORD2
+brake	KEYWORD2
+isFunctionChanged	KEYWORD2
+attach	KEYWORD2
+init	KEYWORD2
+encodeAndWrite	KEYWORD2
+getDistance	KEYWORD2
+setMinAndMax	KEYWORD2
+setGain	KEYWORD2
+setRange	KEYWORD2
+setPingDelay	KEYWORD2
+getLightReading	KEYWORD2
+changeAddress	KEYWORD2
+begin	KEYWORD2
+getRelativeDistance	KEYWORD2
+getDirection	KEYWORD2
+getSpeed	KEYWORD2
+setAngle	KEYWORD2
+arm	KEYWORD2
+setSpeed	KEYWORD2
+establishContact	KEYWORD2
+waitConnection	KEYWORD2
+getSteeringMotor	KEYWORD2
+getEscMotor	KEYWORD2
+getUltrasonicFront	KEYWORD2
+getUltrasonicRight	KEYWORD2
+getInfraredSideFront	KEYWORD2
+getInfraredSideBack	KEYWORD2
+getInfraredBack	KEYWORD2
+getWheelEncoder	KEYWORD2
+getProtocolState	KEYWORD2
+wait	KEYWORD2
+run	KEYWORD2
+
+######################################
+# Constants (LITERAL1)
+#######################################
+ID_OUT_MOTOR	LITERAL1
+ID_OUT_SERVO	LITERAL1
+ID_OUT_ODOMETER	LITERAL1
+ID_IN_ULTRASONIC_CENTER	LITERAL1
+ID_IN_ULTRASONIC_SIDE_FRONT	LITERAL1
+ID_IN_INFRARED_SIDE_FRONT	LITERAL1
+ID_IN_INFRARED_SIDE_BACK	LITERAL1
+ID_IN_INFRARED_BACK	LITERAL1
+ID_IN_ENCODER	LITERAL1
+BAUD	LITERAL1
+US_C	LITERAL1
+US_R	LITERAL1
+ENCODER_PIN_A	LITERAL1
+ENCODER_PIN_B	LITERAL1
+SERVO_PIN	LITERAL1
+ESC_PIN	LITERAL1
+SIDE_FRONT_PIN	LITERAL1
+SIDE_BACK_PIN	LITERAL1
+BACK_PIN	LITERAL1
+CH_1	LITERAL1
+CH_2	LITERAL1
+redPin	LITERAL1
+greenPin	LITERAL1
+bluePin	LITERAL1
+COMMON_ANODE	LITERAL1
+lo	LITERAL1
+hi	LITERAL1
+deadLo	LITERAL1
+deadHi	LITERAL1
+center	LITERAL1

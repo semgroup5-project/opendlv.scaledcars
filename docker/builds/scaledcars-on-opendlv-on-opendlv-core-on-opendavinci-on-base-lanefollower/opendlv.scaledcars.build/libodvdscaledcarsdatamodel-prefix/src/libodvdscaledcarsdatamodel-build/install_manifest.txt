@@ -1,0 +1,9 @@
+/opt/opendlv.scaledcars/lib/libodvdscaledcarsdatamodel-static.a
+/opt/opendlv.scaledcars/lib/libodvdscaledcarsdatamodel.so
+/opt/opendlv.scaledcars/include//odvdscaledcarsdatamodel/generated/chalmersrevere/scaledcars/ExampleMessage.h
+/opt/opendlv.scaledcars/include//odvdscaledcarsdatamodel/GeneratedHeaders_ODVDScaledCarsDataModel_Helper.h
+/opt/opendlv.scaledcars/include//odvdscaledcarsdatamodel/GeneratedHeaders_ODVDScaledCarsDataModel.h
+/opt/opendlv.scaledcars/share/proto//odvdscaledcarsdatamodel.proto
+/opt/opendlv.scaledcars/share/cmake-3.5/Modules/FindODVDScaledCarsDataModel.cmake
+/opt/opendlv.scaledcars/share/cmake-2.8/Modules/FindODVDScaledCarsDataModel.cmake
+/opt/opendlv.scaledcars/share/cmake-3.0/Modules/FindODVDScaledCarsDataModel.cmake

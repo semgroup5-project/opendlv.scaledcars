@@ -1,0 +1,2 @@
+/usr/bin/ar qc libscaledcars-perception-example-static.a  CMakeFiles/scaledcars-perception-example-static.dir/src/Example.cpp.o
+/usr/bin/ranlib libscaledcars-perception-example-static.a
