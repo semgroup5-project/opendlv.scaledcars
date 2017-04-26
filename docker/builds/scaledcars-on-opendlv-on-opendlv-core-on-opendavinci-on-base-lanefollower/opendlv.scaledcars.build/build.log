@@ -5,21 +5,18 @@ Step 2/7 : MAINTAINER Christian Berger "christian.berger@gu.se"
  ---> Using cache
  ---> 0100dd308e2f
 Step 3/7 : ADD opt /opt
- ---> 239c76f98c43
-Removing intermediate container cd61f20568be
+ ---> Using cache
+ ---> a10af530aaa2
 Step 4/7 : RUN chown -R 1000:1000 /opt/opendlv.scaledcars
- ---> Running in 86b3ffea8bfe
- ---> 6fc09d6be152
-Removing intermediate container 86b3ffea8bfe
+ ---> Using cache
+ ---> a1ec9fd892ca
 Step 5/7 : ENV QT_X11_NO_MITSHM 1
- ---> Running in 5c044f30646d
- ---> 62da39d8768b
-Removing intermediate container 5c044f30646d
+ ---> Using cache
+ ---> 8821dec749f3
 Step 6/7 : ENV LD_LIBRARY_PATH $LD_LIBRARY_PATH:/opt/opendlv.scaledcars/lib
- ---> Running in d6fef88e1a1c
- ---> 90b5f66171cb
-Removing intermediate container d6fef88e1a1c
+ ---> Using cache
+ ---> dcc8ea27cd57
 Step 7/7 : WORKDIR /opt/opendlv.scaledcars/bin
- ---> e92631d9177e
-Removing intermediate container a80e5202c893
-Successfully built e92631d9177e
+ ---> Using cache
+ ---> 1123c30fe000
+Successfully built 1123c30fe000
