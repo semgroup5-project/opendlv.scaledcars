@@ -1,6 +1,6 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/scaledcars-control-serialreceivehandler-static.dir/src/Filter.cpp.o"
   "CMakeFiles/scaledcars-control-serialreceivehandler-static.dir/src/SerialListener.cpp.o"
+  "CMakeFiles/scaledcars-control-serialreceivehandler-static.dir/src/Filter.cpp.o"
   "CMakeFiles/scaledcars-control-serialreceivehandler-static.dir/src/SerialReceiveHandler.cpp.o"
   "libscaledcars-control-serialreceivehandler-static.pdb"
   "libscaledcars-control-serialreceivehandler-static.a"

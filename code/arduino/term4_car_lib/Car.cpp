@@ -104,21 +104,21 @@ void Car::automatedDrive() {
 
     func_is_changed = 0;
 
-    red = 0;
-    green = 0;
-    blue = 255;
-#ifdef COMMON_ANODE
-    red = 255 - red;
-    green = 255 - green;
-    blue = 255 - blue;
-#endif
-    analogWrite(redPin, red);
-    analogWrite(greenPin, green);
-    analogWrite(bluePin, blue);
-
     int value = 90, serial_size = 0, count = 0;
     byte in;
-    while ((serial_size = Serial.available()) <= 0 && !isRCControllerOn());
+    while ((serial_size = Serial.available()) <= 0 && !isRCControllerOn()){
+        red = 0;
+        green = 0;
+        blue = 255;
+#ifdef COMMON_ANODE
+        red = 255 - red;
+        green = 255 - green;
+        blue = 255 - blue;
+#endif
+        analogWrite(redPin, red);
+        analogWrite(greenPin, green);
+        analogWrite(bluePin, blue);
+    }
 
     while (count++ < serial_size) {
         in = Serial.read();
