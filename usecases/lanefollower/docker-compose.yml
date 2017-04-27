@@ -39,33 +39,23 @@ services:
             driver: "none"
         command: "/opt/od4/bin/odsimvehicle --cid=${CID} --freq=20"
 
-    #Micro-service for camera
+
+    #Micro-service for odsimcamera
     odsimcamera:
         build: .
         network_mode: host
         ipc: host
-        group_add:
-        - video
         environment:
         - DISPLAY=$DISPLAY
         volumes:
         - ./DIT-168:/opt/configuration
         - /tmp/.X11-unix:/tmp/.X11-unix
-        - /dev/video1:/dev/video1 
+        - /dev/shm:/dev/shm 
         depends_on:
             - odsupercomponent
-        devices:
-        - "/dev/video1:/dev/video1"
-        command: "/opt/opendlv.scaledcars/bin/scaledcars-control-proxy --cid=${CID} --rm=true --privileged=true --device=/dev/video1:/dev/video1 --freq=20 --configuration=/opt/configuration/configuration"
-     #serial
-    serialhandler:
-        build: .
-        network_mode: host
-        depends_on:
-            - odsupercomponent
-        devices:
-        - "/dev/ttyACM0"
-        command: bash -c "sleep 10; /opt/opendlv.scaledcars/bin/scaledcars-control-serialsendhandler --verbose=1 --cid=${CID} --rm=true --device=/dev/ttyACM0 --freq=20"
+            - odsimvehicle
+        command: "/opt/od4/bin/odsimcamera --cid=${CID} --rm=true --privileged=true --freq=20 --configuration=/opt/configuration/configuration"
+
     #odcockpit
     odcockpit:
         build: .
@@ -80,6 +70,18 @@ services:
         depends_on:
             - odsupercomponent
         command: "/opt/od4/bin/odcockpit --cid=${CID} --configuration=/opt/configuration/configuration --freq=20"
+
+   #odsimirus
+    odsimirus:
+        build: .
+        network_mode: host
+        ipc: host
+        volumes:
+        - ./DIT-168:/opt/configuration
+        depends_on: 
+             - odsupercomponent
+        command: "/opt/od4/bin/odsimirus --cid=${CID} --configuration=/opt/configuration/configuration --freq=20"
+
    #Micro-service for lanedtecter scenario.
     lanefollower:
         build: .
@@ -91,6 +93,7 @@ services:
         - ./DIT-168:/opt/configuration
         depends_on:
             - odsupercomponent
+            - odsimirus
             - odsimvehicle
             - odsimcamera
         command: bash -c "sleep 5; /opt/opendlv.scaledcars/bin/scaledcars-control-lanefollwer --verbose=1  --cid=${CID} --freq=20 -e DISPLAY=$DISPLAY"

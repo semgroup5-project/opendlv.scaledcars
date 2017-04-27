@@ -19,7 +19,7 @@
 # GLOBAL CONFIGURATION
 #
 global.car = file:///opt/configuration/Car1.objx
-global.scenario = file:///opt/configuration/Parking-boxes-1.scnx
+global.scenario = file:///opt/configuration/SEM_Test_Track-overtaking.scnx
 global.showGrid = 0
 
 # Location of the origin of the reference frame (example: 57.70485804 N, 11.93831921 E)
@@ -227,7 +227,7 @@ odsimvehicle.LinearBicycleModel.KdynamicBrake=60.0
 #
 lanefollower.camera_id = 1 # select here the proper camera
 lanefollower.debug = 1      # set to 0 to disable any windows and further output
-lanefollower.sim = 0   # Set simulation true or false
+lanefollower.sim = 1   # Set simulation true or false
 lanefollower.p = 1.3     #OG val = 1.3
 lanefollower.d = 0.20    #OG val = 0.10
 lanefollower.i= 0.01     #OG val = 0.01

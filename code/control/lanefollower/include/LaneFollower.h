@@ -139,7 +139,7 @@ namespace control {
                 void processImage();
                 double errorCalculation();
                 void laneFollower(double e);
-                virtual void processImage();
+                //virtual void processImage();
 
 				void measuring_state_machine();
 

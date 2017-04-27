@@ -60,22 +60,6 @@ namespace scaledcars {
         String state = "moving";
         bool inRightLane = true;   //the overtaker alters this value to signal a lane change
 
-        LaneFollower::LaneFollower(const int32_t &argc, char **argv) : TimeTriggeredConferenceClientModule(argc, argv, "lanefollower"),
-                                                                       m_hasAttachedToSharedImageMemory(false),
-                                                                       m_sharedImageMemory(),
-                                                                       m_image(NULL),
-                                                                       m_debug(false),
-                                                                       m_font(),
-                                                                       m_previousTime(),
-                                                                       m_eSum(0),
-                                                                       m_eOld(0),
-                                                                       m_vehicleControl() {}
-                // Initialize fonts.
-        const double hscale = 0.4;
-        const double vscale = 0.3;//0.3;
-        const double shear = 0.2;
-        const int thickness = 1;
-        const int lineType = 6;
         LaneFollower::LaneFollower(const int32_t &argc, char **argv) :
                 TimeTriggeredConferenceClientModule(argc, argv, "lanefollower"),
                 m_sharedImageMemory(),
@@ -98,7 +82,12 @@ namespace scaledcars {
                 i_gain(0),
                 d_gain(0) {}
 
-
+        // Initialize fonts.
+        const double hscale = 0.4;
+        const double vscale = 0.3;//0.3;
+        const double shear = 0.2;
+        const int thickness = 1;
+        const int lineType = 6;
 
 
         // Overall state machines for moving and measuring.
@@ -555,18 +544,18 @@ namespace scaledcars {
                 stageMeasuring = HAVE_BOTH_IR;
 
                 stageToRightLaneRightTurn++;
-                cout << "StageToRightLaneRightTurn is" << stageToRightLaneRightTurn << endl;
+                cout << "StageToRightLaneRightTurn is " << stageToRightLaneRightTurn << endl;
             } else if (stageMoving == TO_LEFT_LANE_RIGHT_TURN) {
                 // Move to the left lane: Turn right part until both IRs have the same distance to obstacle.
                 // State machine measuring: Both IRs need to have the same distance before leaving this moving state.
                 stageMeasuring = HAVE_BOTH_IR_SAME_DISTANCE;
-                if(stageToRightLaneLeftTurn <150) {
-                    m_vehicleControl.setSpeed(0.5);
-                    m_vehicleControl.setSteeringWheelAngle(15);
+                if(stageToRightLaneLeftTurn <130) {
+                    m_vehicleControl.setSpeed(0.5);//0.5
+                    m_vehicleControl.setSteeringWheelAngle(15);//15
                     stageToRightLaneLeftTurn++;
                 }
 
-                cout << "Stage RightLanelLeftTurn is" << stageToRightLaneLeftTurn << endl;
+                cout << "stageToRightLaneLeftTurn is " << stageToRightLaneLeftTurn << endl;
             } else if (stageMoving == CONTINUE_ON_LEFT_LANE) {
                 // Move to the left lane: Passing stag
                 // Use m_vehicleControl data from image processing.
@@ -581,22 +570,22 @@ namespace scaledcars {
 
 
                 stageToRightLaneRightTurn--;
-                cout << "Stage RightLaneRightTurn is" << stageToRightLaneRightTurn << endl;
+                cout << "Stage RightLaneRightTurn is " << stageToRightLaneRightTurn << endl;
 
-                if (stageToRightLaneRightTurn < -10) {
-                    cout << "Going left" << endl;
+                if (stageToRightLaneRightTurn < 80) {
+                    cout << "Going left " << endl;
                     stageMoving = TO_RIGHT_LANE_LEFT_TURN;
 
                 }
             } else if (stageMoving == TO_RIGHT_LANE_LEFT_TURN) {
                 // Move to the left lane: Turn left part.
                 m_vehicleControl.setSpeed(0.5);
-                m_vehicleControl.setSteeringWheelAngle(-10);
+                m_vehicleControl.setSteeringWheelAngle(-10);//-10
 
                 stageToRightLaneLeftTurn--;
-                cout << "Stage  is" << stageToRightLaneLeftTurn << endl;
+                cout << "Stage  is " << stageToRightLaneLeftTurn << endl;
                 //TESTING steps
-                if (stageToRightLaneLeftTurn == 0) {
+                if (stageToRightLaneLeftTurn < 30) {
                     // Start over.
                     overtake = false;
                     stageMoving = FORWARD;
@@ -617,13 +606,13 @@ namespace scaledcars {
 
         // This method will do the main data processing job.
         // Therefore, it tries to open the real camera first. If that fails, the virtual camera images from camgen are used.
-        ModuleExitCodeMessage::ModuleExitCode LaneFollower::body() {    // this method still needs
+          // this method still needs
         ModuleExitCodeMessage::ModuleExitCode LaneFollower::body() {
             // Get configuration data.
             KeyValueConfiguration kv = getKeyValueConfiguration();
             m_debug = kv.getValue<int32_t>("lanefollower.debug") == 1;
 
-            cvInitFont(&m_font, CV_FONT_HERSHEY_DUPLEX, hscale, vscale, shear, thickness, lineType);
+            //cvInitFont(&m_font, CV_FONT_HERSHEY_DUPLEX, hscale, vscale, shear, thickness, lineType);
 
 
 
@@ -645,58 +634,60 @@ namespace scaledcars {
                     processImage();
                     double error = errorCalculation();
                     laneFollower(error);
-                }
+                    movingMachine(has_next_frame);
+                    measuring_state_machine();
 
-                // overtaking part
-                movingMachine(has_next_frame);
-                measuring_state_machine();
-                // State control for intersection stop
-                if (state == "moving") {
-                    if (Sim) {
-                        m_vehicleControl.setSpeed(1);
-                    } else {
-                        m_vehicleControl.setSpeed(100);
-                    }
 
-                    if (stop) {
-                        if (stopCounter < 6.0) {
-                            stopCounter += 0.5;
-                            cerr << stopCounter << endl;
-                        } else {
-                            state = "stop";
-                            cerr << "Stopline found ! " << endl;
-                        }
-                    }
+                    // overtaking part
 
-                }
-                if (state == "stop") {
-                    m_vehicleControl.setSteeringWheelAngle(0);
-                    if (Sim) {
-                        m_vehicleControl.setSpeed(0);
-                    } else {
-                        m_vehicleControl.setSpeed(90);
-                    }
-                    stopCounter += 0.5;
-
-                    if (stopCounter > 29.9999) {
-                        state = "resume";
+                    // State control for intersection stop
+                    if (state == "moving") {
                         if (Sim) {
                             m_vehicleControl.setSpeed(1);
                         } else {
-                            m_vehicleControl.setSpeed(99);
+                            m_vehicleControl.setSpeed(100);
                         }
-                        cerr << "Resuming!" << endl;
-                    }
-                }
-                if (state == "resume") {
-                    if (stopCounter < 50) {
+
+                        if (stop) {
+                            if (stopCounter < 6.0) {
+                                stopCounter += 0.5;
+                                cerr << stopCounter << endl;
+                            } else {
+                                state = "stop";
+                                cerr << "Stopline found ! " << endl;
+                            }
+                        }
+
+                    }else if (state == "stop") {
+                        m_vehicleControl.setSteeringWheelAngle(0);
+                        if (Sim) {
+                            m_vehicleControl.setSpeed(0);
+                        } else {
+                            m_vehicleControl.setSpeed(90);
+                        }
                         stopCounter += 0.5;
-                        cerr << "counter " << stopCounter << endl;
-                    } else {
-                        stopCounter = 0;
-                        state = "moving";
-                        cerr << "Moving!" << endl;
+
+                        if (stopCounter > 29.9999) {
+                            state = "resume";
+                            if (Sim) {
+                                m_vehicleControl.setSpeed(1);
+                            } else {
+                                m_vehicleControl.setSpeed(99);
+                            }
+                            cerr << "Resuming!" << endl;
+                        }
+                    }else if (state == "resume") {
+                        if (stopCounter < 50) {
+                            stopCounter += 0.5;
+                            cerr << "counter " << stopCounter << endl;
+                        } else {
+                            stopCounter = 0;
+                            state = "moving";
+                            cerr << "Moving!" << endl;
+                        }
                     }
+
+
                 }
                 // Create container for finally sending the set values for the control algorithm.
                 //Container c2(m_vehicleControl);
@@ -706,6 +697,7 @@ namespace scaledcars {
                     Container c1(m_vehicleControl);
                     getConference().send(c1);
                 }else {// Create container for finally sending the set values for the control algorithm.
+
                     Container c2(m_vehicleControl);
                     getConference().send(c2);
                 }
