@@ -55,11 +55,11 @@ namespace scaledcars {
                 m_eSum(0),
                 m_eOld(0),
                 m_vehicleControl(),
-                m_threshold1(140),  //50
-                m_threshold2(220),  // 150
+                m_threshold1(50),  //50
+                m_threshold2(200),  // 150
                 m_control_scanline(400),//needs testing with real c
                 m_stop_scanline(200),//needs testing with real car
-                m_distance(160),  //needs testing with real car as well
+                m_distance(180),  //needs testing with real car as well
                 p_gain(0),       // the gain values can be adjusted here outside of simulation scenario (see @setUp() )
                 i_gain(0),
                 d_gain(0) {}
@@ -197,7 +197,7 @@ namespace scaledcars {
             right.y = y;
             right.x = -1;
             // Search from middle to the right
-            for (int x = m_image_new.cols / 2; x < m_image_new.cols - 50; x++) {  //cols - 50 to stop it from finding the wall
+            for (int x = m_image_new.cols / 2; x < m_image_new.cols - 80; x++) {  //cols - 50 to stop it from finding the wall
                 pixelRight = m_image_new.at<uchar>(Point(x, y));
                 if (pixelRight >= 150) {   //tentative value, might need adjustment: lower it closer to 100
                     right.x = x;
@@ -235,30 +235,6 @@ namespace scaledcars {
                 }
             }
 
-
-            //prints the lines for debugging purposes if debug flag is set to true
-            if (m_debug) {
-
-                if (left.x > 0) {
-                    line(m_image_new, Point(m_image.cols / 2, y), left, Scalar(255, 0, 0), 1, 8);
-
-                    stringstream sstr;
-                    sstr << (m_image_new.cols / 2 - left.x);
-
-                    putText(m_image_new, sstr.str().c_str(), Point(m_image_new.cols / 2 - 100, y - 2), FONT_HERSHEY_PLAIN, 1,
-                            CV_RGB(255, 0, 0));
-                }
-                if (right.x > 0) {
-                    line(m_image_new, cvPoint(m_image.cols / 2, y), right, Scalar(255, 0, 0), 1, 8);
-
-                    stringstream sstr;
-                    sstr << (right.x - m_image_new.cols / 2);
-                    putText(m_image_new, sstr.str().c_str(), cvPoint(m_image_new.cols / 2 + 100, y - 2), FONT_HERSHEY_PLAIN, 1,
-                            CV_RGB(255, 0, 0));
-                }
-            }
-
-
             // stopline logic
 
             uchar front_left, front_right;
@@ -266,10 +242,10 @@ namespace scaledcars {
 
             int left_dist = 0;
 
-            stop_left.x = (m_image_new.cols / 2) - 50;
+            stop_left.x = (m_image_new.cols / 2) + 20;
             stop_left.y = m_control_scanline;
 
-            // Find first grey pixel in the front of the car
+            // Find first grey pixel in the front of the car left side
             for (int i = m_control_scanline; i > m_stop_scanline; i--) {
                 front_left = m_image_new.at<uchar>(Point(stop_left.x, i));
                 if (front_left > 150) {
@@ -281,10 +257,10 @@ namespace scaledcars {
 
             int right_dist = 0;
 
-            stop_right.x = (m_image_new.cols / 2) + 50;
+            stop_right.x = (m_image_new.cols / 2) + 100;
             stop_right.y = m_control_scanline;
 
-            // Find first grey pixel in front of the car
+            // Find first grey pixel in front of the car right side
             for (int i = m_control_scanline; i > m_stop_scanline; i--) {
                 front_right = m_image_new.at<uchar>(Point(stop_right.x, i));
                 if (front_right > 150) {
@@ -304,6 +280,39 @@ namespace scaledcars {
                     line(m_image_new, Point(stop_right.x, m_control_scanline), stop_right, Scalar(255, 0, 0));
                 }
             }
+
+            //prints the lines for debugging purposes if debug flag is set to true
+            if (m_debug) {
+                putText(m_image_new, state , Point(m_image_new.cols - 80, 20), FONT_HERSHEY_PLAIN, 1,
+                        CV_RGB(255, 255, 255));
+
+                std::string speed = std::to_string(m_vehicleControl.getSpeed());
+                putText(m_image_new, speed , Point(m_image_new.cols - 80, 40), FONT_HERSHEY_PLAIN, 1,
+                        CV_RGB(255, 255, 255));
+
+                std::string steer = std::to_string(90+ (m_vehicleControl.getSteeringWheelAngle() * (180/3.14)));
+                putText(m_image_new, steer , Point(m_image_new.cols - 80, 60), FONT_HERSHEY_PLAIN, 1,
+                        CV_RGB(255, 255, 255));
+
+                if (left.x > 0) {
+                    line(m_image_new, Point(m_image.cols / 2, y), left, Scalar(255, 0, 0), 1, 8);
+                    std::string left_reading = std::to_string((right.x - m_image_new.cols / 2));
+
+
+                    putText(m_image_new, left_reading, Point(m_image_new.cols / 2 - 100, y - 2), FONT_HERSHEY_PLAIN, 1,
+                            CV_RGB(255, 255, 255));
+                }
+                if (right.x > 0) {
+                    line(m_image_new, cvPoint(m_image.cols / 2, y), right, Scalar(255, 0, 0), 1, 8);
+                    std::string right_reading = std::to_string((right.x - m_image_new.cols / 2));
+
+                    putText(m_image_new, right_reading,Point(m_image_new.cols / 2 + 100, y - 2), FONT_HERSHEY_PLAIN, 1,
+                            CV_RGB(255, 255, 255));
+                }
+            }
+
+
+
 
 
             static int counter = 0;
@@ -454,11 +463,10 @@ namespace scaledcars {
                         m_vehicleControl.setSteeringWheelAngle(0);
                     }else{
                         m_vehicleControl.setSpeed(190);
+                        m_vehicleControl.setSteeringWheelAngle(0);
                     }
 
                 }
-
-
                 // Create container for finally sending the set values for the control algorithm.
                 Container c2(m_vehicleControl);
                 // Send container.
