@@ -455,7 +455,7 @@ namespace scaledcars {
                 // State machine measuring: Both IRs need to have the same distance before leaving this moving state.
                 stageMeasuring = HAVE_BOTH_IR_SAME_DISTANCE;
                 if(stageToRightLaneLeftTurn <150) {
-                    m_vehicleControl.setSpeed(0.5);
+                    m_vehicleControl.setSpeed(0.7);
                     m_vehicleControl.setSteeringWheelAngle(15);
                     stageToRightLaneLeftTurn++;
                 }
@@ -469,15 +469,15 @@ namespace scaledcars {
                 stageMeasuring = END_OF_OBJECT;
             } else if (stageMoving == TO_RIGHT_LANE_RIGHT_TURN) {
                 // Move to the right lane: Turn right part.
-                m_vehicleControl.setSpeed(0.5);
-                m_vehicleControl.setSteeringWheelAngle(10);
+                m_vehicleControl.setSpeed(0.7);
+                m_vehicleControl.setSteeringWheelAngle(20);
 
 
 
                 stageToRightLaneRightTurn--;
                 cout << "Stage RightLaneRightTurn is" << stageToRightLaneRightTurn << endl;
 
-                if (stageToRightLaneRightTurn < -10) {
+                if (stageToRightLaneRightTurn < 10) {
                     cout << "Going left" << endl;
                     stageMoving = TO_RIGHT_LANE_LEFT_TURN;
 
