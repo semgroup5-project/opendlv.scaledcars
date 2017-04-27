@@ -117,16 +117,24 @@ namespace scaledcars {
                 serial_send(this->serial, d_servo);
 
                 int pending = g_async_queue_length(this->serial->incoming_queue);
-                protocol_data m_list[10]; // TODO fix this shit
+                double valuesToNormalize[5];
+                int numbers[5];
                 protocol_data incoming;
                 for (int i = 0; i < pending; i++) {
                     if (serial_receive(this->serial, &incoming)) {
                         cerr << "RECEIVED : id=" << incoming.id << " value=" << incoming.value << endl;
-                        m_list[i] = incoming;
+                        filterData(incoming, valuesToNormalize, numbers);
                     }
                 }
-                // Send to filter
-                filterData(m_list, pending);
+                
+                for(int i = 0; i < 5; i++){
+                	protocol_data d;
+                	d.id = i+1;
+                	d.value = valuesToNormalize[i] / numbers[i];
+                	sendSensorBoardData(d);
+                }
+                
+                
             }
 
             return ModuleExitCodeMessage::OKAY;
@@ -176,64 +184,25 @@ namespace scaledcars {
         *
         * @param data to filter
         */
-        void SerialSendHandler::filterData(protocol_data *list, int size){
-				double us1, us2, ir3, ir4, ir5;
-				int us1_size, us2_size, ir3_size, ir4_size, ir5_size;
+        void SerialSendHandler::filterData(protocol_data data, double *values, int *numbers){
 				
-				for(int i = 0; i < size; i++){
 					//US-SENSOR [ID 1] [ID 2] with value between 1 - 70
-        			if(list[i].id == 1 && list[i].value >= 1 && list[i].value <= 70){
-        				us1 += list[i].value;
-        				us1_size++;
+        			if(data.id == 1 && data.value >= 1 && data.value <= 70){
+        				values[data.id] += data.value;
+        				numbers[data.id] += 1;
         				
-        			} else if (list[i].id == 2 && list[i].value >= 1 && list[i].value <= 70){
-						us2 += list[i].value;
-						us2_size++;
-						
 					//IR-SENSOR [ID 3] [ID 4] with value between 3 - 40
-					} else if (list[i].id == 3 && list[i].value >= 3 && list[i].value <= 40){
-						ir3 += list[i].value;
-						ir3_size++;
-					
-					} else if (list[i].id == 4 && list[i].value >= 3 && list[i].value <= 40){
-						ir4 += list[i].value;
-						ir4_size++;
-					
-					} else if (list[i].id == 5 && list[i].value >= 3 && list[i].value <= 40){
-						ir5 += list[i].value;
-						ir5_size++;
+					} else if (data.id == 3 && data.value >= 3 && data.value <= 40){
+						values[data.id] += data.value;
+        				numbers[data.id] += 1;
 							
 					//ODOMETER [ID 6] with value between 0 - 255
-					} else if (list[i].id == 6 && list[i].value >= 0 && list[i].value <= 255){ 
-						sendVehicleData(list[i]);	
+					} else if (data.id == 6 && data.value >= 0 && data.value <= 255){ 
+						sendVehicleData(data);	
 						
 					} else {
-						cerr << "[Filter no sensor] ID: " << list[i].id << " VALUE: " << list[i].value << endl;
+						cerr << "[Filter no sensor] ID: " << data.id << " VALUE: " << data.value << endl;
         			}
-				}
-				
-				protocol_data one, two, three, four, five;
-				
-				one.id = 1;
-				one.value = us1/us1_size;
-				
-				two.id = 2;
-				two.value = us2/us2_size;
-				
-				three.id = 3;
-				three.value = ir3/ir3_size;
-				
-				four.id = 4;
-				four.value = ir4/ir4_size;
-				
-				five.id = 5;
-				five.value = ir5/ir5_size;
-				
-				sendSensorBoardData(one);
-				sendSensorBoardData(two);
-				sendSensorBoardData(three);
-				sendSensorBoardData(four);
-				sendSensorBoardData(five);
 			}
         
         /**

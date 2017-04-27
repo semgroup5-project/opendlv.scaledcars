@@ -79,7 +79,7 @@ namespace scaledcars {
 
                 virtual void tearDown();
                 
-                void filterData(protocol_data *list, int size);
+                void filterData(protocol_data data, double *values, int *numbers);
                 
                 void sendSensorBoardData(protocol_data data);
                 
