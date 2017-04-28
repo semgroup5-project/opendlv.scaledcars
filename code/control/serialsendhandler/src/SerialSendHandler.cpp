@@ -119,20 +119,28 @@ namespace scaledcars {
                 int pending = g_async_queue_length(this->serial->incoming_queue);
                 double valuesToNormalize[5];
                 int numbers[5];
+                //bool yes = false;
                 protocol_data incoming;
                 for (int i = 0; i < pending; i++) {
                     if (serial_receive(this->serial, &incoming)) {
                         cerr << "RECEIVED : id=" << incoming.id << " value=" << incoming.value << endl;
                         filterData(incoming, valuesToNormalize, numbers);
+                //        yes = true;
                     }
                 }
                 
+              //  if(yes){
                 for(int i = 0; i < 5; i++){
                 	protocol_data d;
                 	d.id = i+1;
-                	d.value = valuesToNormalize[i] / numbers[i];
+                	if(numbers[i] != 0){
+                		d.value = valuesToNormalize[i] / numbers[i];
+                	} else {
+                		d.value = valuesToNormalize[i];
+                	}
                 	sendSensorBoardData(d);
                 }
+             //   }
                 
                 
             }
@@ -187,18 +195,21 @@ namespace scaledcars {
         void SerialSendHandler::filterData(protocol_data data, double *values, int *numbers){
 				
 					//US-SENSOR [ID 1] [ID 2] with value between 1 - 70
-        			if(data.id == 1 && data.value >= 1 && data.value <= 70){
-        				values[data.id] += data.value;
-        				numbers[data.id] += 1;
+        			if((data.id == 1 || data.id == 2) && data.value >= 1 && data.value <= 70){
+        				values[data.id - 1] += data.value;
+        				numbers[data.id - 1] += 1;
+        				cout << "filter " << data.id << "  " << data.value << endl;
         				
 					//IR-SENSOR [ID 3] [ID 4] with value between 3 - 40
-					} else if (data.id == 3 && data.value >= 3 && data.value <= 40){
-						values[data.id] += data.value;
-        				numbers[data.id] += 1;
+					} else if ((data.id == 3 || data.id == 4 || data.id == 5) && data.value >= 3 && data.value <= 40){
+						values[data.id - 1] += data.value;
+        				numbers[data.id - 1] += 1;
+        				cout << "filter " << data.id << "  " << data.value << endl;
 							
 					//ODOMETER [ID 6] with value between 0 - 255
 					} else if (data.id == 6 && data.value >= 0 && data.value <= 255){ 
-						sendVehicleData(data);	
+						sendVehicleData(data);
+						cout << "filter " << data.id << "  " << data.value << endl;	
 						
 					} else {
 						cerr << "[Filter no sensor] ID: " << data.id << " VALUE: " << data.value << endl;
