@@ -9,6 +9,9 @@
 #include <opendavinci/odcore/wrapper/SerialPort.h>
 #include <opendavinci/odcore/wrapper/SerialPortFactory.h>
 
+#include "automotivedata/generated/automotive/VehicleData.h"
+#include "automotivedata/generated/automotive/miniature/SensorBoardData.h"
+
 #include "protocol.c"
 #include "serial.c"
 #include "arduino.c"
@@ -22,6 +25,8 @@ using namespace odcore::base::module;
 using namespace odcore::data;
 using namespace odcore::wrapper;
 using namespace odcore::data::dmcp;
+using namespace automotive;
+using namespace automotive::miniature;
 
 namespace scaledcars {
     namespace control {
@@ -112,12 +117,23 @@ namespace scaledcars {
                 serial_send(this->serial, d_servo);
 
                 int pending = g_async_queue_length(this->serial->incoming_queue);
+                double valuesToNormalize[5];
+                int numbers[5];
                 protocol_data incoming;
                 for (int i = 0; i < pending; i++) {
                     if (serial_receive(this->serial, &incoming)) {
                         cerr << "RECEIVED : id=" << incoming.id << " value=" << incoming.value << endl;
+                        filterData(incoming, valuesToNormalize, numbers);
                     }
                 }
+                
+                for(int i = 0; i < 5; i++){
+                	protocol_data d;
+                	d.id = i+1;
+                	d.value = valuesToNormalize[i] / numbers[i];
+                	sendSensorBoardData(d);
+                }
+                
                 
             }
 
@@ -157,6 +173,73 @@ namespace scaledcars {
                     this->servo = arduinoAngle;
 
                 }
+        }
+        
+        /**
+        * Devides the protocol_data according to what sensor it represents.
+        *
+        * Send as
+        * 	SensorBoardData -> Ultrasonic sensor and IR-sensor
+        * 	VehicleData	->	Odometer
+        *
+        * @param data to filter
+        */
+        void SerialSendHandler::filterData(protocol_data data, double *values, int *numbers){
+				
+					//US-SENSOR [ID 1] [ID 2] with value between 1 - 70
+        			if(data.id == 1 && data.value >= 1 && data.value <= 70){
+        				values[data.id] += data.value;
+        				numbers[data.id] += 1;
+        				
+					//IR-SENSOR [ID 3] [ID 4] with value between 3 - 40
+					} else if (data.id == 3 && data.value >= 3 && data.value <= 40){
+						values[data.id] += data.value;
+        				numbers[data.id] += 1;
+							
+					//ODOMETER [ID 6] with value between 0 - 255
+					} else if (data.id == 6 && data.value >= 0 && data.value <= 255){ 
+						sendVehicleData(data);	
+						
+					} else {
+						cerr << "[Filter no sensor] ID: " << data.id << " VALUE: " << data.value << endl;
+        			}
+			}
+        
+        /**
+      	* Pack a sensor id and a sensor value as a SensorBoardData.
+      	* Then put the SensorBoardData into a Container and send the
+      	* Container to the Conference.
+      	*
+      	* @param id and value of either a ultrasonic or ir-sensor
+			*/        
+        void SerialSendHandler::sendSensorBoardData(protocol_data data){
+        		SensorBoardData sbd;
+        		map<uint32_t, double> sensor;
+        		
+        		sensor[data.id] = data.value;
+				sbd.setMapOfDistances(sensor);
+				
+				Container c(sbd);
+				getConference().send(c);
+				
+				cout << "[SensorBoardData to conference] ID: " << data.id << " VALUE: " << data.value << endl;
+        }
+          
+        /**
+      	* Pack a sensor value as a VehicleData. Then put the VehicleData 
+      	* into a Container and send the Container to the Conference.
+      	*
+      	* @param value of a odometer sensor
+			*/      
+        void SerialSendHandler::sendVehicleData(protocol_data data){
+        		VehicleData vd;
+        		
+        		vd.setAbsTraveledPath(data.value);
+        		
+				Container c(vd);
+				getConference().send(c);
+				
+				cout << "[VehicleData to conference] VALUE: " << data.value << endl;
         }
     }
 }
