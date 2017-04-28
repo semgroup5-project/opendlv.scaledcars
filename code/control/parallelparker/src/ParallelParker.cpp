@@ -20,6 +20,7 @@
 #include <cstdio>
 #include <cmath>
 #include <iostream>
+#include <math.h>
 
 #include "opendavinci/odcore/io/conference/ContainerConference.h"
 #include "opendavinci/odcore/data/Container.h"
@@ -29,6 +30,7 @@
 
 #include "ParallelParker.h"
 
+#define PI 3.14159265359
 namespace scaledcars {
     namespace control {
 
@@ -69,26 +71,26 @@ namespace scaledcars {
             //bool IFRRObstacle;
             const double INFRARED_FRONT_RIGHT = 0;
             const double INFRARED_REAR = 1;
-            // const double INFRARED_REAR_RIGHT = 2;
+            const double INFRARED_REAR_RIGHT = 2;
+            const double ULTRASONIC_FRONT = 3;
+
             double GAP_SIZE = 0;
             double distance = 0;
             double absPathStart = 0;
             double absPathEnd = 0;
-//            double backDist = 0;
-//            double backStart = 0;
-//            double backEnd = 0;
+            double backDist = 0;
+            double parkStart = 0;
+            double parkEnd = 0;
+            double parkingGap = 0;
+            double counter = 1;
 
-
-            int stageMeasuring = 0;
-
-
-            // double irFrontRight = 0;
+            //double irFrontRight = 0;
+            double usFront = 0;
             double irRear = 0;
-            //double irRearRight = 0;
-
-
+            double irRearRight = 0;
+            int gap = 0;
+            int stageMeasuring = 0;
             int stageMoving = 0;
-
 
             while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
                    odcore::data::dmcp::ModuleStateMessage::RUNNING) {
@@ -103,79 +105,123 @@ namespace scaledcars {
 
                 // Create vehicle control data.
                 VehicleControl vc;
-                irRear=sbd.getValueForKey_MapOfDistances(INFRARED_REAR);
-                if (GAP_SIZE < 7 && stageMoving == 0) {
+                //irFrontRight = sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT);
+                irRear = sbd.getValueForKey_MapOfDistances(INFRARED_REAR);
+                irRearRight = sbd.getValueForKey_MapOfDistances(INFRARED_REAR_RIGHT);
+                usFront = sbd.getValueForKey_MapOfDistances(ULTRASONIC_FRONT);
+                IFFRObstacle = obstacleDetect(sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT));
+
+                if (stageMoving == 1) {
+                    vc.setSpeed(0);
+                    vc.setSteeringWheelAngle(0);
+                    if (irRearRight > 0) {
+                        stageMoving = 2;
+                    }
+                }
+                if (stageMoving == 2) {
+                    vc.setSpeed(0);
+                    stageMoving = 2;
+                    if (irRear < 0) {
+                        stageMoving = 3;
+                    }
+                }
+                if (stageMoving == 0) {
                     // Go forward.
                     vc.setSpeed(2);
                     vc.setSteeringWheelAngle(0);
+                    parkStart = vd.getAbsTraveledPath();
                 }
-                if (stageMoving == 1 && (irRear<0)) {
-                    vc.setSpeed(-1);
-                    vc.setSteeringWheelAngle(25);
+
+                if (counter < 1) {
+                    stageMoving = 4;
                 }
-                if(irRear > 0 && irRear < 4){
+
+                if (stageMoving == 4) {
+                    vc.setSpeed(1);
+                    vc.setSteeringWheelAngle(.2);
+                    cerr << "usFront :" << usFront << endl;
+                    if (usFront < 7 && usFront > 0) {
+                        stageMoving = 5;
+                    }
+                }
+                if (stageMoving == 5) {
+                    vc.setSpeed(0);
+                    vc.setSteeringWheelAngle(0);
+                }
+
+                if (irRear > 0 && irRear < 4) {
+                    //Emergency stop
+                    cerr << "stopping the car: " << endl;
                     vc.setSpeed(0);
                 }
+                if (stageMoving == 0) {
 
+                    switch (stageMeasuring) {
+                        case 0: {
 
+                            // Initialize measurement.
 
-
-                IFFRObstacle = obstacleDetect(sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT));
-
-                switch (stageMeasuring) {
-                    case 0: {
-                        // Initialize measurement.
-                        cerr << "case 0" << endl;
-                        distance = sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT);
-                        if ((IFFRObstacle)) {
-                            stageMeasuring++;
-                        }
-                    }
-                        break;
-                    case 1: {
-                        cerr << "case 1" << endl;
-                        // Checking for sequence +, -.
-                        if ((distance > 0) && (sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT) < 0)) {
-                            // Found sequence +, -.
-                            stageMeasuring = 2;
-                            absPathStart = vd.getAbsTraveledPath();
-                        }
-                        distance = sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT);
-                    }
-                        break;
-                    case 2: {
-                        // Checking for sequence -, +.
-                        double PathEnd = vd.getAbsTraveledPath();
-                        double gapSize = (PathEnd - absPathStart);
-                        cerr << "case 2" << endl;
-                        if ((distance < 0) && (sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT) > 0)) {
-                            // Found sequence -, +.
-                            stageMeasuring = 1;
-                            absPathEnd = vd.getAbsTraveledPath();
-
-                            GAP_SIZE = (absPathEnd - absPathStart);
-
-                            cerr << "Size = " << GAP_SIZE << endl;
-
-                            if ((stageMoving < 1) && (GAP_SIZE > 7)) {
-                                cerr << "set stage moving to 1" << endl;
-                                stageMoving = 1;
+                            distance = sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT);
+                            if ((IFFRObstacle)) {
+                                stageMeasuring++;
                             }
                         }
-                        if ((distance < 1) && (gapSize > 9)) {
-                            stageMoving = 1;
+                            break;
+                        case 1: {
+
+                            // Checking for sequence +, -.
+                            if ((distance > 0) && (sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT) < 0)) {
+                                // Found sequence +, -.
+                                stageMeasuring = 2;
+                                absPathStart = vd.getAbsTraveledPath();
+                            }
+                            distance = sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT);
                         }
-                        distance = sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT);
+                            break;
+                        case 2: {
+                            // Checking for sequence -, +.
+                            if (sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT) > 0) {
+                                absPathEnd = vd.getAbsTraveledPath();
+                                GAP_SIZE = (absPathEnd - absPathStart);
+                                cerr << "Size = " << GAP_SIZE << endl;
+                                if (GAP_SIZE < 15) {
+                                    gap = 1;
+                                } else if (GAP_SIZE > 15) {
+                                    gap = 2;
+                                }
+                                cerr << "gap: " << gap << endl;
+                                stageMeasuring = 1;
+                                if ((stageMoving < 1) &&
+                                    (sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT) > 0) && (GAP_SIZE > 7)) {
+                                    stageMeasuring = 1;
+                                    parkingGap = GAP_SIZE;
+                                    //parkingGap = 15;
+                                    stageMoving = 1;
+                                    cerr << "Size = " << GAP_SIZE << endl;
+                                }
+                                //Extra, when there is only one box on the track
+//                                if ((stageMoving < 1) &&
+//                                    (sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT) < 0) && (GAP_SIZE > 7)) {
+//                                    cerr << "case 2 if 2" << endl;
+//                                    stageMeasuring = 1;
+//                                    parkingGap = GAP_SIZE;
+//                                    cerr << "set stage moving to 1 gapSize" << endl;
+//                                    stageMoving = 1;
+//                                    cerr << "Size = " << GAP_SIZE << endl;
+//                                }
+                            }
+                            distance = sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT);
+                        }
+                            break;
                     }
-                        break;
                 }
+
 
                 // Create container for finally sending the data.
                 Container c(vc);
                 // Send container.
                 getConference().send(c);
             }
-
             return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
         }
     }

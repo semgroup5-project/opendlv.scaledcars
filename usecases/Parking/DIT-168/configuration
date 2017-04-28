@@ -19,9 +19,9 @@
 # GLOBAL CONFIGURATION
 #
 global.car = file:///opt/configuration/Car1.objx
-#global.scenario = file:///opt/configuration/Parking-boxes-1.scnx
+global.scenario = file:///opt/configuration/Parking-boxes-1.scnx
 #global.scenario = file:///opt/configuration/SEM_Test_Track-overtaking.scnx
-global.scenario = file:///opt/configuration/parking.scnx
+#global.scenario = file:///opt/configuration/parking.scnx
 global.showGrid = 0
 
 # Location of the origin of the reference frame (example: 57.70485804 N, 11.93831921 E)
