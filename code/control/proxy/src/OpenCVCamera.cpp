@@ -38,7 +38,6 @@ namespace scaledcars {
                 cvSetCaptureProperty(m_capture, CV_CAP_PROP_FRAME_WIDTH, width);
                 cvSetCaptureProperty(m_capture, CV_CAP_PROP_FRAME_HEIGHT, height);
                 cvSetCaptureProperty(m_capture, CV_CAP_PROP_FPS, 30);
-                //          cvSetCaptureProperty(m_capture, CV_CAP_PROP_FOCUS_MOD, 0);
             }
             else {
                 cerr << "proxy: Could not open camera '" << name << "' with ID: " << id << endl;
@@ -85,8 +84,8 @@ namespace scaledcars {
             if ( (dest != NULL) && (size > 0) && (m_image != NULL) ) {
                 memcpy(dest, m_image->imageData, size);
 
-                cvShowImage("WindowShowImage", m_image);
-                cvWaitKey(10);
+//                cvShowImage("WindowShowImage", m_image);
+//                cvWaitKey(10);
 
                 retVal = true;
             }
