@@ -127,9 +127,6 @@ void Car::automatedDrive() {
     protocol_frame frame;
     frame.a = in;
     protocol_data data = protocol_decode_t1(frame);
-//    Serial.print(data.id);
-//    Serial.print(" ");
-//    Serial.println(data.value);
 
     if (data.id == ID_OUT_SERVO) {
         value = data.value * 3;
@@ -140,7 +137,7 @@ void Car::automatedDrive() {
 
     if (data.id == ID_OUT_MOTOR) {
         value = data.value * 3;
-        if (value > 180){
+        if (value > 189){
             escMotor.brake();//applying values greater than 180 will be our indicative to brake
         }
         else {
