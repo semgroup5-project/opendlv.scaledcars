@@ -63,9 +63,7 @@ services:
         network_mode: host
         depends_on:
             - odsupercomponent
-        devices:
-        - "/dev/ttyACM0"
-        command: "/opt/opendlv.scaledcars/bin/scaledcars-control-serialsendhandler --cid=${CID} --rm=true --device=/dev/ttyACM0 --freq=20"
+        command: "/opt/opendlv.scaledcars/bin/scaledcars-control-serialsendhandler --cid=${CID} --rm=true --privileged --freq=20"
     #odcockpit
     #odcockpit:
     #   build: .
