@@ -1,5 +1,5 @@
-ExamplePerceptionTestSuite.h-TestSuite 96 1.96348e-05
-ExampleControlTestSuite.h-TestSuite 96 1.98434e-05
-LaneFollowerTestSuite.h-TestSuite 96 0.000362491
-ProxyTestSuite.h-TestSuite 96 2.28037e-05
+ExamplePerceptionTestSuite.h-TestSuite 98 3.38068e-05
+ExampleControlTestSuite.h-TestSuite 98 3.37654e-05
+LaneFollowerTestSuite.h-TestSuite 98 0.00144096
+ProxyTestSuite.h-TestSuite 98 3.41839e-05
 ---
