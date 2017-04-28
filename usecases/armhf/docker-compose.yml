@@ -46,11 +46,8 @@ services:
         ipc: host
         group_add:
         - video
-        environment:
-        - DISPLAY=$DISPLAY
         volumes:
         - ./DIT-168:/opt/configuration
-        - /tmp/.X11-unix:/tmp/.X11-unix
         - /dev/video0:/dev/video0
         depends_on:
             - odsupercomponent
@@ -83,14 +80,12 @@ services:
         build: .
         network_mode: host
         ipc: host
-        environment:
-        - DISPLAY=$DISPLAY
         volumes:
         - ./DIT-168:/opt/configuration
         depends_on:
             - odsupercomponent
             - odsimvehicle
             - odsimcamera
-        command: bash -c "sleep 5; /opt/opendlv.scaledcars/bin/scaledcars-control-lanefollwer --verbose=1  --cid=${CID} --freq=20 -e DISPLAY=$DISPLAY"
+        command: bash -c "sleep 5; /opt/opendlv.scaledcars/bin/scaledcars-control-lanefollwer --verbose=1  --cid=${CID} --freq=20"
 
 

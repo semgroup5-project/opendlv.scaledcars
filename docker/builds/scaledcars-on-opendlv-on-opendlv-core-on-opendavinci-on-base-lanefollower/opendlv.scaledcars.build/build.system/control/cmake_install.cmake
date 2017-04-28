@@ -38,7 +38,6 @@ if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   include("/opt/opendlv.scaledcars.build/build.system/control/lanefollower/cmake_install.cmake")
   include("/opt/opendlv.scaledcars.build/build.system/control/proxy/cmake_install.cmake")
   include("/opt/opendlv.scaledcars.build/build.system/control/serialsendhandler/cmake_install.cmake")
-  include("/opt/opendlv.scaledcars.build/build.system/control/serialreceivehandler/cmake_install.cmake")
 
 endif()
 

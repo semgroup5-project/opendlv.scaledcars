@@ -21,7 +21,6 @@ set(CMAKE_MAKEFILE_DEPENDS
   "/opt/opendlv.scaledcars.sources/code/control/example/CMakeLists.txt"
   "/opt/opendlv.scaledcars.sources/code/control/lanefollower/CMakeLists.txt"
   "/opt/opendlv.scaledcars.sources/code/control/proxy/CMakeLists.txt"
-  "/opt/opendlv.scaledcars.sources/code/control/serialreceivehandler/CMakeLists.txt"
   "/opt/opendlv.scaledcars.sources/code/control/serialsendhandler/CMakeLists.txt"
   "/opt/opendlv.scaledcars.sources/code/perception/CMakeLists.txt"
   "/opt/opendlv.scaledcars.sources/code/perception/example/CMakeLists.txt"
@@ -81,7 +80,6 @@ set(CMAKE_MAKEFILE_PRODUCTS
   "control/lanefollower/CMakeFiles/CMakeDirectoryInformation.cmake"
   "control/proxy/CMakeFiles/CMakeDirectoryInformation.cmake"
   "control/serialsendhandler/CMakeFiles/CMakeDirectoryInformation.cmake"
-  "control/serialreceivehandler/CMakeFiles/CMakeDirectoryInformation.cmake"
   )
 
 # Dependency information for all targets:
@@ -100,6 +98,4 @@ set(CMAKE_DEPEND_INFO_FILES
   "control/proxy/CMakeFiles/ProxyTestSuite.h-TestSuite.dir/DependInfo.cmake"
   "control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler.dir/DependInfo.cmake"
   "control/serialsendhandler/CMakeFiles/scaledcars-control-serialsendhandler-static.dir/DependInfo.cmake"
-  "control/serialreceivehandler/CMakeFiles/scaledcars-control-serialreceivehandler-static.dir/DependInfo.cmake"
-  "control/serialreceivehandler/CMakeFiles/scaledcars-control-serialreceivehandler.dir/DependInfo.cmake"
   )

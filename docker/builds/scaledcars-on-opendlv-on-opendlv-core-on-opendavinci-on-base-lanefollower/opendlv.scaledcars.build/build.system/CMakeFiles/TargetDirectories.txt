@@ -84,14 +84,3 @@
 /opt/opendlv.scaledcars.build/build.system/control/serialsendhandler/CMakeFiles/list_install_components.dir
 /opt/opendlv.scaledcars.build/build.system/control/serialsendhandler/CMakeFiles/package_source.dir
 /opt/opendlv.scaledcars.build/build.system/control/serialsendhandler/CMakeFiles/package.dir
-/opt/opendlv.scaledcars.build/build.system/control/serialreceivehandler/CMakeFiles/test.dir
-/opt/opendlv.scaledcars.build/build.system/control/serialreceivehandler/CMakeFiles/install/local.dir
-/opt/opendlv.scaledcars.build/build.system/control/serialreceivehandler/CMakeFiles/scaledcars-control-serialreceivehandler-static.dir
-/opt/opendlv.scaledcars.build/build.system/control/serialreceivehandler/CMakeFiles/package_source.dir
-/opt/opendlv.scaledcars.build/build.system/control/serialreceivehandler/CMakeFiles/install.dir
-/opt/opendlv.scaledcars.build/build.system/control/serialreceivehandler/CMakeFiles/install/strip.dir
-/opt/opendlv.scaledcars.build/build.system/control/serialreceivehandler/CMakeFiles/list_install_components.dir
-/opt/opendlv.scaledcars.build/build.system/control/serialreceivehandler/CMakeFiles/rebuild_cache.dir
-/opt/opendlv.scaledcars.build/build.system/control/serialreceivehandler/CMakeFiles/scaledcars-control-serialreceivehandler.dir
-/opt/opendlv.scaledcars.build/build.system/control/serialreceivehandler/CMakeFiles/edit_cache.dir
-/opt/opendlv.scaledcars.build/build.system/control/serialreceivehandler/CMakeFiles/package.dir
