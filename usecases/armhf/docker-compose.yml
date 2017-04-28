@@ -59,7 +59,9 @@ services:
         network_mode: host
         depends_on:
             - odsupercomponent
-        command: "/opt/opendlv.scaledcars/bin/scaledcars-control-serialsendhandler --cid=${CID} --rm=true --privileged --freq=20"
+        devices:
+        - "/dev/ttyACM0"
+        command: "/opt/opendlv.scaledcars/bin/scaledcars-control-serialsendhandler --cid=${CID} --rm=true --privileged --device=/dev/ttyACM0 --freq=20"
    #Micro-service for lanedtecter scenario.
     lanefollower:
         build: .
