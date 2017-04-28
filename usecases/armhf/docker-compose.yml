@@ -38,7 +38,6 @@ services:
         logging: 
             driver: "none"
         command: "/opt/od4/bin/odsimvehicle --cid=${CID} --freq=20"
-
     #Micro-service for camera
     odsimcamera:
         build: .
@@ -61,20 +60,6 @@ services:
         depends_on:
             - odsupercomponent
         command: "/opt/opendlv.scaledcars/bin/scaledcars-control-serialsendhandler --cid=${CID} --rm=true --privileged --freq=20"
-    #odcockpit
-    #odcockpit:
-    #   build: .
-    #    network_mode: host
-    #    environment:
-    #    - DISPLAY=$DISPLAY
-    #    volumes:
-    #    - ./DIT-168:/opt/configuration
-    #    - /tmp/.X11-unix:/tmp/.X11-unix
-    #    - ~/CsvData/Overtaking:/opt/Datacsv
-    #    ipc: host
-    #    depends_on:
-    #        - odsupercomponent
-    #    command: "/opt/od4/bin/odcockpit --cid=${CID} --configuration=/opt/configuration/configuration --freq=20"
    #Micro-service for lanedtecter scenario.
     lanefollower:
         build: .

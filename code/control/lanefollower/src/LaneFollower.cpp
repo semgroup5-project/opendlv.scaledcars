@@ -160,9 +160,6 @@ namespace scaledcars {
             double median;
             median = Median(m_image_new);
 
-
-
-
             m_threshold1 = max(static_cast<double>(0), ((1.0 - 0.33) * median));
             m_threshold2 = min(static_cast<double>(255), (1.0 + 0.33) * median);
 
