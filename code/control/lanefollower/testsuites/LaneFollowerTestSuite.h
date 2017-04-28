@@ -102,53 +102,53 @@ class LaneFollowerTest : public CxxTest::TestSuite {
             TS_ASSERT(ldt != NULL);
         }
 
-        void testLaneFollowerProcessingMethod() {
-            // First, create a shared memory region for the LaneFollower.
-            const uint32_t WIDTH = 3;
-            const uint32_t HEIGHT = 4;
-            const uint32_t BYTESPERPIXEL = 3;
-            std::shared_ptr<odcore::wrapper::SharedMemory> imageProducer = odcore::wrapper::SharedMemoryFactory::createSharedMemory("ImageProducer", WIDTH * HEIGHT * BYTESPERPIXEL);
-            TS_ASSERT(imageProducer->isValid());
-            TS_ASSERT(imageProducer->getSize() == WIDTH * HEIGHT * BYTESPERPIXEL);
-            imageProducer->lock();
-            for (uint32_t i = 0; i < imageProducer->getSize(); i++) {
-                *(((char*)(imageProducer->getSharedMemory())) + i) = ('A' + i);
-            }
-            imageProducer->unlock();
+//        void testLaneFollowerProcessingMethod() {
+//            // First, create a shared memory region for the LaneFollower.
+//            const uint32_t WIDTH = 3;
+//            const uint32_t HEIGHT = 4;
+//            const uint32_t BYTESPERPIXEL = 3;
+//            std::shared_ptr<odcore::wrapper::SharedMemory> imageProducer = odcore::wrapper::SharedMemoryFactory::createSharedMemory("ImageProducer", WIDTH * HEIGHT * BYTESPERPIXEL);
+//            TS_ASSERT(imageProducer->isValid());
+//            TS_ASSERT(imageProducer->getSize() == WIDTH * HEIGHT * BYTESPERPIXEL);
+//            imageProducer->lock();
+//            for (uint32_t i = 0; i < imageProducer->getSize(); i++) {
+//                *(((char*)(imageProducer->getSharedMemory())) + i) = ('A' + i);
+//            }
+//            imageProducer->unlock();
+//
+//            // Wrap the shared memory region into a SharedImage.
+//            SharedImage si;
+//            si.setName(imageProducer->getName());
+//            si.setWidth(WIDTH);
+//            si.setHeight(HEIGHT);
+//            si.setBytesPerPixel(BYTESPERPIXEL);
+//            si.setSize(si.getWidth() * si.getHeight() * si.getBytesPerPixel());
+//
+//            // Create a container.
+//            Container c(si);
+//
+//            TS_ASSERT(ldt->callReadSharedImage(c) == true);
+//        }
 
-            // Wrap the shared memory region into a SharedImage.
-            SharedImage si;
-            si.setName(imageProducer->getName());
-            si.setWidth(WIDTH);
-            si.setHeight(HEIGHT);
-            si.setBytesPerPixel(BYTESPERPIXEL);
-            si.setSize(si.getWidth() * si.getHeight() * si.getBytesPerPixel());
-
-            // Create a container.
-            Container c(si);
-
-            TS_ASSERT(ldt->callReadSharedImage(c) == true);
-        }
-
-        void testLaneFollowerProcessingMethodInvalidSharedMemory() {
-            // First, create a shared memory region for the LaneFollower.
-            const uint32_t WIDTH = 3;
-            const uint32_t HEIGHT = 4;
-            const uint32_t BYTESPERPIXEL = 3;
-
-            // Wrap the shared memory region into a SharedImage.
-            SharedImage si;
-            si.setName("InvalidSharedMemory");
-            si.setWidth(WIDTH);
-            si.setHeight(HEIGHT);
-            si.setBytesPerPixel(BYTESPERPIXEL);
-            si.setSize(si.getWidth() * si.getHeight() * si.getBytesPerPixel());
-
-            // Create a container.
-            Container c(si);
-
-            TS_ASSERT(ldt->callReadSharedImage(c) == false);
-        }
+//        void testLaneFollowerProcessingMethodInvalidSharedMemory() {
+//            // First, create a shared memory region for the LaneFollower.
+//            const uint32_t WIDTH = 3;
+//            const uint32_t HEIGHT = 4;
+//            const uint32_t BYTESPERPIXEL = 3;
+//
+//            // Wrap the shared memory region into a SharedImage.
+//            SharedImage si;
+//            si.setName("InvalidSharedMemory");
+//            si.setWidth(WIDTH);
+//            si.setHeight(HEIGHT);
+//            si.setBytesPerPixel(BYTESPERPIXEL);
+//            si.setSize(si.getWidth() * si.getHeight() * si.getBytesPerPixel());
+//
+//            // Create a container.
+//            Container c(si);
+//
+//            TS_ASSERT(ldt->callReadSharedImage(c) == false);
+//        }
 
         ////////////////////////////////////////////////////////////////////////////////////
         // Below this line the necessary constructor for initializing the pointer variables,

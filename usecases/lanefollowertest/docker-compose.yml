@@ -1,0 +1,98 @@
+
+# docker-compose.yml - Micro-services to record one documentation camera.
+# Copyright (C) 2016 Hang Yin, Christian Berger
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+version: '2'
+
+services:
+     # Micro-service for odsupercomponent.
+    odsupercomponent:
+        build: .
+        network_mode: host
+        ipc : host
+        volumes:
+            - ./DIT-168:/opt/configuration
+        command: "/opt/od4/bin/odsupercomponent --cid=${CID} --configuration=/opt/configuration/configuration --freq=20"
+
+    # Micro-service for odsimvehicle.
+    odsimvehicle:
+        build: .
+        network_mode: host
+        ipc : host
+        depends_on:
+            - odsupercomponent
+        logging: 
+            driver: "none"
+        command: "/opt/od4/bin/odsimvehicle --cid=${CID} --freq=20"
+
+    #Micro-service for camera
+    odsimcamera:
+        build: .
+        network_mode: host
+        ipc: host
+        group_add:
+        - video
+        environment:
+        - DISPLAY=$DISPLAY
+        volumes:
+        - ./DIT-168:/opt/configuration
+        - /tmp/.X11-unix:/tmp/.X11-unix
+        - /dev/video0:/dev/video0 
+        depends_on:
+            - odsupercomponent
+        devices:
+        - "/dev/video0:/dev/video0"
+        command: "/opt/opendlv.scaledcars/bin/scaledcars-control-proxy --cid=${CID} --rm=true --privileged=true --device=/dev/video0:/dev/video0 --freq=20 --configuration=/opt/configuration/configuration"
+     #serial
+    serialhandler:
+        build: .
+        network_mode: host
+        depends_on:
+            - odsupercomponent
+        devices:
+        - "/dev/ttyACM0"
+        command: bash -c "sleep 10; /opt/opendlv.scaledcars/bin/scaledcars-control-serialsendhandler --verbose=1 --cid=${CID} --rm=true --device=/dev/ttyACM0 --freq=1"
+    #odcockpit
+    odcockpit:
+        build: .
+        network_mode: host
+        environment:
+        - DISPLAY=$DISPLAY
+        volumes:
+        - ./DIT-168:/opt/configuration
+        - /tmp/.X11-unix:/tmp/.X11-unix
+        - ~/CsvData/Overtaking:/opt/Datacsv
+        ipc: host
+        depends_on:
+            - odsupercomponent
+        command: "/opt/od4/bin/odcockpit --cid=${CID} --configuration=/opt/configuration/configuration --freq=20"
+   #Micro-service for lanedtecter scenario.
+    lanefollower:
+        build: .
+        network_mode: host
+        ipc: host
+        environment:
+        - DISPLAY=$DISPLAY
+        volumes:
+        - ./DIT-168:/opt/configuration
+        depends_on:
+            - odsupercomponent
+            - odsimvehicle
+            - odsimcamera
+        command: bash -c "sleep 5; /opt/opendlv.scaledcars/bin/scaledcars-control-lanefollwer --verbose=1  --cid=${CID} --freq=20 -e DISPLAY=$DISPLAY"
+
+

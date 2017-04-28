@@ -1,0 +1,10 @@
+// This is an auto-generated file from a .odvd message specification using OpenDaVINCI's odDataStructureGenerator.
+
+// This line is only needed when using Google Protobuf 3.
+syntax = "proto2";
+
+// Message identifier: 801.
+message chalmersrevere_scaledcars_ExampleMessage {
+    optional uint32 field1 = 1;
+}
+

@@ -20,7 +20,6 @@
 #
 global.car = file:///opt/configuration/Car1.objx
 global.scenario = file:///opt/configuration/Parking-boxes-1.scnx
-#global.scenario = file:///opt/configuration/SEM_Test_Track-overtaking.scnx
 global.showGrid = 0
 
 # Location of the origin of the reference frame (example: 57.70485804 N, 11.93831921 E)
@@ -32,7 +31,7 @@ global.reference.WGS84.longitude = -11.93831921
 # camera resolution for example (640x480x3 --> 1000000 for memorySegment,
 # 1280x720x3 --> 2800000).
 global.buffer.memorySegmentSize = 2800000 # Size of a memory segment in bytes.
-global.buffer.numberOfMemorySegments = 20 # Number of memory segments.
+global.buffer.numberOfMemorySegments = 40 # Number of memory segments.                        // tentantive value, original = 20 !!
 
 # The following key describes the list of modules expected to participate in this --cid session.
 global.session.expectedModules = HelloWorldExample,HelloWorldExample:2
@@ -76,7 +75,7 @@ odsupercomponent.pulsetimeack.exclude = odcockpit
 #
 # CONFIGURATION FOR ODCOCKPIT
 #
-odcockpit.plugins = configurationviewer,livefeed,logmessage,player,sharedimageviewer,streetmapviewer,birdseyemap,iruscharts,irusmap # List of modules to show in odcockpit; leave blank to show all.
+odcockpit.plugins = #configurationviewer,livefeed,logmessage,player,sharedimageviewer,streetmapviewer,birdseyemap,iruscharts,irusmap # List of modules to show in odcockpit; leave blank to show all.
 odcockpit.directoriesForSharedLibaries = /opt,/lib # List of directories to search for libodvd*.so files.
 
 
@@ -226,8 +225,15 @@ odsimvehicle.LinearBicycleModel.KdynamicBrake=60.0
 #
 # CONFIGURATION FOR LANEFOLLOWER
 #
-lanefollower.camera_id = 2 # select here the proper camera
+lanefollower.camera_id = 1 # select here the proper camera
 lanefollower.debug = 1      # set to 0 to disable any windows and further output
+lanefollower.sim = 0   # Set simulation true or false
+lanefollower.p = 1.4     #OG val = 1.3
+lanefollower.d = 0.60    #OG val = 0.10
+lanefollower.i= 0.1     #OG val = 0.01
+
+
+
 
 
 ###############################################################################
@@ -280,19 +286,14 @@ proxy.useRecorder = 0 # 1 = record all captured data directly, 0 otherwise.
 proxy.recorder.output = file://recs/
 proxy.camera.name = WebCam
 proxy.camera.type = OpenCV # OpenCV or UEYE
-proxy.camera.id = 0 # Select here the proper ID for OpenCV
+proxy.camera.id = 1 # Select here the proper ID for OpenCV
 proxy.camera.width = 640 #752-UEYE, 640-OpenCV 
 proxy.camera.height = 480
 proxy.camera.bpp = 3 #3- openCV, 1-UEYE
+proxy.camera.flipped = 1 #1 = flipped image, 0 =notflipped image.
+#proxy.camera.dumpSharedData = 1
 
-#NEW CAMERA SETTING
-#proxy.camera.debug = 0 #1 = show recording(requires X11), 0 = otherwise.
-#proxy.camera.name = DocumentationCamera0
-#proxy.camera.id = 0 #Select here the proper ID for OpenCV.
-#proxy.camera.width = 640
-#proxy.camera.height = 480
-#proxy.camera.bpp = 3
-#proxy.camera.flipped = 0 #1 = flipped image, 0 =notflipped image.
+
 
 Proxy.Actuator.UseRealSpeed=0
 proxy.Actuator.SerialPort=/dev/ttyACM0
@@ -358,7 +359,7 @@ lanedetector.inspect_rec = file://recording.rec # Config for lanedetector-inspec
 # filterAndMerge = 4
 # finalFilter = 5
 # finalResult = 6
-# createTrajectory = 7
+# createTrajectory = 6
 lanedetector.what_to_inspect = 7
 # Choose which windows to display. 0: no, 1: yes
 lanedetector.showRes_getContours = 1
@@ -366,7 +367,7 @@ lanedetector.showRes_getRectangles = 1
 lanedetector.showRes_classification = 1
 lanedetector.showRes_filterAndMerge = 1
 lanedetector.showRes_finalFilter = 1
-lanedetector.showRes_finalResult = 0
+lanedetector.showRes_finalResult = 1
 lanedetector.showRes_createTrajectory = 1
 lanedetector.threshBaseParameter=48
 
