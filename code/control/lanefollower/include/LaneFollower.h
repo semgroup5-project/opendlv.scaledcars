@@ -137,6 +137,7 @@ namespace control {
 	            virtual void tearDown();
 
                 void processImage();
+                double Median(cv::Mat mat);
                 double errorCalculation();
                 void laneFollower(double e);
         };
