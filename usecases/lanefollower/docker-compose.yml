@@ -44,8 +44,8 @@ services:
         build: .
         network_mode: host
         ipc: host
-        group_add:
-        - video
+        #group_add:
+        #- video
         environment:
         - DISPLAY=$DISPLAY
         volumes:
