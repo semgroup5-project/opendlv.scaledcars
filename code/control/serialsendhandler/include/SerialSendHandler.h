@@ -1,3 +1,6 @@
+#ifndef SERIALSENDHANDLER_H
+#define SERIALSENDHANDLER_H
+
 #include <automotivedata/GeneratedHeaders_AutomotiveData.h>
 
 #include <opendavinci/GeneratedHeaders_OpenDaVINCI.h>
@@ -87,3 +90,4 @@ namespace scaledcars {
         };
     }
 }
+#endif

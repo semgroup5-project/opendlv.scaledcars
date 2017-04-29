@@ -133,8 +133,6 @@ namespace scaledcars {
                 	d.value = valuesToNormalize[i] / numbers[i];
                 	sendSensorBoardData(d);
                 }
-                
-                
             }
 
             return ModuleExitCodeMessage::OKAY;
@@ -159,15 +157,6 @@ namespace scaledcars {
 
                     int speed = vd.getSpeed();
                     cerr << "speed to arduino : " << speed << endl;
-
-//                    // TODO: int odometer = vd.getOdometer();
-
-
-
-//  TODO SEND
-//                    string speedMessage = pack(ID_OUT_MOTOR, speed);
-//                    string angleMessage = pack(ID_OUT_SERVO, arduinoAngle);
-//                    TODO: string odometerMessage = pack(ID_OUT_ODOMETER, odometer);
 
                     this->motor = speed;
                     this->servo = arduinoAngle;
