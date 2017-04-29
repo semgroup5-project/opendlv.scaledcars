@@ -53,8 +53,6 @@ void Car::run() {
         rcControl();
     }
     provideSensorsData();
-
-
 }
 
 void Car::provideSensorsData() {
