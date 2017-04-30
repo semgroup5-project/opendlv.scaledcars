@@ -22,10 +22,6 @@ using namespace odcore::data::dmcp;
 namespace scaledcars {
     namespace control {
 
-        void UDPReceiveBytes::nextString(const string &s) {
-            cout << "Received " << s.length() << " bytes containing '" << s << "'" << endl;
-        }
-
         DecisionMaker::DecisionMaker(const int32_t &argc, char **argv) :
         TimeTriggeredConferenceClientModule(argc, argv, "DecisionMaker") {}
 

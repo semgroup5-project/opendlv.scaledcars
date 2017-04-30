@@ -10,23 +10,23 @@
 #include <opendavinci/odcore/wrapper/SharedMemory.h>
 #include <opendavinci/odcore/wrapper/SharedMemoryFactory.h>
 #include <opendavinci/odcore/io/StringListener.h>
+#include <opendavinci/odcore/io/udp/UDPReceiver.h>
+#include <opendavinci/odcore/io/udp/UDPSender.h>
+#include <opendavinci/odcore/io/udp/UDPFactory.h>
 
 #include "defines.h"
 
 using namespace std;
 
 using namespace odcore;
+using namespace odcore::io;
+using namespace odcore::io::udp;
 using namespace odcore::base::module;
 using namespace odcore::data;
 using namespace odcore::wrapper;
 
 namespace scaledcars {
     namespace control {
-
-        class UDPReceiveBytes : public odcore::io::StringListener {
-
-            virtual void nextString(const string &s);
-        };
 
         class DecisionMaker :
                 public odcore::base::module::TimeTriggeredConferenceClientModule {
@@ -77,10 +77,6 @@ namespace scaledcars {
             virtual void setUp();
 
             virtual void tearDown();
-
-            const string RECEIVER = "0.0.0.0";
-
-            const uint32_t PORT = 1234;
         };
     }//control
 }//scaledcars
