@@ -48,6 +48,7 @@ namespace scaledcars {
         using namespace odcore::base;
         using namespace odcore::data;
         using namespace odcore::data::image;
+        using namespace odcore::data::dmcp;
         using namespace automotive;
         using namespace automotive::miniature;
         using namespace odcore::wrapper;
@@ -98,8 +99,8 @@ namespace scaledcars {
         // State counter for dynamically moving back to right lane.
         int32_t stageToRightLaneRightTurn = 0;
         int32_t stageToRightLaneLeftTurn = 0;
+        int32_t traveled_distance = 0;
 
-        //int32_t distance = 0;
         //int32_t stageToRightLaneRightTurn2= 88;
         //int32_t stageToRightLaneLeftTurn2 = 44;
 
@@ -134,11 +135,11 @@ namespace scaledcars {
 
             bool retVal = false;
 
-            if (c.getDataType() == odcore::data::image::SharedImage::ID()) {
+            if (c.getDataType() == SharedImage::ID()) {
                 SharedImage si = c.getData<SharedImage> ();//if is =shareImage the container get the data from the container
 
 
-                cerr << si << endl; //
+                //cerr << si << endl; //
 
                 // Check if we have already attached to the shared memory.
                 if (!m_hasAttachedToSharedImageMemory) {
@@ -295,7 +296,7 @@ namespace scaledcars {
             }
 
 
-            //Good values dont change
+            //Good values don't change
 //            const double Kp = 1.3;
 //            const double Ki = 0.01;
 //            const double Kd = 0.1;
@@ -331,8 +332,8 @@ namespace scaledcars {
                 }
             }
 
-            cerr << "PID: " << "e = " << e << ", eSum = " << m_eSum << ", desiredSteering = " << desiredSteering
-                 << ", y = " << y << endl;
+//            cerr << "PID: " << "e = " << e << ", eSum = " << m_eSum << ", desiredSteering = " << desiredSteering
+//                 << ", y = " << y << endl;
 
 
             // Go forward
@@ -351,12 +352,11 @@ namespace scaledcars {
 
             const double OVERTAKING_DISTANCE = 5.0;
             const double HEADING_PARALLEL = 0.04;
-            //int32_t covered_distance = 0;
             //Get most recent vehicle data:
             Container containerVehicleData = getKeyValueDataStore().get(VehicleData::ID());
             VehicleData vd = containerVehicleData.getData<VehicleData> ();
             //Get most recent sensor board data:
-            Container containerSensorBoardData = getKeyValueDataStore().get(automotive::miniature::SensorBoardData::ID());
+            Container containerSensorBoardData = getKeyValueDataStore().get(SensorBoardData::ID());
             SensorBoardData sbd = containerSensorBoardData.getData<SensorBoardData> ();
 
             if (stageMeasuring == FIND_OBJECT_INIT) {
@@ -364,10 +364,6 @@ namespace scaledcars {
                 stageMeasuring = FIND_OBJECT;
             } else if (stageMeasuring == FIND_OBJECT) {
                 distanceToObstacle = sbd.getValueForKey_MapOfDistances(ULTRASONIC_FRONT_CENTER);
-                //covered_distance =sbd.getValueForKey_MapOfDistances(WHEEL_ENCODER);
-                //cerr << "Distance  " << covered_distance << endl;
-
-
                 // Approaching an obstacle (stationary or driving slower than us).
                 if ((distanceToObstacle > 0) && (((distanceToObstacleOld - distanceToObstacle) > 0) ||
                                                  (fabs(distanceToObstacleOld - distanceToObstacle) < 1e-2))) {
@@ -428,15 +424,15 @@ namespace scaledcars {
             VehicleData vd = containerVehicleData.getData<VehicleData>();
 
             // 2. Get most recent sensor board data:
-            Container containerSensorBoardData = getKeyValueDataStore().get(
-                    automotive::miniature::SensorBoardData::ID());
+            Container containerSensorBoardData = getKeyValueDataStore().get(SensorBoardData::ID());//
             SensorBoardData sbd = containerSensorBoardData.getData<SensorBoardData>();
-            overtake = false;
+            traveled_distance = vd.getAbsTraveledPath();
+            //overtake = false;
             // Moving state machine.
             if (stageMoving == FORWARD && has_next_frame) {
                 // Use m_vehicleControl data from image processing.
                 //processImage();
-
+                traveled_distance = 0;
                 stageToRightLaneLeftTurn = 0;
                 stageToRightLaneRightTurn = 0;
             } else if (stageMoving == TO_LEFT_LANE_LEFT_TURN) {
@@ -449,7 +445,9 @@ namespace scaledcars {
                 stageMeasuring = HAVE_BOTH_IR;
 
                 stageToRightLaneRightTurn++;
+                traveled_distance++;
                 cout << "StageToRightLaneRightTurn is" << stageToRightLaneRightTurn << endl;
+                cout << "Distance is " << traveled_distance<< endl;
             } else if (stageMoving == TO_LEFT_LANE_RIGHT_TURN) {
                 // Move to the left lane: Turn right part until both IRs have the same distance to obstacle.
                 // State machine measuring: Both IRs need to have the same distance before leaving this moving state.
@@ -472,18 +470,18 @@ namespace scaledcars {
                 m_vehicleControl.setSpeed(0.7);
                 m_vehicleControl.setSteeringWheelAngle(20);
 
-
-
+                traveled_distance--;
                 stageToRightLaneRightTurn--;
                 cout << "Stage RightLaneRightTurn is" << stageToRightLaneRightTurn << endl;
-
-                if (stageToRightLaneRightTurn < 10) {
+                cout <<"Distance "<< traveled_distance << endl;
+                if (stageToRightLaneRightTurn < 17) {
                     cout << "Going left" << endl;
                     stageMoving = TO_RIGHT_LANE_LEFT_TURN;
 
                 }
             } else if (stageMoving == TO_RIGHT_LANE_LEFT_TURN) {
                 // Move to the left lane: Turn left part.
+                cout<< "Reached here , start to turn "<< endl;
                 m_vehicleControl.setSpeed(0.5);
                 m_vehicleControl.setSteeringWheelAngle(-10);
 
@@ -494,6 +492,9 @@ namespace scaledcars {
                     // Start over.
                     overtake = false;
                     stageMoving = FORWARD;
+
+                    stageToRightLaneLeftTurn = 0;
+                    stageToRightLaneRightTurn = 0;
 
                     stageMeasuring = FIND_OBJECT_INIT;
 
@@ -511,24 +512,22 @@ namespace scaledcars {
 
         // This method will do the main data processing job.
         // Therefore, it tries to open the real camera first. If that fails, the virtual camera images from camgen are used.
-        odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode LaneFollower::body() {
+        ModuleExitCodeMessage::ModuleExitCode LaneFollower::body() {
             // Get configuration data.
             KeyValueConfiguration kv = getKeyValueConfiguration();
             m_debug = kv.getValue<int32_t>("lanefollower.debug") == 1;
 
             cvInitFont(&m_font, CV_FONT_HERSHEY_DUPLEX, hscale, vscale, shear, thickness, lineType);
 
-
-
             // Overall state machine handler.
-            while (getModuleStateAndWaitForRemainingTimeInTimeslice() == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
+            while (getModuleStateAndWaitForRemainingTimeInTimeslice() == ModuleStateMessage::RUNNING) {
                 bool has_next_frame = false;
 
 
                 // Get the most recent available container for a SharedImage.
-                Container c = getKeyValueDataStore().get(odcore::data::image::SharedImage::ID());
+                Container c = getKeyValueDataStore().get(SharedImage::ID());
 
-                if (c.getDataType() == odcore::data::image::SharedImage::ID()) {
+                if (c.getDataType() == SharedImage::ID()) {
                     // Example for processing the received container.
                     has_next_frame = readSharedImage(c);
                 }
@@ -554,7 +553,7 @@ namespace scaledcars {
 
             }
 
-            return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
+            return ModuleExitCodeMessage::OKAY;
         }
 
     }
