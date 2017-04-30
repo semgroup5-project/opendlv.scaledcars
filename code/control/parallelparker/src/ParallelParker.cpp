@@ -41,7 +41,6 @@ namespace scaledcars {
         using namespace automotive::miniature;
 
         ParallelParker::ParallelParker(const int32_t &argc, char **argv) :
-                sim(false),
                 TimeTriggeredConferenceClientModule(argc, argv, "ParallelParker") {
         }
 
@@ -49,7 +48,6 @@ namespace scaledcars {
 
         void ParallelParker::setUp() {
             // This method will be call automatically _before_ running body().
-            sim = kv.getValue<int32_t>("parallelParking.sim") == 1;
         }
 
         void ParallelParker::tearDown() {
@@ -112,31 +110,48 @@ namespace scaledcars {
                 irRearRight = sbd.getValueForKey_MapOfDistances(INFRARED_REAR_RIGHT);
                 usFront = sbd.getValueForKey_MapOfDistances(ULTRASONIC_FRONT);
                 IFFRObstacle = obstacleDetect(sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT));
-             ////
-
-                    if (stageMoving == 4) {
-                        vc.setSpeed(1);
-                        vc.setSteeringWheelAngle(.2);
-                        cerr << "usFront :" << usFront << endl;
-                        if (usFront < 7 && usFront > 0) {
-                            stageMoving = 5;
-                        }
+                if (stageMoving == 0) {
+                    // Go forward.
+                    vc.setSpeed(2);
+                    vc.setSteeringWheelAngle(0);
+                    parkStart = vd.getAbsTraveledPath();
+                }
+                if (stageMoving == 1) {
+                    vc.setSpeed(0);
+                    vc.setSteeringWheelAngle(0);
+                    if (irRearRight > 0) {
+                        stageMoving = 2;
                     }
-                    if (stageMoving == 5) {
-                        vc.setSpeed(0);
-                        vc.setSteeringWheelAngle(0);
+                }
+                if (stageMoving == 2) {
+                    vc.setSpeed(0);
+                    stageMoving = 2;
+                    if (irRear < 0) {
+                        stageMoving = 3;
                     }
-
-                    if (irRear > 0 && irRear < 4) {
-                        //Emergency stop
-                        cerr << "stopping the car: " << endl;
-                        vc.setSpeed(0);
-                    }
-                }else if(!sim){
-                    cerr<< "This is not sim"<<endl;
                 }
 
-                if (stageMoving == 0 && sim == true) {
+
+                if (stageMoving == 4) {
+                    vc.setSpeed(1);
+                    vc.setSteeringWheelAngle(.2);
+                    cerr << "usFront :" << usFront << endl;
+                    if (usFront < 7 && usFront > 0) {
+                        stageMoving = 5;
+                    }
+                }
+                if (stageMoving == 5) {
+                    vc.setSpeed(0);
+                    vc.setSteeringWheelAngle(0);
+                }
+
+                if (irRear > 0 && irRear < 4) {
+                    //Emergency stop
+                    cerr << "stopping the car: " << endl;
+                    vc.setSpeed(0);
+                }
+                if (stageMoving == 0) {
+
                     switch (stageMeasuring) {
                         case 0: {
 

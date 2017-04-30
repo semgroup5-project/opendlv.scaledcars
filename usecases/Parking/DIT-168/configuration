@@ -40,6 +40,14 @@ global.session.expectedModules = HelloWorldExample,HelloWorldExample:2
 
 
 ###############################################################################
+
+###############################################################################
+#
+# CONFIGURATION FOR PARALLELPARKING
+#
+
+parallelParking.sim = 0   # Set simulation true or false
+
 ###############################################################################
 #
 # NEXT, THE CONFIGURATION FOR OpenDaVINCI TOOLS FOLLOWS. 
