@@ -36,8 +36,8 @@ namespace automotive {
         using namespace automotive;
 
         BoxParker::BoxParker(const int32_t &argc, char **argv) :
-            TimeTriggeredConferenceClientModule(argc, argv, "BoxParker"),
-            m_foundGaps() {}
+                TimeTriggeredConferenceClientModule(argc, argv, "BoxParker"),
+                m_foundGaps() {}
 
         BoxParker::~BoxParker() {}
 
@@ -62,14 +62,16 @@ namespace automotive {
             int stageMoving = 0;
             int stageMeasuring = 0;
 
-            while (getModuleStateAndWaitForRemainingTimeInTimeslice() == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
+            while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
+                   odcore::data::dmcp::ModuleStateMessage::RUNNING) {
                 // 1. Get most recent vehicle data:
                 Container containerVehicleData = getKeyValueDataStore().get(automotive::VehicleData::ID());
-                VehicleData vd = containerVehicleData.getData<VehicleData> ();
+                VehicleData vd = containerVehicleData.getData<VehicleData>();
 
                 // 2. Get most recent sensor board data describing virtual sensor data:
-                Container containerSensorBoardData = getKeyValueDataStore().get(automotive::miniature::SensorBoardData::ID());
-                SensorBoardData sbd = containerSensorBoardData.getData<SensorBoardData> ();
+                Container containerSensorBoardData = getKeyValueDataStore().get(
+                        automotive::miniature::SensorBoardData::ID());
+                SensorBoardData sbd = containerSensorBoardData.getData<SensorBoardData>();
 
                 // Create vehicle control data.
                 VehicleControl vc;
@@ -112,43 +114,40 @@ namespace automotive {
 
                 // Measuring state machine.
                 switch (stageMeasuring) {
-                    case 0:
-                        {
-                            // Initialize measurement.
-                            distanceOld = sbd.getValueForKey_MapOfDistances(2);
-                            stageMeasuring++;
+                    case 0: {
+                        // Initialize measurement.
+                        distanceOld = sbd.getValueForKey_MapOfDistances(2);
+                        stageMeasuring++;
+                    }
+                        break;
+                    case 1: {
+                        // Checking for distance sequence +, -.
+                        if ((distanceOld > 0) && (sbd.getValueForKey_MapOfDistances(2) < 0)) {
+                            // Found distance sequence +, -.
+                            stageMeasuring = 2;
+                            absPathStart = vd.getAbsTraveledPath();
                         }
-                    break;
-                    case 1:
-                        {
-                            // Checking for distance sequence +, -.
-                            if ((distanceOld > 0) && (sbd.getValueForKey_MapOfDistances(2) < 0)) {
-                                // Found distance sequence +, -.
-                                stageMeasuring = 2;
-                                absPathStart = vd.getAbsTraveledPath();
-                            }
-                            distanceOld = sbd.getValueForKey_MapOfDistances(2);
-                        }
-                    break;
-                    case 2:
-                        {
-                            // Checking for distance sequence -, +.
-                            if ((distanceOld < 0) && (sbd.getValueForKey_MapOfDistances(2) > 0)) {
-                                // Found distance sequence -, +.
-                                stageMeasuring = 1;
-                                absPathEnd = vd.getAbsTraveledPath();
+                        distanceOld = sbd.getValueForKey_MapOfDistances(2);
+                    }
+                        break;
+                    case 2: {
+                        // Checking for distance sequence -, +.
+                        if ((distanceOld < 0) && (sbd.getValueForKey_MapOfDistances(2) > 0)) {
+                            // Found distance sequence -, +.
+                            stageMeasuring = 1;
+                            absPathEnd = vd.getAbsTraveledPath();
 
-                                const double GAP_SIZE = (absPathEnd - absPathStart);
-                                cerr << "Size = " << GAP_SIZE << endl;
-                                m_foundGaps.push_back(GAP_SIZE);
+                            const double GAP_SIZE = (absPathEnd - absPathStart);
+                            cerr << "Size = " << GAP_SIZE << endl;
+                            m_foundGaps.push_back(GAP_SIZE);
 
-                                if ((stageMoving < 1) && (GAP_SIZE > 3.5)) {
-                                    stageMoving = 1;
-                                }
+                            if ((stageMoving < 1) && (GAP_SIZE > 3.5)) {
+                                stageMoving = 1;
                             }
-                            distanceOld = sbd.getValueForKey_MapOfDistances(2);
                         }
-                    break;
+                        distanceOld = sbd.getValueForKey_MapOfDistances(2);
+                    }
+                        break;
                 }
 
                 // Create container for finally sending the data.

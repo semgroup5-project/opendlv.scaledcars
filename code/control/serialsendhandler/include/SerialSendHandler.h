@@ -84,9 +84,9 @@ namespace scaledcars {
                 
                 void filterData(protocol_data data, double *values, int *numbers);
                 
-                void sendSensorBoardData(protocol_data data);
+                void sendSensorBoardData(std::map<uint32_t, double> sensor);
                 
-                void sendVehicleData(protocol_data data);
+                void sendVehicleData();
         };
     }
 }
