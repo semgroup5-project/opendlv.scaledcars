@@ -140,6 +140,7 @@ namespace scaledcars {
                         stageMoving = 5;
                     }
                 }
+
                 if (stageMoving == 5) {
                     vc.setSpeed(0);
                     vc.setSteeringWheelAngle(0);
