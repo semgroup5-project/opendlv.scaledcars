@@ -20,5 +20,7 @@ message chalmersrevere.scaledcars.ExampleMessage [id = 801] {
     uint32 field1   [id = 1];
 }
 
-
+message group5.DecisionMakerMSG [id = 555 ] {
+    uint8 state [id = 1];
+}
 
