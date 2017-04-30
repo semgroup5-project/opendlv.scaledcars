@@ -216,6 +216,12 @@ odsimvehicle.LinearBicycleModel.tauBrake=1.0
 odsimvehicle.LinearBicycleModel.KstaticBrake=100.0
 odsimvehicle.LinearBicycleModel.KdynamicBrake=60.0
 
+###############################################################################
+#
+# CONFIGURATION FOR PARALLEL PARKING
+#
+parallelParking.debug = 1      # set to 0 to disable any windows and further output
+parallelParking.sim = 0   # Set simulation true(1) or false(0)
 
 ###############################################################################
 ###############################################################################

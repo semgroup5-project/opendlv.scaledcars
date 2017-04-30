@@ -39,20 +39,14 @@ services:
             driver: "none"
         command: "/opt/od4/bin/odsimvehicle --cid=${CID} --freq=20"
 
-
-  #odsimirus
-    odsimirus:
+    #serial
+    serialhandler:
         build: .
         network_mode: host
-        ipc: host
-        volumes:
-        - ./DIT-168:/opt/configuration
         depends_on:
             - odsupercomponent
-            - odsimvehicle
-        command: "/opt/od4/bin/odsimirus --cid=${CID} --freq=20 --configuration=/opt/configuration/configuration"
-    
-#odcockpit
+        command: bash -c "sleep 10; /opt/opendlv.scaledcars/bin/scaledcars-control-serialsendhandler --verbose=1 --cid=${CID} --rm=true --privileged --freq=20"
+    #odcockpit
     odcockpit:
         build: .
         network_mode: host
@@ -66,17 +60,21 @@ services:
         depends_on:
             - odsupercomponent
         command: "/opt/od4/bin/odcockpit --cid=${CID} --configuration=/opt/configuration/configuration --freq=20"
-   #Micro-service for parallelparking scenario.
-    boxparker:
+   #Micro-service for lanedtecter scenario.
+    lanefollower:
         build: .
         network_mode: host
         ipc: host
+        environment:
+        - DISPLAY=$DISPLAY
         volumes:
         - ./DIT-168:/opt/configuration
         depends_on:
             - odsupercomponent
             - odsimvehicle
-            - odsimirus
-        command: bash -c "sleep 5; /opt/opendlv.scaledcars/bin/scaledcars-control-parallelparker --configuration=/opt/configuration/configuration --verbose=1  --cid=${CID} --freq=20"
+            - odsimcamera
+        command: bash -c "sleep 5; /opt/opendlv.scaledcars/bin/scaledcars-control-lanefollwer --verbose=1  --cid=${CID} --freq=20 -e DISPLAY=$DISPLAY"
+
+
 
 
