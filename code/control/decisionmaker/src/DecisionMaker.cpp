@@ -12,6 +12,8 @@
 using namespace std;
 
 using namespace odcore;
+using namespace odcore::io;
+using namespace odcore::io::udp;
 using namespace odcore::base::module;
 using namespace odcore::data;
 using namespace odcore::wrapper;
@@ -19,14 +21,23 @@ using namespace odcore::data::dmcp;
 
 namespace scaledcars {
     namespace control {
+
+        void UDPReceiveBytes::nextString(const string &s) {
+            cout << "Received " << s.length() << " bytes containing '" << s << "'" << endl;
+        }
+
         DecisionMaker::DecisionMaker(const int32_t &argc, char **argv) :
         TimeTriggeredConferenceClientModule(argc, argv, "DecisionMaker") {}
 
         DecisionMaker::~DecisionMaker() {}
 
-        void DecisionMaker::setUp() {}
+        void DecisionMaker::setUp() {
+            cout << "Starting DecisionMaker" << endl;
+        }
 
-        void DecisionMaker::tearDown() {}
+        void DecisionMaker::tearDown() {
+            cout << "Shutting down DecisionMaker" << endl;
+        }
 
         odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode DecisionMaker::body() {
             while (getModuleStateAndWaitForRemainingTimeInTimeslice() == ModuleStateMessage::RUNNING) {
