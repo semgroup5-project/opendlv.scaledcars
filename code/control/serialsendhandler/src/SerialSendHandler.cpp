@@ -49,7 +49,11 @@ namespace scaledcars {
 
         SerialSendHandler::SerialSendHandler(const int32_t &argc, char **argv) :
             TimeTriggeredConferenceClientModule(argc, argv, "SerialSendHandler")
-        {}
+        {
+            this->motor = 90;
+            this->servo = 90;
+            this->cycle = 0;
+        }
 
         SerialSendHandler::~SerialSendHandler() {}
 
@@ -98,6 +102,9 @@ namespace scaledcars {
             d_servo.value = 90 / 3;
             serial_send(this->serial, d_motor);
             serial_send(this->serial, d_servo);
+
+            const uint32_t ONE_SECOND = 1000 * 1000;
+            odcore::base::Thread::usleepFor(5 * ONE_SECOND);
 
             serial_stop(this->serial);
             serial_free(this->serial);
@@ -153,7 +160,7 @@ namespace scaledcars {
         }
 
         void SerialSendHandler::nextContainer(Container &c) {
-                cerr << "NEXT CONTAINER " << c.getDataType() << endl;
+                cerr << "NEXT CONTAINER OF TYPE : " << c.getDataType() << endl;
                 if (c.getDataType() == automotive::VehicleControl::ID()) {
                     const automotive::VehicleControl vd =
                             c.getData<automotive::VehicleControl>();

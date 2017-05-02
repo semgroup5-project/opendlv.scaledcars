@@ -22,5 +22,23 @@ message chalmersrevere.scaledcars.ExampleMessage [id = 801] {
 
 message group5.DecisionMakerMSG [id = 555 ] {
     uint8 state [id = 1];
+    double ultraSonicFrontCenter [id = 2];
+    double ultrasonicFrontRight [id = 3];
+    double infraredSideFront [id = 4];
+    double infraredSideBack [id = 5];
+    double infraredBack [id = 6];
+    double wheelEncoder [id = 7];
+}
+
+message group5.LaneFollowerMSG [id = 556 ] {
+    uint8 state [id = 1];
+}
+
+message group5.OvertakerMSG [id = 557 ] {
+    uint8 state [id = 1];
+}
+
+message group5.ParkerMSG [id = 558 ] {
+    uint8 state [id = 1];
 }
 
