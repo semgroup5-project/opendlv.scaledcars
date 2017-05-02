@@ -86,8 +86,6 @@ namespace scaledcars {
 
             int motor;
             int servo;
-
-            int cycle = 0;
         };
     }
 }

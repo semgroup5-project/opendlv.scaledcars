@@ -112,8 +112,6 @@ namespace scaledcars {
 
         odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode SerialSendHandler::body() {
            while (getModuleStateAndWaitForRemainingTimeInTimeslice() == ModuleStateMessage::RUNNING) {
-                cout << "CYCLE " << cycle << endl;
-                cycle++;
 
                 protocol_data d_motor;
                 d_motor.id = ID_OUT_MOTOR;

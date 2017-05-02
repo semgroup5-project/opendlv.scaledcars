@@ -74,8 +74,8 @@ namespace scaledcars {
 
             // Get configuration data.
             KeyValueConfiguration kv = getKeyValueConfiguration();
-            m_debug = kv.getValue<int32_t>("lanefollower.debug") == 1;
-            Sim = kv.getValue<int32_t>("lanefollower.sim") == 1;
+            m_debug = kv.getValue<int32_t>("global.debug") == 1;
+            Sim = kv.getValue<int32_t>("global.sim") == 1;
             p_gain = kv.getValue<double>("lanefollower.p");
             d_gain = kv.getValue<double>("lanefollower.d");
             i_gain = kv.getValue<double>("lanefollower.i");

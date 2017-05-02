@@ -71,8 +71,8 @@ cat  << EOF
 #
 # GLOBAL CONFIGURATION
 #
-global.car = file:///opt/configuration/Car1.objx
-global.scenario = file:///opt/configuration/Parking-boxes-1.scnx
+global.car = file://Car1.objx
+global.scenario = file://Parking-boxes-1.scnx
 global.showGrid = 0
 
 # Location of the origin of the reference frame (example: 57.70485804 N, 11.93831921 E)
@@ -267,6 +267,7 @@ odsimvehicle.LinearBicycleModel.tauBrake=1.0
 odsimvehicle.LinearBicycleModel.KstaticBrake=100.0
 odsimvehicle.LinearBicycleModel.KdynamicBrake=60.0
 
+
 ###############################################################################
 ###############################################################################
 #
@@ -277,9 +278,6 @@ odsimvehicle.LinearBicycleModel.KdynamicBrake=60.0
 #
 # CONFIGURATION FOR LANEFOLLOWER
 #
-lanefollower.camera_id = $CAMID # select here the proper camera
-lanefollower.debug = $MDEBUG      # set to 0 to disable any windows and further output
-lanefollower.sim = $SIM    # Set simulation true or false
 lanefollower.p = $P     #OG val = 1.3
 lanefollower.d = $D    #OG val = 0.10
 lanefollower.i= $I     #OG val = 0.01
@@ -291,6 +289,7 @@ lanefollower.i= $I     #OG val = 0.01
 #
 VCR.camera_id = 2 # select here the proper camera
 VCR.debug = 1      # set to 0 to disable any windows and further output
+
 
 ###############################################################################
 ###############################################################################
@@ -423,5 +422,13 @@ lanedetector.threshBaseParameter=48
 # CONFIGURATION FOR DECISIONMAKER
 #
 decisionmaker.function = $FUNCTION
+
+###############################################################################
+###############################################################################
+#
+# GLOBAL CONFIGURATION
+#
+global.debug = $MDEBUG      # set to 0 to disable any windows and further output
+global.sim = $SIM    # Set simulation true or false
 EOF
 
