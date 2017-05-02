@@ -13,5 +13,5 @@ then
         cd $HOME/opendlv.scaledcars/usecases/armhf/DIT-168 && ./setupODVconfig.sh && cd $HOME/opendlv.scaledcars/usecases/armhf && xhost + && docker-compose down && docker-compose up
     fi
 else
-    echo "File /dev/video0 not found pleae plugg your webCam and try again..." >&2
+    echo "File /dev/video0 not found please plugg your webCam and try again..." >&2
 fi
