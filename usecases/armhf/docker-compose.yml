@@ -64,7 +64,7 @@ services:
         build: .
         network_mode: host
         group_add:
-        - dialout
+        - uucp
         depends_on:
             - odsupercomponent
         restart: on-failure
