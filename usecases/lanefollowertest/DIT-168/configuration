@@ -214,7 +214,6 @@ odsimvehicle.LinearBicycleModel.tauBrake=1.0
 odsimvehicle.LinearBicycleModel.KstaticBrake=100.0
 odsimvehicle.LinearBicycleModel.KdynamicBrake=60.0
 
-
 ###############################################################################
 ###############################################################################
 #
@@ -227,14 +226,10 @@ odsimvehicle.LinearBicycleModel.KdynamicBrake=60.0
 #
 lanefollower.camera_id = 0 # select here the proper camera
 lanefollower.debug = 1      # set to 0 to disable any windows and further output
-lanefollower.sim = 0   # Set simulation true or false
-lanefollower.p = 1.3     #OG val = 1.3
-lanefollower.d = 0.60    #OG val = 0.10
-lanefollower.i= 0.01     #OG val = 0.01
-
-
-
-
+lanefollower.sim = 0    # Set simulation true or false
+lanefollower.p = 1.4     #OG val = 1.3
+lanefollower.d = 0.50    #OG val = 0.10
+lanefollower.i= 0.1     #OG val = 0.01
 
 ###############################################################################
 ###############################################################################
@@ -243,7 +238,6 @@ lanefollower.i= 0.01     #OG val = 0.01
 #
 VCR.camera_id = 2 # select here the proper camera
 VCR.debug = 1      # set to 0 to disable any windows and further output
-
 
 ###############################################################################
 ###############################################################################
@@ -293,8 +287,6 @@ proxy.camera.bpp = 3 #3- openCV, 1-UEYE
 proxy.camera.flipped = 1 #1 = flipped image, 0 =notflipped image.
 #proxy.camera.dumpSharedData = 1
 
-
-
 Proxy.Actuator.UseRealSpeed=0
 proxy.Actuator.SerialPort=/dev/ttyACM0
 
@@ -343,7 +335,6 @@ driver.isSmallGapSize = 0
 driver.DesiredMoreStates = 5
 driver.MoreStates = 2
 
-
 ###############################################################################
 ###############################################################################
 #
@@ -371,3 +362,9 @@ lanedetector.showRes_finalResult = 1
 lanedetector.showRes_createTrajectory = 1
 lanedetector.threshBaseParameter=48
 
+###############################################################################
+###############################################################################
+#
+# CONFIGURATION FOR DECISIONMAKER
+#
+decisionmaker.function = 1

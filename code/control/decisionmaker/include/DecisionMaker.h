@@ -1,20 +1,40 @@
 #ifndef DECISIONMAKER_H_
 #define DECISIONMAKER_H_
 
-#include <automotivedata/GeneratedHeaders_AutomotiveData.h>
 
-#include <opendavinci/GeneratedHeaders_OpenDaVINCI.h>
 #include <opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h>
 #include <opendavinci/odcore/data/Container.h>
 #include <opendavinci/odcore/data/TimeStamp.h>
+
 #include <opendavinci/odcore/wrapper/SharedMemory.h>
 #include <opendavinci/odcore/wrapper/SharedMemoryFactory.h>
+
+#include <opendavinci/odcore/io/StringListener.h>
+#include <opendavinci/odcore/io/udp/UDPReceiver.h>
+#include <opendavinci/odcore/io/udp/UDPSender.h>
+#include <opendavinci/odcore/io/udp/UDPFactory.h>
+
+#include "automotivedata/generated/automotive/VehicleData.h"
+#include "automotivedata/generated/automotive/miniature/SensorBoardData.h"
+#include <automotivedata/GeneratedHeaders_AutomotiveData.h>
+#include <opendavinci/GeneratedHeaders_OpenDaVINCI.h>
+#include "odvdscaledcarsdatamodel/generated/group5/DecisionMakerMSG.h"
+
+#include <iostream>
+#include <memory>
+#include <stdint.h>
+#include <string>
+#include <opendavinci/odcore/base/Thread.h>
+
+#include <opendavinci/odcore/base/KeyValueConfiguration.h>
 
 #include "defines.h"
 
 using namespace std;
 
 using namespace odcore;
+using namespace odcore::io;
+using namespace odcore::io::udp;
 using namespace odcore::base::module;
 using namespace odcore::data;
 using namespace odcore::wrapper;
@@ -68,9 +88,16 @@ namespace scaledcars {
 
         private:
 
+            group5::DecisionMakerMSG decisionMakerMSG;
+
+            automotive::VehicleData vd;
+
+            automotive::miniature::SensorBoardData sbd;
+
             virtual void setUp();
 
             virtual void tearDown();
+
         };
     }//control
 }//scaledcars

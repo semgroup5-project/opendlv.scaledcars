@@ -35,11 +35,12 @@ namespace scaledcars {
         using namespace odcore::wrapper;
         using namespace odcore::data::dmcp;
         using namespace automotive::miniature;
+        using namespace group5;
 
         Mat m_image_mat, m_image_new;
         bool stop = false;
         double stopCounter = 0;
-        String state = "moving", oldState ="stop";
+        String state = "moving", oldState = "stop";
         bool inRightLane = true;   //the overtaker alters this value to signal a lane change
 
         LaneFollower::LaneFollower(const int32_t &argc, char **argv) :
@@ -62,7 +63,8 @@ namespace scaledcars {
                 m_distance(180),  //needs testing with real car as well
                 p_gain(0),       // the gain values can be adjusted here outside of simulation scenario (see @setUp() )
                 i_gain(0),
-                d_gain(0) {}
+                d_gain(0),
+                _state(0) {}
 
         LaneFollower::~LaneFollower() {}
 
@@ -84,6 +86,7 @@ namespace scaledcars {
             cerr << "p is " << p_gain << endl;
             cerr << "d is " << d_gain << endl;
             cerr << "i is " << i_gain << endl;
+            cerr << "m_debug is " << m_debug << endl;
             // setup window for debugging
             if (m_debug) {
                 cvNamedWindow("Debug Image", CV_WINDOW_AUTOSIZE);
@@ -107,7 +110,6 @@ namespace scaledcars {
 
         // This method returns a boolean true if it gets an image from the shared image memory
         bool LaneFollower::readSharedImage(Container &c) {
-
             bool retVal = false;
 
             if (c.getDataType() == SharedImage::ID()) {
@@ -157,23 +159,36 @@ namespace scaledcars {
 
 
             GaussianBlur(m_image_mat, m_image_new, Size(5, 5), 0, 0);
-            // Calculate the median value of pixel color
+            // calc median of pixel color
             double median;
             median = Median(m_image_new);
 
-            // Derive threshold used for canny algorithm using the median calculated above
             m_threshold1 = max(static_cast<double>(0), ((1.0 - 0.33) * median));
             m_threshold2 = min(static_cast<double>(255), (1.0 + 0.33) * median);
+
+            cerr << m_threshold1 << " m_threshold1" << endl;
+            cerr << m_threshold2 << " m_threshold2" << endl;
+//          uchar pixel;
+//          for (int x = m_image_new.cols; x < 0; x--) {
+
+//                pixel = m_image_new.at<uchar>(Point(x, m_control_scanline));
+//                if (pixel < 150) {   //tentative value, might need adjustment: lower it closer to 100
+//                    pixel = 1;
+//                    break;
+//
+//                }
+//            }
 
             Canny(m_image_new, m_image_new, m_threshold1, m_threshold2 , 3); // see header for algorithm and threshold explanation
 
         }
-        // Method responsible for calculating the median pixel value in a frame
+
         double LaneFollower::Median( Mat mat )
         {
             double m = (mat.rows*mat.cols) / 2;
             int bin = 0;
             double med = -1.0;
+
             int histSize = 256;
             float range[] = { 0, 256 };
             const float* histRange = { range };
@@ -217,7 +232,7 @@ namespace scaledcars {
             right.y = y;
             right.x = -1;
             // Search from middle to the right
-            for (int x = m_image_new.cols / 2; x < m_image_new.cols - 40; x++) {  //cols - 50 to stop it from finding the wall
+            for (int x = m_image_new.cols / 2; x < m_image_new.cols - 80; x++) {  //cols - 50 to stop it from finding the wall
                 pixelRight = m_image_new.at<uchar>(Point(x, y));
                 if (pixelRight >= 150) {   //tentative value, might need adjustment: lower it closer to 100
                     right.x = x;
@@ -227,14 +242,14 @@ namespace scaledcars {
 
             if ( right.x == -1 && left.x == -1 ){  //setting state if the car does not see any line
                 state = "danger";
-               // m_control_scanline = 200;
-          //      m_distance = 80;
+                m_control_scanline = 200;
+                m_distance = 80;
                 if (oldState == "moving"){
                     oldState = "danger";
                 }
             }else{
                 state = "moving";
-            //    m_control_scanline = 400;
+                m_control_scanline = 400;
             }
 
             if (y == m_control_scanline) {
@@ -259,6 +274,7 @@ namespace scaledcars {
             }
 
             // stopline logic
+
             uchar front_left, front_right;
             Point stop_left, stop_right;
 
@@ -305,7 +321,6 @@ namespace scaledcars {
 
             //prints the lines for debugging purposes if debug flag is set to true
             if (m_debug) {
-                // Various pieces of information being displayed on the debug image, helpful during tuning process
                 putText(m_image_new, state , Point(m_image_new.cols - 80, 20), FONT_HERSHEY_PLAIN, 1,
                         CV_RGB(255, 255, 255));
 
@@ -343,7 +358,8 @@ namespace scaledcars {
 
             static int counter = 0;
 
-            // Checls whether the detected stopline at a similar distance on both sides
+            // is the detected stopline at a similar distance on both sides
+
             if (counter < 5 && (left_dist - right_dist) > -10 && (left_dist - right_dist) < 10 && left_dist != 0 &&
                 right_dist != 0) {
                 counter++;
@@ -351,7 +367,7 @@ namespace scaledcars {
                 counter = 0;
             }
 
-            if (counter > 3) {
+            if (counter > 4) {
                 stop = true;
             } else {
                 stop = false;
@@ -366,7 +382,7 @@ namespace scaledcars {
             double timeStep = (currentTime.toMicroseconds() - m_previousTime.toMicroseconds()) / (1000.0 * 1000.0);
             m_previousTime = currentTime;
 
-            //a more soft way to handle instead of resetting to 0, a way to mittigate togling in corners
+            //a more soft way to handle instead of resetting to 0 a way to mittigate togling in corners
             if (fabs(e) < 1e-1) {
                 m_eSum = m_eSum * 0.01;
             }
@@ -378,7 +394,16 @@ namespace scaledcars {
             } else {
                 m_eSum += e;
             }
-            // PID control logic
+
+            // The following values have been determined by Twiddle algorithm.
+            //Kp = p_gain -> Proportional -> how big of a turn when the car try to "fix" the error
+            //const double Kp = 0.4482626884328734;
+            //Ki = i_gain-> Integral -> Current -> might be the middle position of the car
+            //const double Ki = 3.103197570937628;
+            //Kd = d_gain-> derivative -> how frequent the reaction the car will be -> the smaller the better.
+            //const double Kd = 0.030450210485408566;
+
+
             const double p = p_gain * e;
             const double i = i_gain * timeStep * m_eSum;
             const double d = d_gain * (e - m_eOld) / timeStep;
@@ -391,7 +416,7 @@ namespace scaledcars {
             if (fabs(e) > 1e-2) {
                 desiredSteering = y;
 
-                // Set an upper and lower limit for the desired steering
+                // set an upper and lower limit for the desired steering
                 if (desiredSteering > 1.5) {
                     desiredSteering = 1.5;
                 }
@@ -411,20 +436,18 @@ namespace scaledcars {
             }
             m_vehicleControl.setSteeringWheelAngle(desiredSteering);
 
-
-            // Adjust the position of the car in the lane according to the desired steering, meaning curves to either side
             int curveCheckerRight, curveCheckerLeft;
 
             if (desiredSteering < 0){
                 curveCheckerLeft++;
-            }if (desiredSteering < 0){
+            }if (desiredSteering > 0){
                 curveCheckerRight++;
             }
 
             if (curveCheckerLeft > 5){
-                m_distance = 175;
+                m_distance = 190;
             }else if (curveCheckerRight > 5){
-                m_distance = 160;
+                m_distance = 170;
             }
 
 
