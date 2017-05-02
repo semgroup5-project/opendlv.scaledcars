@@ -1,5 +1,5 @@
 /**
- * Parallelparker - Sample application for realizing a Parallel parking car.
+ * parallelparker - Sample application for realizing a Parallel parking car.
  * Copyright (C) 2012 - 2015 Christian Berger
  *
  * This program is free software; you can redistribute it and/or
@@ -28,7 +28,7 @@
 #include "opendavinci/GeneratedHeaders_OpenDaVINCI.h"
 #include "automotivedata/GeneratedHeaders_AutomotiveData.h"
 
-#include "ParallelParker.h"
+#include "parallelparker.h"
 
 #define PI 3.14159265359
 namespace scaledcars {
@@ -40,21 +40,25 @@ namespace scaledcars {
         using namespace automotive;
         using namespace automotive::miniature;
 
-        ParallelParker::ParallelParker(const int32_t &argc, char **argv) :
-                TimeTriggeredConferenceClientModule(argc, argv, "ParallelParker") {
-        }
+        parallelparker::parallelparker(const int32_t &argc, char **argv) :
+                TimeTriggeredConferenceClientModule(argc, argv, "parallelparker"),
+                sim(false) {}
 
-        ParallelParker::~ParallelParker() {}
+        parallelparker::~parallelparker() {}
 
-        void ParallelParker::setUp() {
+        void parallelparker::setUp() {
             // This method will be call automatically _before_ running body().
+           // sim = getKeyValueConfiguration().getValue<int32_t>("parallelparking.simu");
+            KeyValueConfiguration kv = getKeyValueConfiguration();
+            sim = (kv.getValue<int32_t>("parallelparker.sim") == 0);
+            cerr<< "the sim is :"<< sim << endl;
         }
 
-        void ParallelParker::tearDown() {
+        void parallelparker::tearDown() {
             // This method will be call automatically _after_ return from body().
         }
 
-        bool ParallelParker::obstacleDetect(int i) {
+        bool parallelparker::obstacleDetect(int i) {
             bool ifObstacle;
             if (i < 0) {
                 ifObstacle = false;
@@ -65,7 +69,7 @@ namespace scaledcars {
         }
 
         // This method will do the main data processing job.
-        odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode ParallelParker::body() {
+        odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode parallelparker::body() {
 
             bool IFFRObstacle;
             //bool IFRRObstacle;
@@ -106,94 +110,100 @@ namespace scaledcars {
                 // Create vehicle control data.
                 VehicleControl vc;
                 //irFrontRight = sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT);
-                irRear = sbd.getValueForKey_MapOfDistances(INFRARED_REAR);
-                irRearRight = sbd.getValueForKey_MapOfDistances(INFRARED_REAR_RIGHT);
-                usFront = sbd.getValueForKey_MapOfDistances(ULTRASONIC_FRONT);
-                IFFRObstacle = obstacleDetect(sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT));
-                if (stageMoving == 0) {
-                    // Go forward.
-                    vc.setSpeed(2);
-                    vc.setSteeringWheelAngle(0);
-                    parkStart = vd.getAbsTraveledPath();
-                }
-                if (stageMoving == 1) {
-                    vc.setSpeed(0);
-                    vc.setSteeringWheelAngle(0);
-                    if (irRearRight > 0) {
+
+                if (sim) {
+                    irRear = sbd.getValueForKey_MapOfDistances(INFRARED_REAR);
+                    irRearRight = sbd.getValueForKey_MapOfDistances(INFRARED_REAR_RIGHT);
+                    usFront = sbd.getValueForKey_MapOfDistances(ULTRASONIC_FRONT);
+                    IFFRObstacle = obstacleDetect(sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT));
+                    if (stageMoving == 0) {
+                        // Go forward.
+                        vc.setSpeed(2);
+                        vc.setSteeringWheelAngle(0);
+                        parkStart = vd.getAbsTraveledPath();
+                    }
+                    if (stageMoving == 1) {
+                        vc.setSpeed(0);
+                        vc.setSteeringWheelAngle(0);
+                        if (irRearRight > 0) {
+                            stageMoving = 2;
+                        }
+                    }
+                    if (stageMoving == 2) {
+                        cerr<< "stage Moving 3"<<endl;
+                        vc.setSpeed(0);
                         stageMoving = 2;
-                    }
-                }
-                if (stageMoving == 2) {
-                    vc.setSpeed(0);
-                    stageMoving = 2;
-                    if (irRear < 0) {
-                        stageMoving = 3;
-                    }
-                }
-
-                if (stageMoving == 3 && (irRear < 0)) {
-                    //Parking
-                    parkEnd = vd.getAbsTraveledPath();
-                    backDist = parkEnd - parkStart;
-
-                    double cosVal = cos(30 * PI / 180.0);
-                    double adjDist = cosVal * backDist;
-                    if (gap == 1) {
-                        if (irRear < 0 && adjDist < parkingGap / 2) {
-
-                            vc.setSpeed(-1);
-                            vc.setSteeringWheelAngle(2);
-
-                            counter++;
-                        }
-                        if (irRear < 0 && adjDist > parkingGap / 2 && counter > 1) {
-
-                            vc.setSpeed(-1);
-                            vc.setSteeringWheelAngle(-2);
-
-                            counter -= 1.5;
+                        if (irRear < 0) {
+                            stageMoving = 3;
                         }
                     }
-                    if (gap == 2) {
-                        if (irRear < 0 && adjDist < parkingGap / 3) {
 
-                            vc.setSpeed(-1);
-                            vc.setSteeringWheelAngle(.3);
+                    if (stageMoving == 3 && (irRear < 0)) {
+                        //Parking
+                        parkEnd = vd.getAbsTraveledPath();
+                        backDist = parkEnd - parkStart;
 
-                            counter++;
+                        double cosVal = cos(30 * PI / 180.0);
+                        double adjDist = cosVal * backDist;
+                        if (gap == 1) {
+                            if (irRear < 0 && adjDist < parkingGap / 2) {
+
+                                vc.setSpeed(-1);
+                                vc.setSteeringWheelAngle(2);
+
+                                counter++;
+                            }
+                            if (irRear < 0 && adjDist > parkingGap / 2 && counter > 1) {
+
+                                vc.setSpeed(-1);
+                                vc.setSteeringWheelAngle(-2);
+
+                                counter -= 1.5;
+                            }
                         }
-                        if (irRear < 0 && adjDist > parkingGap / 3 && counter > 1) {
+                        if (gap == 2) {
+                            if (irRear < 0 && adjDist < parkingGap / 3) {
 
-                            vc.setSpeed(-1);
+                                vc.setSpeed(-1);
+                                vc.setSteeringWheelAngle(.3);
 
-                            vc.setSteeringWheelAngle(-.3);
+                                counter++;
+                            }
+                            if (irRear < 0 && adjDist > parkingGap / 3 && counter > 1) {
 
-                            counter -= 1.5;
+                                vc.setSpeed(-1);
+
+                                vc.setSteeringWheelAngle(-.3);
+
+                                counter -= 1.5;
+                            }
                         }
                     }
-                }
-                if (counter < 1) {
-                    stageMoving = 4;
-                }
-
-                if (stageMoving == 4) {
-                    vc.setSpeed(1);
-                    vc.setSteeringWheelAngle(.2);
-                    cerr << "usFront :" << usFront << endl;
-                    if (usFront < 7 && usFront > 0) {
-                        stageMoving = 5;
+                    if (counter < 1) {
+                        stageMoving = 4;
                     }
-                }
-                if (stageMoving == 5) {
-                    vc.setSpeed(0);
-                    vc.setSteeringWheelAngle(0);
+                    if (stageMoving == 4) {
+                        cerr<< "Move one last bit"<<endl;
+                        vc.setSpeed(1);
+                        vc.setSteeringWheelAngle(.2);
+
+                        if (usFront < 7 && usFront > 0) {
+                            stageMoving = 5;
+                        }
+                    }
+                    if (stageMoving == 5) {
+                        vc.setSpeed(0);
+                        vc.setSteeringWheelAngle(0);
+                    }
+                    if (irRear > 0 && irRear < 4) {
+                        //Emergency stop
+                        vc.setSpeed(0);
+                    }
+                }else if(!sim){
+                    cerr<<"This is for the car!"<<endl;
                 }
 
-                if (irRear > 0 && irRear < 4) {
-                    //Emergency stop
-                    cerr << "stopping the car: " << endl;
-                    vc.setSpeed(0);
-                }
+
                 if (stageMoving == 0) {
 
                     switch (stageMeasuring) {
@@ -266,5 +276,6 @@ namespace scaledcars {
         }
     }
 } // automotive::miniature
+
 
 
