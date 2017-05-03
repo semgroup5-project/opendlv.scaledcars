@@ -1,6 +1,6 @@
 /**
- * DecisionMaker
- * Copyright (C) 2017 Raphael Puccinelli
+ * SerialSendHandler
+ * Copyright (C) 2017 Mattias Landkvist
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,9 +17,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#include "DecisionMaker.h"
+#include "UDPConnection.h"
 
 int32_t main(int32_t argc, char **argv) {
-    scaledcars::control::DecisionMaker decisionmaker(argc, argv);
-    return decisionmaker.runModule();
+    scaledcars::control::UDPConnection udpconnection(argc, argv);
+    return udpconnection.runModule();
 }

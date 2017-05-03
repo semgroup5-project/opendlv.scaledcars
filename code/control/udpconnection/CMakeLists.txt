@@ -17,7 +17,7 @@
 
 CMAKE_MINIMUM_REQUIRED (VERSION 2.8)
 
-PROJECT (scaledcars-control-decisionmaker)
+PROJECT (scaledcars-control-udpconnection)
 
 ###########################################################################
 # Set the search path for .cmake files.
@@ -59,8 +59,6 @@ find_package(ODVDScaledCarsDataModel REQUIRED)
 ###############################################################################
 # Set header files from OpenCV.
 INCLUDE_DIRECTORIES (SYSTEM ${OpenCV_INCLUDE_DIR})
-# Set header files from GLib.
-INCLUDE_DIRECTORIES (SYSTEM ${GLIB_INCLUDE_DIRS})
 # Set header files from ODVDScaledCarsDataModel.
 INCLUDE_DIRECTORIES (SYSTEM ${ODVDSCALEDCARSDATAMODEL_INCLUDE_DIRS})
 # Set header files from OpenDaVINCI.
@@ -74,8 +72,7 @@ INCLUDE_DIRECTORIES(include)
 set(LIBRARIES ${OPENDAVINCI_LIBRARIES}
               ${AUTOMOTIVEDATA_LIBRARIES}
               ${ODVDSCALEDCARSDATAMODEL_LIBRARIES}
-              ${OpenCV_LIBS}
-              ${GLIB_LIBRARIES})
+              ${OpenCV_LIBS})
 
 ###############################################################################
 # Build this project.
@@ -94,5 +91,5 @@ INSTALL(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin COMPONENT scaledcars-sof
 INSTALL(TARGETS ${PROJECT_NAME}-static DESTINATION lib COMPONENT scaledcars-software)
 
 # Install header files.
-INSTALL(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/" DESTINATION include/scaledcars-control-decisionmaker COMPONENT scaledcars-software)
+INSTALL(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/" DESTINATION include/scaledcars-control-udpconnection COMPONENT scaledcars-software)
 

@@ -48,12 +48,11 @@ namespace scaledcars {
         }
 
         SerialSendHandler::SerialSendHandler(const int32_t &argc, char **argv) :
-            TimeTriggeredConferenceClientModule(argc, argv, "SerialSendHandler")
-        {
-            this->motor = 90;
-            this->servo = 90;
-            this->cycle = 0;
-        }
+            TimeTriggeredConferenceClientModule(argc, argv, "SerialSendHandler"),
+            serial(),
+            motor(90),
+            servo(90)
+        {}
 
         SerialSendHandler::~SerialSendHandler() {}
 
@@ -113,6 +112,30 @@ namespace scaledcars {
         odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode SerialSendHandler::body() {
            while (getModuleStateAndWaitForRemainingTimeInTimeslice() == ModuleStateMessage::RUNNING) {
 
+               Container vehicleControlContainer = getKeyValueDataStore().get(automotive::VehicleControl::ID());
+               if (vehicleControlContainer.getDataType() == automotive::VehicleControl::ID()) {
+                   const automotive::VehicleControl vd =
+                           vehicleControlContainer.getData<automotive::VehicleControl>();
+
+                   int arduinoAngle = 0;
+                   double angle = vd.getSteeringWheelAngle();
+                   cerr << "angle radius : " << angle << endl;
+
+                   arduinoAngle = 90 + (angle * (180 / pi));
+                   if (arduinoAngle < 0) {
+                       arduinoAngle = 0;
+                   } else if(arduinoAngle > 180){
+                       arduinoAngle = 180;
+                   }
+                   cerr << "angle degree " << arduinoAngle << endl;
+
+                   int speed = vd.getSpeed();
+                   cerr << "speed to arduino : " << speed << endl;
+
+                   this->motor = speed;
+                   this->servo = arduinoAngle;
+               }
+
                 protocol_data d_motor;
                 d_motor.id = ID_OUT_MOTOR;
                 d_motor.value = this->motor / 3;
@@ -155,32 +178,6 @@ namespace scaledcars {
             }
 
             return ModuleExitCodeMessage::OKAY;
-        }
-
-        void SerialSendHandler::nextContainer(Container &c) {
-                cerr << "NEXT CONTAINER OF TYPE : " << c.getDataType() << endl;
-                if (c.getDataType() == automotive::VehicleControl::ID()) {
-                    const automotive::VehicleControl vd =
-                            c.getData<automotive::VehicleControl>();
-                    int arduinoAngle = 0;
-                    double angle = vd.getSteeringWheelAngle();
-                    cerr << "angle radius : " << angle << endl;
-
-                    arduinoAngle = 90 + (angle * (180 / pi));
-                    if (arduinoAngle < 0) {
-                        arduinoAngle = 0;
-                    } else if(arduinoAngle > 180){
-                        arduinoAngle = 180;
-                    }
-                    cerr << "angle degree " << arduinoAngle << endl;
-
-                    int speed = vd.getSpeed();
-                    cerr << "speed to arduino : " << speed << endl;
-
-                    this->motor = speed;
-                    this->servo = arduinoAngle;
-
-                }
         }
         
         /**

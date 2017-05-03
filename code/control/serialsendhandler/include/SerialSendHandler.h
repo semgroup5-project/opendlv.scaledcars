@@ -70,8 +70,6 @@ namespace scaledcars {
 
             odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
 
-            virtual void nextContainer(odcore::data::Container &c);
-
         private:
 
             virtual void setUp();

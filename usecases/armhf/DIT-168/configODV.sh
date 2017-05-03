@@ -16,8 +16,10 @@ echo "Please provide m_debug>" >&2
 read MDEBUG
 echo "Please provide SIM>" >&2
 read SIM
-echo "Please provide wich function will the decision maker run>" >&2
-read FUNCTION
+echo "Please provide if function lanefollower will be running [0 | 1]>" >&2
+read FUNCTION1
+echo "Please provide wich other function will the decision maker run [0 for overtaker | 1 for parker]>" >&2
+read FUNCTION2
 
 echo "Do you wish to modify the PID [y,n]?>" >&2
 read ANSWER
@@ -419,9 +421,10 @@ lanedetector.threshBaseParameter=48
 ###############################################################################
 ###############################################################################
 #
-# CONFIGURATION FOR DECISIONMAKER
+# CONFIGURATION FOR CommunicationLink
 #
-decisionmaker.function = $FUNCTION
+communicationlink.functionlane = $FUNCTION1
+communicationlink.function2 = $FUNCTION2
 
 ###############################################################################
 ###############################################################################
