@@ -16,8 +16,10 @@ echo "Please provide m_debug>" >&2
 read MDEBUG
 echo "Please provide SIM>" >&2
 read SIM
-echo "Please provide wich function will the decision maker run>" >&2
-read FUNCTION
+echo "Please provide if function lanefollower will be running [0 | 1]>" >&2
+read FUNCTION1
+echo "Please provide wich other function will the decision maker run [0 for overtaker | 1 for parker]>" >&2
+read FUNCTION2
 
 echo "Do you wish to modify the PID [y,n]?>" >&2
 read ANSWER
@@ -71,8 +73,8 @@ cat  << EOF
 #
 # GLOBAL CONFIGURATION
 #
-global.car = file:///opt/configuration/Car1.objx
-global.scenario = file:///opt/configuration/Parking-boxes-1.scnx
+global.car = file://Car1.objx
+global.scenario = file://Parking-boxes-1.scnx
 global.showGrid = 0
 
 # Location of the origin of the reference frame (example: 57.70485804 N, 11.93831921 E)
@@ -267,6 +269,7 @@ odsimvehicle.LinearBicycleModel.tauBrake=1.0
 odsimvehicle.LinearBicycleModel.KstaticBrake=100.0
 odsimvehicle.LinearBicycleModel.KdynamicBrake=60.0
 
+
 ###############################################################################
 ###############################################################################
 #
@@ -277,9 +280,6 @@ odsimvehicle.LinearBicycleModel.KdynamicBrake=60.0
 #
 # CONFIGURATION FOR LANEFOLLOWER
 #
-lanefollower.camera_id = $CAMID # select here the proper camera
-lanefollower.debug = $MDEBUG      # set to 0 to disable any windows and further output
-lanefollower.sim = $SIM    # Set simulation true or false
 lanefollower.p = $P     #OG val = 1.3
 lanefollower.d = $D    #OG val = 0.10
 lanefollower.i= $I     #OG val = 0.01
@@ -291,6 +291,7 @@ lanefollower.i= $I     #OG val = 0.01
 #
 VCR.camera_id = 2 # select here the proper camera
 VCR.debug = 1      # set to 0 to disable any windows and further output
+
 
 ###############################################################################
 ###############################################################################
@@ -420,8 +421,17 @@ lanedetector.threshBaseParameter=48
 ###############################################################################
 ###############################################################################
 #
-# CONFIGURATION FOR DECISIONMAKER
+# CONFIGURATION FOR CommunicationLink
 #
-decisionmaker.function = $FUNCTION
+communicationlink.functionlane = $FUNCTION1
+communicationlink.function2 = $FUNCTION2
+
+###############################################################################
+###############################################################################
+#
+# GLOBAL CONFIGURATION
+#
+global.debug = $MDEBUG      # set to 0 to disable any windows and further output
+global.sim = $SIM    # Set simulation true or false
 EOF
 
