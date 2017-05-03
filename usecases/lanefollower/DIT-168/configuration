@@ -194,7 +194,7 @@ odsimirus.sensor5.showFOV = 1                   # Show FOV in monitor.
 # CONFIGURATION FOR ODSIMVEHICLE
 #
 odsimvehicle.posX = 0                     # Initial position X in cartesian coordinates.
-odsimvehicle.posY = 0                     # Initial position Y in cartesian coordinates.
+odsimvehicle.posY = -20                     # Initial position Y in cartesian coordinates.
 odsimvehicle.headingDEG = 90
 odsimvehicle.model=LinearBicycleModelNew  # Which motion model to be used: LinearBicycleModelNew or LinearBicycleModel (for CaroloCup 2013!).
 odsimvehicle.LinearBicycleModelNew.withSpeedController=1          # iff 1: use the VehicleControl.m_speed field; otherwise, ignore m_speed and use VehicleControl.m_acceleration field
