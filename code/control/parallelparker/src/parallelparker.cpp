@@ -92,7 +92,7 @@ namespace scaledcars {
             double usFront = 0;
             double irRear = 0;
             double irRearRight = 0;
-            int parkingSit = 0; //0 -> Two boxes, 1 -> Enough space from beginning,
+            int parkingSit = 0; //1 -> Two boxes, 0 -> Enough space from beginning,
             int gap = 0;
             int stageMeasuring = 0;
             int stageMoving = 0;
