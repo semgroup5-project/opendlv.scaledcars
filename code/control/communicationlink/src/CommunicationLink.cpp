@@ -45,7 +45,7 @@ namespace scaledcars {
         }
 
         void CommunicationLink::tearDown() {
-            cout << "Shutting down CommunicationLink" << endl;
+            cout << "Shutting down CommunicationLink " << endl;
         }
 
         odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode CommunicationLink::body() {
