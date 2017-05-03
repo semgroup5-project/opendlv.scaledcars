@@ -70,8 +70,6 @@ namespace scaledcars {
 
             odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
 
-            virtual void nextContainer(odcore::data::Container &c);
-
         private:
 
             virtual void setUp();
@@ -86,8 +84,6 @@ namespace scaledcars {
 
             int motor;
             int servo;
-
-            int cycle = 0;
         };
     }
 }

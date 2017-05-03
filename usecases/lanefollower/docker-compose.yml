@@ -74,15 +74,15 @@ services:
         privileged: true
         command: bash -c "sleep 10; /opt/opendlv.scaledcars/bin/scaledcars-control-serialsendhandler --verbose=1 --cid=${CID} --rm=true --freq=1"
 
-    #decisionmaker
-    decisionmaker:
+    #communicationlink
+    communicationlink:
         build: .
         network_mode: host
         depends_on:
             - odsupercomponent
         restart: on-failure
         privileged: true
-        command: bash -c "sleep 5; /opt/opendlv.scaledcars/bin/scaledcars-control-decisionmaker --verbose=1 --cid=${CID} --rm=true --freq=20"
+        command: bash -c "sleep 5; /opt/opendlv.scaledcars/bin/scaledcars-control-communicationlink --verbose=1 --cid=${CID} --rm=true --freq=20"
 
     #odcockpit
     odcockpit:
@@ -114,7 +114,7 @@ services:
             - odsupercomponent
             - odsimvehicle
             - odsimcamera
-            - decisionmaker
+            - communicationlink
         restart: on-failure
         privileged: true
         command: bash -c "sleep 5; /opt/opendlv.scaledcars/bin/scaledcars-control-lanefollwer --verbose=1  --cid=${CID} --freq=20"
