@@ -39,8 +39,8 @@ namespace scaledcars {
 
         Mat m_image_mat, m_image_new;
         bool stop = false;
-        double stopCounter = 0;
-        String state = "moving", oldState = "stop";
+        double stopCounter = 0, counter = 0;
+        String state = "moving", oldState = "moving", state2 = "??";
         bool inRightLane = true;   //the overtaker alters this value to signal a lane change
 
         LaneFollower::LaneFollower(const int32_t &argc, char **argv) :
@@ -59,7 +59,7 @@ namespace scaledcars {
                 m_threshold1(50),  //50
                 m_threshold2(200),  // 150
                 m_control_scanline(400),//needs testing with real c
-                m_stop_scanline(200),//needs testing with real car
+                m_stop_scanline(300),//needs testing with real car
                 m_distance(180),  //needs testing with real car as well
                 p_gain(0),       // the gain values can be adjusted here outside of simulation scenario (see @setUp() )
                 i_gain(0),
@@ -166,19 +166,6 @@ namespace scaledcars {
             m_threshold1 = max(static_cast<double>(0), ((1.0 - 0.33) * median));
             m_threshold2 = min(static_cast<double>(255), (1.0 + 0.33) * median);
 
-            cerr << m_threshold1 << " m_threshold1" << endl;
-            cerr << m_threshold2 << " m_threshold2" << endl;
-//          uchar pixel;
-//          for (int x = m_image_new.cols; x < 0; x--) {
-
-//                pixel = m_image_new.at<uchar>(Point(x, m_control_scanline));
-//                if (pixel < 150) {   //tentative value, might need adjustment: lower it closer to 100
-//                    pixel = 1;
-//                    break;
-//
-//                }
-//            }
-
             Canny(m_image_new, m_image_new, m_threshold1, m_threshold2 , 3); // see header for algorithm and threshold explanation
 
         }
@@ -186,14 +173,11 @@ namespace scaledcars {
         double LaneFollower::Median( Mat mat )
         {
             double m = (mat.rows*mat.cols) / 2;
-            int bin = 0;
+            int bin = 0, histSize = 256;
             double med = -1.0;
-
-            int histSize = 256;
             float range[] = { 0, 256 };
             const float* histRange = { range };
-            bool uniform = true;
-            bool accumulate = false;
+            bool uniform = true, accumulate = false;
             Mat hist;
             calcHist( &mat, 1, 0, Mat(), hist, 1, &histSize, &histRange, uniform, accumulate );
 
@@ -242,14 +226,10 @@ namespace scaledcars {
 
             if ( right.x == -1 && left.x == -1 ){  //setting state if the car does not see any line
                 state = "danger";
-                m_control_scanline = 200;
-                m_distance = 80;
-                if (oldState == "moving"){
-                    oldState = "danger";
-                }
             }else{
-                state = "moving";
-                m_control_scanline = 400;
+                if(oldState == "moving" || oldState == "stopLine" ){
+                    state = "moving";
+                }
             }
 
             if (y == m_control_scanline) {
@@ -280,7 +260,7 @@ namespace scaledcars {
 
             int left_dist = 0;
 
-            stop_left.x = (m_image_new.cols / 2) + 20;
+            stop_left.x = (m_image_new.cols / 2) + 20;   // stop line checker needs to be moved more towards the left side
             stop_left.y = m_control_scanline;
 
             // Find first grey pixel in the front of the car left side
@@ -295,7 +275,7 @@ namespace scaledcars {
 
             int right_dist = 0;
 
-            stop_right.x = (m_image_new.cols / 2) + 100;
+            stop_right.x = (m_image_new.cols / 2) + 100;  // stop line checker needs to be moved more towards the left side
             stop_right.y = m_control_scanline;
 
             // Find first grey pixel in front of the car right side
@@ -321,19 +301,28 @@ namespace scaledcars {
 
             //prints the lines for debugging purposes if debug flag is set to true
             if (m_debug) {
-                putText(m_image_new, state , Point(m_image_new.cols - 80, 20), FONT_HERSHEY_PLAIN, 1,
+                putText(m_image_new, state2 , Point(m_image_new.cols - 120, 20), FONT_HERSHEY_PLAIN, 1,
                         CV_RGB(255, 255, 255));
 
-                std::string speed = std::to_string(m_vehicleControl.getSpeed());
-                putText(m_image_new, speed , Point(m_image_new.cols - 80, 40), FONT_HERSHEY_PLAIN, 1,
+                putText(m_image_new, state , Point(m_image_new.cols - 120, 40), FONT_HERSHEY_PLAIN, 1,
                         CV_RGB(255, 255, 255));
 
-                std::string steer = std::to_string(90+ (m_vehicleControl.getSteeringWheelAngle() * (180/3.14)));
-                putText(m_image_new, steer , Point(m_image_new.cols - 80, 60), FONT_HERSHEY_PLAIN, 1,
+                putText(m_image_new, std::to_string(stopCounter) , Point(m_image_new.cols - 120, 60), FONT_HERSHEY_PLAIN, 1,
                         CV_RGB(255, 255, 255));
-                std::string speed3 = std::to_string(m_distance);
-                putText(m_image_new, speed3 , Point(m_image_new.cols - 80, 80), FONT_HERSHEY_PLAIN, 1,
-                        CV_RGB(255, 255, 255));
+
+//                putText(m_image_new, state , Point(m_image_new.cols - 80, 20), FONT_HERSHEY_PLAIN, 1,
+//                        CV_RGB(255, 255, 255));
+//
+//                std::string speed = std::to_string(m_vehicleControl.getSpeed());
+//                putText(m_image_new, speed , Point(m_image_new.cols - 80, 40), FONT_HERSHEY_PLAIN, 1,
+//                        CV_RGB(255, 255, 255));
+//
+//                std::string steer = std::to_string(90+ (m_vehicleControl.getSteeringWheelAngle() * (180/3.14)));
+//                putText(m_image_new, steer , Point(m_image_new.cols - 80, 60), FONT_HERSHEY_PLAIN, 1,
+//                        CV_RGB(255, 255, 255));
+//                std::string speed3 = std::to_string(m_distance);
+//                putText(m_image_new, speed3 , Point(m_image_new.cols - 80, 80), FONT_HERSHEY_PLAIN, 1,
+//                        CV_RGB(255, 255, 255));
 
                 if (left.x > 0) {
                     line(m_image_new, Point(m_image.cols / 2, y), left, Scalar(255, 0, 0), 1, 8);
@@ -356,21 +345,22 @@ namespace scaledcars {
 
 
 
-            static int counter = 0;
 
-            // is the detected stopline at a similar distance on both sides
 
-            if (counter < 5 && (left_dist - right_dist) > -10 && (left_dist - right_dist) < 10 && left_dist != 0 &&
-                right_dist != 0) {
+            // is the detected stopline at a similar distance on both sides   && left_dist != 0 && right_dist != 0
+
+            if (counter < 5 && ((left_dist - right_dist) > -10) && ((left_dist - right_dist) < 10 ) && (left_dist != 0) && (right_dist != 0)) {
                 counter++;
-            } else {
+            }else{
                 counter = 0;
             }
 
             if (counter > 4) {
                 stop = true;
+                state2 = "Stopline";
             } else {
                 stop = false;
+                state2= " ";
             }
             return e;
         }
@@ -382,7 +372,7 @@ namespace scaledcars {
             double timeStep = (currentTime.toMicroseconds() - m_previousTime.toMicroseconds()) / (1000.0 * 1000.0);
             m_previousTime = currentTime;
 
-            //a more soft way to handle instead of resetting to 0 a way to mittigate togling in corners
+            //a more soft way to handle instead of resetting to 0 a way to mitigate toggling in corners
             if (fabs(e) < 1e-1) {
                 m_eSum = m_eSum * 0.01;
             }
@@ -460,74 +450,87 @@ namespace scaledcars {
         ModuleExitCodeMessage::ModuleExitCode LaneFollower::body() {    // this method still needs
             // Overall state machine handler.
             while (getModuleStateAndWaitForRemainingTimeInTimeslice() == ModuleStateMessage::RUNNING) {
-                bool has_next_frame = false;
 
-                // Get the most recent available container for a SharedImage.
-                Container image_container = getKeyValueDataStore().get(SharedImage::ID());
+                Container decisionMakerContainer = getKeyValueDataStore().get(DecisionMakerMSG::ID());
 
+                if (decisionMakerContainer.getDataType() == DecisionMakerMSG::ID()) {
+                    const DecisionMakerMSG decisionMakerMSG = decisionMakerContainer.getData<DecisionMakerMSG>();
 
-                if (image_container.getDataType() == SharedImage::ID()) {
-                    has_next_frame = readSharedImage(image_container);
+                    _state = decisionMakerMSG.getState();
                 }
 
-                // If we have an image from the previous call, it is then processed
-                if (has_next_frame) {
-                    processImage();
-                    double error = errorCalculation();
-                    laneFollower(error);
-                }
 
-                // State control for intersection stop
-                if (state == "moving") {
-                    if (Sim) {
-                        m_vehicleControl.setSpeed(1);
-                    } else {
-                        if (stop) {
-                            state = "stop";
-                        }
-                        else {
-                            m_vehicleControl.setSpeed(100);
-                            oldState = "moving";
-                        }
+                if (_state == 1) {
+                    bool has_next_frame = false;
+
+                    // Get the most recent available container for a SharedImage.
+                    Container image_container = getKeyValueDataStore().get(SharedImage::ID());
+
+
+                    if (image_container.getDataType() == SharedImage::ID()) {
+                        has_next_frame = readSharedImage(image_container);
                     }
 
-
-                }
-                if (state == "stop") {
-                    m_vehicleControl.setSteeringWheelAngle(0);
-                    if (Sim) {
-                        m_vehicleControl.setSpeed(0);
-                    } else {
-                        m_vehicleControl.setSpeed(190);
+                    // If we have an image from the previous call, it is then processed
+                    if (has_next_frame) {
+                        processImage();
+                        double error = errorCalculation();
+                        laneFollower(error);
                     }
 
-                    stopCounter += 0.5;
-
-                    if (stopCounter > 4.9999) {
-                        state = "moving";
-                        oldState = "stopLine";
+                    // State control for intersection stop
+                    if (state == "moving") {
                         if (Sim) {
                             m_vehicleControl.setSpeed(1);
                         } else {
-                            m_vehicleControl.setSpeed(100);
+                            if (stop) {
+                                state = "stop";
+                            } else {
+                                m_vehicleControl.setSpeed(100);
+                                oldState = "moving";
+                            }
                         }
-                        cerr << "Resuming!" << endl;
                     }
-                }
-                if (state == "danger") {
-                    if (oldState == "stopLine") {  // The idea here is, after a stop line, go forward and dont steer at all, it is exepcted to not find any reference line markings
-                        m_vehicleControl.setSpeed(100);
+                    if (state == "stop") {
                         m_vehicleControl.setSteeringWheelAngle(0);
-                    }else{
-                        m_vehicleControl.setSpeed(190);
-                        m_vehicleControl.setSteeringWheelAngle(0);
+                        if (Sim) {
+                            m_vehicleControl.setSpeed(0);
+                        } else {
+                            state = "stop";
+                            m_vehicleControl.setSpeed(190);
+                        }
+
+                        stopCounter += 0.5;
+
+                        if (stopCounter > 20.9999) {
+                            state = "moving";
+                            oldState = "stopLine";
+                            stopCounter = 0;
+                            if (Sim) {
+                                m_vehicleControl.setSpeed(1);
+                            } else {
+                                m_vehicleControl.setSpeed(100);
+                            }
+
+                        }
                     }
+                    if (state == "danger") {
+                        if (oldState ==
+                            "stopLine") {  // The idea here is, after a stop line, go forward and dont steer at all, it is expected to not find any reference line markings
+                            m_vehicleControl.setSpeed(100);
+                            m_vehicleControl.setSteeringWheelAngle(0);
+                        }
+                        if (oldState == "moving") {
+                            m_vehicleControl.setSpeed(190);
+                            m_vehicleControl.setSteeringWheelAngle(0);
+                        }
+                    }
+                    // Create container for finally sending the set values for the control algorithm.
+                    Container c2(m_vehicleControl);
+                    // Send container.
+                    getConference().send(c2);
 
                 }
-                // Create container for finally sending the set values for the control algorithm.
-                Container c2(m_vehicleControl);
-                // Send container.
-                getConference().send(c2);
             }
             return ModuleExitCodeMessage::OKAY;
         }
