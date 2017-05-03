@@ -128,7 +128,7 @@ namespace scaledcars {
                     if (serial_receive(this->serial, &incoming)) {
                         cerr << "RECEIVED : id=" << incoming.id << " value=" << incoming.value << endl;
                         filterData(incoming, valuesToNormalize, numbers);
-                        isSensorValues = true;
+                        isSensorValues = true;	
                     }
                 }
                 
@@ -136,8 +136,8 @@ namespace scaledcars {
                 	map<uint32_t, double> sensor;
                 	for(int i = 0; i < 5; i++){
                 		protocol_data d;
-                		d.id = i+1;
-                		if(numbers[i] != 0){
+                		d.id = i;
+                		if(numbers[i] > 0){
                 			d.value = valuesToNormalize[i] / numbers[i];
                 		} else {
                 			d.value = valuesToNormalize[i];
@@ -147,6 +147,7 @@ namespace scaledcars {
                 	}
                 	sendSensorBoardData(sensor);
                 }
+                isSensorValues = false;
                 
                 
             }
@@ -200,14 +201,14 @@ namespace scaledcars {
 				
 					//US-SENSOR [ID 1] [ID 2] with value between 1 - 70
         			if((data.id == 1 || data.id == 2) && data.value >= 1 && data.value <= 70){
-        				values[data.id - 1] += data.value;
-        				numbers[data.id - 1] += 1;
+        				values[data.id] += data.value;
+        				numbers[data.id]++ ;
         				cout << "filter " << data.id << "  " << data.value << endl;
         				
 					//IR-SENSOR [ID 3] [ID 4] with value between 3 - 40
 					} else if ((data.id == 3 || data.id == 4 || data.id == 5) && data.value >= 3 && data.value <= 40){
-						values[data.id - 1] += data.value;
-        				numbers[data.id - 1] += 1;
+						values[data.id] += data.value;
+        				numbers[data.id]++;
         				cout << "filter " << data.id << "  " << data.value << endl;
 							
 					//ODOMETER [ID 6] with value between 0 - 255
