@@ -25,6 +25,8 @@ void Car::setUp() {
     wheelEncoder.attach(ENCODER_PIN_A, ENCODER_PIN_B, true);
     wheelEncoder.begin();
 
+    encoderPos = wheelEncoder.getDistance();
+
     Serial.begin(BAUD); //start the serial
     waitConnection();
     while (Serial.available()) { //empty any rubbish value from the buffer
@@ -51,8 +53,6 @@ void Car::run() {
         rcControl();
     }
     provideSensorsData();
-
-
 }
 
 void Car::provideSensorsData() {
@@ -65,9 +65,8 @@ void Car::provideSensorsData() {
         encoderPos = wheelEncoder.getDistance();
         odometer -= 255;
     }
-    if (odometerStart) {
-        wheelEncoder.encodeAndWrite(ID_IN_ENCODER, odometer);
-    }
+
+    wheelEncoder.encodeAndWrite(ID_IN_ENCODER, odometer);
 
     ultrasonicFront.encodeAndWrite(ID_IN_ULTRASONIC_CENTER, ultrasonicFront.getDistance());
     ultrasonicRight.encodeAndWrite(ID_IN_ULTRASONIC_SIDE_FRONT, ultrasonicRight.getDistance());
@@ -106,7 +105,7 @@ void Car::automatedDrive() {
 
     int value = 90, serial_size = 0, count = 0;
     byte in;
-    while ((serial_size = Serial.available()) <= 0 && !isRCControllerOn()){
+    while ((serial_size = Serial.available()) <= 0 && !isRCControllerOn()) {
         red = 0;
         green = 0;
         blue = 255;
@@ -127,9 +126,6 @@ void Car::automatedDrive() {
     protocol_frame frame;
     frame.a = in;
     protocol_data data = protocol_decode_t1(frame);
-//    Serial.print(data.id);
-//    Serial.print(" ");
-//    Serial.println(data.value);
 
     if (data.id == ID_OUT_SERVO) {
         value = data.value * 3;
@@ -140,10 +136,9 @@ void Car::automatedDrive() {
 
     if (data.id == ID_OUT_MOTOR) {
         value = data.value * 3;
-        if (value > 180){
+        if (value > 189) {
             escMotor.brake();//applying values greater than 180 will be our indicative to brake
-        }
-        else {
+        } else {
             if (value >= 0 && value <= 180) {
                 escMotor.setSpeed(value);
             }

@@ -49,7 +49,11 @@ namespace scaledcars {
 
         SerialSendHandler::SerialSendHandler(const int32_t &argc, char **argv) :
             TimeTriggeredConferenceClientModule(argc, argv, "SerialSendHandler")
-        {}
+        {
+            this->motor = 90;
+            this->servo = 90;
+            this->cycle = 0;
+        }
 
         SerialSendHandler::~SerialSendHandler() {}
 
@@ -99,6 +103,9 @@ namespace scaledcars {
             serial_send(this->serial, d_motor);
             serial_send(this->serial, d_servo);
 
+            const uint32_t ONE_SECOND = 1000 * 1000;
+            odcore::base::Thread::usleepFor(5 * ONE_SECOND);
+
             serial_stop(this->serial);
             serial_free(this->serial);
         }
@@ -128,7 +135,7 @@ namespace scaledcars {
                     if (serial_receive(this->serial, &incoming)) {
                         cerr << "RECEIVED : id=" << incoming.id << " value=" << incoming.value << endl;
                         filterData(incoming, valuesToNormalize, numbers);
-                        isSensorValues = true;	
+                        isSensorValues = true;
                     }
                 }
                 
@@ -136,8 +143,8 @@ namespace scaledcars {
                 	map<uint32_t, double> sensor;
                 	for(int i = 0; i < 5; i++){
                 		protocol_data d;
-                		d.id = i;
-                		if(numbers[i] > 0){
+                		d.id = i+1;
+                		if(numbers[i] != 0){
                 			d.value = valuesToNormalize[i] / numbers[i];
                 		} else {
                 			d.value = valuesToNormalize[i];
@@ -147,16 +154,13 @@ namespace scaledcars {
                 	}
                 	sendSensorBoardData(sensor);
                 }
-                isSensorValues = false;
-                
-                
             }
 
             return ModuleExitCodeMessage::OKAY;
         }
 
         void SerialSendHandler::nextContainer(Container &c) {
-                cerr << "NEXT CONTAINER " << c.getDataType() << endl;
+                cerr << "NEXT CONTAINER OF TYPE : " << c.getDataType() << endl;
                 if (c.getDataType() == automotive::VehicleControl::ID()) {
                     const automotive::VehicleControl vd =
                             c.getData<automotive::VehicleControl>();
@@ -175,15 +179,6 @@ namespace scaledcars {
                     int speed = vd.getSpeed();
                     cerr << "speed to arduino : " << speed << endl;
 
-//                    // TODO: int odometer = vd.getOdometer();
-
-
-
-//  TODO SEND
-//                    string speedMessage = pack(ID_OUT_MOTOR, speed);
-//                    string angleMessage = pack(ID_OUT_SERVO, arduinoAngle);
-//                    TODO: string odometerMessage = pack(ID_OUT_ODOMETER, odometer);
-
                     this->motor = speed;
                     this->servo = arduinoAngle;
 
@@ -201,14 +196,14 @@ namespace scaledcars {
 				
 					//US-SENSOR [ID 1] [ID 2] with value between 1 - 70
         			if((data.id == 1 || data.id == 2) && data.value >= 1 && data.value <= 70){
-        				values[data.id] += data.value;
-        				numbers[data.id]++ ;
+        				values[data.id - 1] += data.value;
+        				numbers[data.id - 1] += 1;
         				cout << "filter " << data.id << "  " << data.value << endl;
         				
 					//IR-SENSOR [ID 3] [ID 4] with value between 3 - 40
 					} else if ((data.id == 3 || data.id == 4 || data.id == 5) && data.value >= 3 && data.value <= 40){
-						values[data.id] += data.value;
-        				numbers[data.id]++;
+						values[data.id - 1] += data.value;
+        				numbers[data.id - 1] += 1;
         				cout << "filter " << data.id << "  " << data.value << endl;
 							
 					//ODOMETER [ID 6] with value between 0 - 255

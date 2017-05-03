@@ -23,27 +23,23 @@
 #include "opencv2/imgproc/imgproc.hpp"
 
 #include "OpenCVCamera.h"
-#include "opencv2/opencv.hpp"
-
-using namespace cv;
 
 namespace scaledcars {
     namespace control {
 
-        OpenCVCamera::OpenCVCamera(const string &name, const uint32_t &id, const uint32_t &width,
-                                   const uint32_t &height, const uint32_t &bpp) :
-
+        OpenCVCamera::OpenCVCamera(const string &name, const uint32_t &id, const uint32_t &width, const uint32_t &height, const uint32_t &bpp) :
                 Camera(name, id, width, height, bpp),
                 m_capture(NULL),
                 m_image(NULL),
-                m_sharedImageMemory() {
+                m_sharedImageMemory(){
+
             m_capture = cvCaptureFromCAM(id);
             if (m_capture) {
                 cvSetCaptureProperty(m_capture, CV_CAP_PROP_FRAME_WIDTH, width);
                 cvSetCaptureProperty(m_capture, CV_CAP_PROP_FRAME_HEIGHT, height);
                 cvSetCaptureProperty(m_capture, CV_CAP_PROP_FPS, 30);
-                //          cvSetCaptureProperty(m_capture, CV_CAP_PROP_FOCUS_MOD, 0);
-            } else {
+            }
+            else {
                 cerr << "proxy: Could not open camera '" << name << "' with ID: " << id << endl;
             }
         }
@@ -71,7 +67,8 @@ namespace scaledcars {
                         }
 
                         cvCvtColor(tmpFrame, m_image, CV_BGR2GRAY);
-                    } else {
+                    }
+                    else {
                         m_image = cvRetrieveFrame(m_capture);
                     }
 
@@ -84,11 +81,11 @@ namespace scaledcars {
         bool OpenCVCamera::copyImageTo(char *dest, const uint32_t &size) {
             bool retVal = false;
 
-            if ((dest != NULL) && (size > 0) && (m_image != NULL)) {
+            if ( (dest != NULL) && (size > 0) && (m_image != NULL) ) {
                 memcpy(dest, m_image->imageData, size);
 
-                cvShowImage("WindowShowImage", m_image);
-                cvWaitKey(10);
+//                cvShowImage("WindowShowImage", m_image);
+//                cvWaitKey(10);
 
                 retVal = true;
             }
@@ -98,4 +95,3 @@ namespace scaledcars {
 
     }   // control
 } // scaledcars
-

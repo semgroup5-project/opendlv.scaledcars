@@ -1,2 +1,0 @@
-/usr/bin/ar qc libscaledcars-control-example-static.a  CMakeFiles/scaledcars-control-example-static.dir/src/Example.cpp.o
-/usr/bin/ranlib libscaledcars-control-example-static.a

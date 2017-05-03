@@ -1,5 +1,6 @@
-/*
- * Copyright (C) 2016 Chalmers
+/**
+ * Example - Example code.
+ * Copyright (C) 2016 Christian Berger
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -16,29 +17,26 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-message chalmersrevere.scaledcars.ExampleMessage [id = 801] {
-    uint32 field1   [id = 1];
-}
+#ifndef SCALEDCARS_CONTROL_DECISIONMAKER_TESTSUITE_H
+#define SCALEDCARS_CONTROL_DECISIONMAKER_TESTSUITE_H
 
-message group5.DecisionMakerMSG [id = 555 ] {
-    uint8 state [id = 1];
-    double ultraSonicFrontCenter [id = 2];
-    double ultrasonicFrontRight [id = 3];
-    double infraredSideFront [id = 4];
-    double infraredSideBack [id = 5];
-    double infraredBack [id = 6];
-    double wheelEncoder [id = 7];
-}
+#include "cxxtest/TestSuite.h"
 
-message group5.LaneFollowerMSG [id = 556 ] {
-    uint8 state [id = 1];
-}
+// Include local header files.
+#include "../include/DecisionMaker.h"
 
-message group5.OvertakerMSG [id = 557 ] {
-    uint8 state [id = 1];
-}
+using namespace std;
+using namespace scaledcars::control;
 
-message group5.ParkerMSG [id = 558 ] {
-    uint8 state [id = 1];
-}
+class SerialSendHandlerTest : public CxxTest::TestSuite {
+   public:
+    void setUp() {}
 
+    void tearDown() {}
+
+    void testApplication() {
+        TS_ASSERT(true);
+    }
+};
+
+#endif /*SCALEDCARS_CONTROL_DECISIONMAKER_TESTSUITE_H*/

@@ -1,6 +1,0 @@
-/opt/opendlv.scaledcars.build/CMakeFiles/test.dir
-/opt/opendlv.scaledcars.build/CMakeFiles/edit_cache.dir
-/opt/opendlv.scaledcars.build/CMakeFiles/libodvdscaledcarsdatamodel.dir
-/opt/opendlv.scaledcars.build/CMakeFiles/code.dir
-/opt/opendlv.scaledcars.build/CMakeFiles/libodvdscaledcarsdatamodel-cleanup.dir
-/opt/opendlv.scaledcars.build/CMakeFiles/rebuild_cache.dir

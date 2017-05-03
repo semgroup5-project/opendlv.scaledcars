@@ -42,103 +42,112 @@
 
 #include <opendavinci/GeneratedHeaders_OpenDaVINCI.h>
 #include <automotivedata/GeneratedHeaders_AutomotiveData.h>
+#include "automotivedata/generated/automotive/VehicleData.h"
+#include "automotivedata/generated/automotive/miniature/SensorBoardData.h"
+#include "odvdscaledcarsdatamodel/generated/group5/DecisionMakerMSG.h"
 
 
 namespace scaledcars {
-namespace control {
+    namespace control {
 
         using namespace std;
 
         /**
          * This class is an exemplary skeleton for processing video data.
          */
-        class LaneFollower: public odcore::base::module::TimeTriggeredConferenceClientModule {
-            private:
-	            /**
-	             * "Forbidden" copy constructor. Goal: The compiler should warn
-	             * already at compile time for unwanted bugs caused by any misuse
-	             * of the copy constructor.
-	             *
-	             * @param obj Reference to an object of this class.
-	             */
-	            LaneFollower(const LaneFollower &/*obj*/);
+        class LaneFollower : public odcore::base::module::TimeTriggeredConferenceClientModule {
+        private:
+            /**
+             * "Forbidden" copy constructor. Goal: The compiler should warn
+             * already at compile time for unwanted bugs caused by any misuse
+             * of the copy constructor.
+             *
+             * @param obj Reference to an object of this class.
+             */
+            LaneFollower(const LaneFollower &/*obj*/);
 
-	            /**
-	             * "Forbidden" assignment operator. Goal: The compiler should warn
-	             * already at compile time for unwanted bugs caused by any misuse
-	             * of the assignment operator.
-	             *
-	             * @param obj Reference to an object of this class.
-	             * @return Reference to this instance.
-	             */
-	            LaneFollower& operator=(const LaneFollower &/*obj*/);
+            /**
+             * "Forbidden" assignment operator. Goal: The compiler should warn
+             * already at compile time for unwanted bugs caused by any misuse
+             * of the assignment operator.
+             *
+             * @param obj Reference to an object of this class.
+             * @return Reference to this instance.
+             */
+            LaneFollower &operator=(const LaneFollower &/*obj*/);
 
-            public:
-	            /**
-	             * Constructor.
-	             *
-	             * @param argc Number of command line arguments.
-	             * @param argv Command line arguments.
-	             */
-	            LaneFollower(const int32_t &argc, char **argv);
+        public:
+            /**
+             * Constructor.
+             *
+             * @param argc Number of command line arguments.
+             * @param argv Command line arguments.
+             */
+            LaneFollower(const int32_t &argc, char **argv);
 
-	            virtual ~LaneFollower();
+            virtual ~LaneFollower();
 
-	            odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
+            odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
 
-            protected:
-	            /**
-	             * This method is called to process an incoming container.
-	             *
-	             * @param c Container to process.
-	             * @return true if c was successfully processed.
-	             */
-	            bool readSharedImage(odcore::data::Container &c);
+        protected:
+            /**
+             * This method is called to process an incoming container.
+             *
+             * @param c Container to process.
+             * @return true if c was successfully processed.
+             */
+            bool readSharedImage(odcore::data::Container &c);
 
-            private:
+        private:
 
-	            shared_ptr<odcore::wrapper::SharedMemory> m_sharedImageMemory;
-				shared_ptr<odcore::wrapper::SharedMemory> m_sharedProcessedImageMemory;
-			    odcore::data::image::SharedImage m_sharedProcessedImage;
+            shared_ptr <odcore::wrapper::SharedMemory> m_sharedImageMemory;
+            shared_ptr <odcore::wrapper::SharedMemory> m_sharedProcessedImageMemory;
+            odcore::data::image::SharedImage m_sharedProcessedImage;
 
-                bool m_hasAttachedToSharedImageMemory;
-                bool m_debug;
-                bool Sim;
+            bool m_hasAttachedToSharedImageMemory;
+            bool m_debug;
+            bool Sim;
 
-                cv::Mat m_image;
-                odcore::data::TimeStamp m_previousTime;
+            cv::Mat m_image;
+            odcore::data::TimeStamp m_previousTime;
 
-                double m_eSum;
-                double m_eOld;
+            double m_eSum;
+            double m_eOld;
 
-                automotive::VehicleControl m_vehicleControl;
-                /**
-                 *Canny algoithm
-                 * http://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/canny_detector/canny_detector.html
-                 *
-                 *If a pixel gradient is higher than the upper threshold, the pixel is accepted as an edge
-                 *If a pixel gradient value is below the lower threshold, then it is rejected.
-                 *If the pixel gradient is between the two thresholds, then it will be accepted only if it is connected to a pixel that is above the upper threshold.
-                 *
-                 **/
-                int32_t m_threshold1;
-                int32_t m_threshold2;
-                int32_t m_control_scanline;
-                int32_t m_stop_scanline;
-                int32_t m_distance;
+            automotive::VehicleControl m_vehicleControl;
+            /**
+             *Canny algoithm
+             * http://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/canny_detector/canny_detector.html
+             *
+             *If a pixel gradient is higher than the upper threshold, the pixel is accepted as an edge
+             *If a pixel gradient value is below the lower threshold, then it is rejected.
+             *If the pixel gradient is between the two thresholds, then it will be accepted only if it is connected to a pixel that is above the upper threshold.
+             *
+             **/
+            int32_t m_threshold1;
+            int32_t m_threshold2;
+            int32_t m_control_scanline;
+            int32_t m_stop_scanline;
+            int32_t m_distance;
 
 
-                double p_gain;
-                double i_gain;
-                double d_gain;
+            double p_gain;
+            double i_gain;
+            double d_gain;
 
-	            virtual void setUp();
+            int _state;
 
-	            virtual void tearDown();
+            virtual void setUp();
 
-                void processImage();
-                double errorCalculation();
-                void laneFollower(double e);
+            virtual void tearDown();
+
+            void processImage();
+
+            double Median(cv::Mat mat);
+
+            double errorCalculation();
+
+            void laneFollower(double e);
         };
 
     } //control

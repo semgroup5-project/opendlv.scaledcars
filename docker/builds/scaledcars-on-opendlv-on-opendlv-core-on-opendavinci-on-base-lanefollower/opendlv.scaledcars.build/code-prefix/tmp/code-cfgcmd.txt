@@ -1,1 +1,0 @@
-cmd='/usr/bin/cmake;-DCMAKE_INSTALL_PREFIX=/opt/opendlv.scaledcars;-DOPENDAVINCI_DIR=/opt/od4;-DAUTOMOTIVEDATA_DIR=/opt/od4;-DCXXTEST_INCLUDE_DIR=/opt/opendlv.scaledcars.sources/thirdparty/cxxtest;-GUnix Makefiles;/opt/opendlv.scaledcars.sources/code'
