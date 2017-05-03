@@ -148,8 +148,8 @@ namespace scaledcars {
                 serial_send(this->serial, d_servo);
 
                 int pending = g_async_queue_length(this->serial->incoming_queue);
-                double valuesToNormalize[5];
-                int numbers[5];
+                double valuesToNormalize[6];
+                int numbers[6];
                 bool isSensorValues = false;
                 protocol_data incoming;
                 for (int i = 0; i < pending; i++) {
@@ -162,11 +162,11 @@ namespace scaledcars {
                 
               	 if(isSensorValues){
                 	map<uint32_t, double> sensor;
-                	for(int i = 0; i < 5; i++){
+                	for(int i = 0; i < 6; i++){
                 		protocol_data d;
-                		d.id = i+1;
-                		if(numbers[i] != 0){
-                			d.value = valuesToNormalize[i] / numbers[i];
+                		d.id = i;
+                		if(numbers[i] > 1){
+                			d.value = (double)valuesToNormalize[i] / (double)numbers[i];
                 		} else {
                 			d.value = valuesToNormalize[i];
                 		}
@@ -191,14 +191,14 @@ namespace scaledcars {
 				
 					//US-SENSOR [ID 1] [ID 2] with value between 1 - 70
         			if((data.id == 1 || data.id == 2) && data.value >= 1 && data.value <= 70){
-        				values[data.id - 1] += data.value;
-        				numbers[data.id - 1] += 1;
+        				values[data.id] += data.value;
+        				numbers[data.id] += 1;
         				cout << "filter " << data.id << "  " << data.value << endl;
         				
 					//IR-SENSOR [ID 3] [ID 4] with value between 3 - 40
 					} else if ((data.id == 3 || data.id == 4 || data.id == 5) && data.value >= 3 && data.value <= 40){
-						values[data.id - 1] += data.value;
-        				numbers[data.id - 1] += 1;
+						values[data.id] += data.value;
+        				numbers[data.id] += 1;
         				cout << "filter " << data.id << "  " << data.value << endl;
 							
 					//ODOMETER [ID 6] with value between 0 - 255
@@ -228,6 +228,7 @@ namespace scaledcars {
         void SerialSendHandler::sendSensorBoardData(map<uint32_t, double> sensor){
         		SensorBoardData sbd;
         		
+        		sbd.setNumberOfSensors((uint32_t)sensor.size());
 				sbd.setMapOfDistances(sensor);
 				
 				Container c(sbd);

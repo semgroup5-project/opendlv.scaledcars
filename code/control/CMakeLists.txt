@@ -20,6 +20,11 @@ project(scaledcars-control)
 add_subdirectory(lanefollower)
 add_subdirectory(proxy)
 add_subdirectory(serialsendhandler)
+<<<<<<< HEAD
+add_subdirectory(decisionmaker)
+add_subdirectory(parallelparker)
+=======
 add_subdirectory(communicationlink)
 add_subdirectory(udpconnection)
 add_subdirectory(parallelparker)
+>>>>>>> 5e65e59c47a6c2000b5a04397f22a7d4c108327e
