@@ -108,6 +108,7 @@ namespace scaledcars {
                         automotive::miniature::SensorBoardData::ID());
                 SensorBoardData sbd = containerSensorBoardData.getData<SensorBoardData>();
 
+
                 // Create vehicle control data.
                 VehicleControl vc;
                 //irFrontRight = sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT);
