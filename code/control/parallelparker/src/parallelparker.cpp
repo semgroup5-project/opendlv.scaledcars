@@ -138,23 +138,19 @@ namespace scaledcars {
                         vc.setSpeed(1);
                         if (irRear < 0) {
                             stageMoving = 3;
-                            cerr<<"irRear smaller than 0 Stage Moving = 3"<<endl;
+                            cerr << "irRear smaller than 0 Stage Moving = 3" << endl;
                         }
                     }
-
                     if (stageMoving == 3 && (irRear < 0)) {
                         //Parking
                         parkEnd = vd.getAbsTraveledPath();
                         backDist = parkEnd - parkStart;
-
                         double cosVal = cos(30 * PI / 180.0);
                         double adjDist = cosVal * backDist;
                         if (gap == 1) {
                             if (irRear < 0 && adjDist < parkingGap / 2) {
-
                                 vc.setSpeed(-1);
                                 vc.setSteeringWheelAngle(2);
-
                                 counter++;
                             }
                             if (irRear < 0 && adjDist > parkingGap / 2 && counter > 1) {
@@ -165,24 +161,17 @@ namespace scaledcars {
                         }
                         if (gap == 2) {
                             if (irRear < 0 && adjDist < parkingGap / 3) {
-
                                 vc.setSpeed(-1);
                                 vc.setSteeringWheelAngle(.3);
-
                                 counter++;
                             }
                             if (irRear < 0 && adjDist > parkingGap / 3 && counter > 1) {
-
                                 vc.setSpeed(-1);
-
                                 vc.setSteeringWheelAngle(-.3);
-
                                 counter -= 1.6;
                             }
                         }
-                        cerr<< "counter "<< counter <<endl;
                     }
-
                     if (counter < 1) {
                         i = vd.getAbsTraveledPath();
                         stageMoving = 4;
@@ -192,33 +181,29 @@ namespace scaledcars {
                         double j = vd.getAbsTraveledPath();
                         vc.setSpeed(1);
                         vc.setSteeringWheelAngle(.2);
-                        if(parkingSit ==2 && j-i < 2){
-                            cerr<<"stage4 #1 if"<<endl;
+                        if (parkingSit == 2 && j - i < 2) {
+                            cerr << "stage4 #1 if" << endl;
                             stageMoving = 5;
                         }
                         if (usFront < 7 && usFront > 0) {
                             stageMoving = 5;
-                            cerr<<"stage4 #2 if"<<endl;
+                            cerr << "stage4 #2 if" << endl;
                         }
-                        
                     }
                     if (stageMoving == 5) {
-                        cerr<<"car stopped!!"<<endl;
+                        cerr << "car stopped!!" << endl;
                         vc.setSpeed(0);
                         vc.setSteeringWheelAngle(0);
                     }
                     if (irRear > 0 && irRear < 4) {
                         //Emergency stop
                         vc.setSpeed(0);
-                        cerr << "emergency stop!"<<endl;
+                        cerr << "emergency stop!" << endl;
                     }
                 } else if (!sim) {
                     cerr << "This is for the real car!" << endl;
                 }
-
-
                 if (stageMoving == 0) {
-
                     switch (stageMeasuring) {
                         case 0: {
                             distance = sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT);
@@ -231,7 +216,7 @@ namespace scaledcars {
                                 gap = 1;
                                 stageMoving = 1;
                                 parkingSit = 2;
-                                stageMeasuring ++;
+                                stageMeasuring++;
                             }
                             //when there is something detected within 7 units
                             if (parking < 7 && IFFRObstacle) {
@@ -288,8 +273,6 @@ namespace scaledcars {
                             break;
                     }
                 }
-
-
                 // Create container for finally sending the data.
                 Container c(vc);
                 // Send container.
