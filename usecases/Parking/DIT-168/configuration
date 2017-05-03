@@ -45,7 +45,6 @@ global.session.expectedModules = HelloWorldExample,HelloWorldExample:2
 #
 # CONFIGURATION FOR PARALLELPARKING
 #
-
 parallelparker.sim = 0   # Set simulation true or false
 
 ###############################################################################
