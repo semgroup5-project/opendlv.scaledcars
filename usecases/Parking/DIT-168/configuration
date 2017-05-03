@@ -18,10 +18,8 @@
 #
 # GLOBAL CONFIGURATION
 #
-global.car = file:///opt/configuration/Car1.objx
-global.scenario = file:///opt/configuration/Parking-boxes-1.scnx
-#global.scenario = file:///opt/configuration/SEM_Test_Track-overtaking.scnx
-#global.scenario = file:///opt/configuration/parking.scnx
+global.car = file://Car1.objx
+global.scenario = file://Parking-boxes-1.scnx
 global.showGrid = 0
 
 # Location of the origin of the reference frame (example: 57.70485804 N, 11.93831921 E)
@@ -33,20 +31,13 @@ global.reference.WGS84.longitude = -11.93831921
 # camera resolution for example (640x480x3 --> 1000000 for memorySegment,
 # 1280x720x3 --> 2800000).
 global.buffer.memorySegmentSize = 2800000 # Size of a memory segment in bytes.
-global.buffer.numberOfMemorySegments = 20 # Number of memory segments.
+global.buffer.numberOfMemorySegments = 40 # Number of memory segments.                        // tentantive value, original = 20 !!
 
 # The following key describes the list of modules expected to participate in this --cid session.
 global.session.expectedModules = HelloWorldExample,HelloWorldExample:2
 
 
 ###############################################################################
-
-###############################################################################
-#
-# CONFIGURATION FOR PARALLELPARKING
-#
-parallelparker.sim = 0   # Set simulation true or false
-
 ###############################################################################
 #
 # NEXT, THE CONFIGURATION FOR OpenDaVINCI TOOLS FOLLOWS. 
@@ -84,7 +75,7 @@ odsupercomponent.pulsetimeack.exclude = odcockpit
 #
 # CONFIGURATION FOR ODCOCKPIT
 #
-odcockpit.plugins = configurationviewer,livefeed,logmessage,player,sharedimageviewer,streetmapviewer,birdseyemap,iruscharts,irusmap # List of modules to show in odcockpit; leave blank to show all.
+odcockpit.plugins = #configurationviewer,livefeed,logmessage,player,sharedimageviewer,streetmapviewer,birdseyemap,iruscharts,irusmap # List of modules to show in odcockpit; leave blank to show all.
 odcockpit.directoriesForSharedLibaries = /opt,/lib # List of directories to search for libodvd*.so files.
 
 
@@ -148,7 +139,7 @@ odsimirus.sensor0.rotZ = -90                    # Rotation of the sensor around 
 odsimirus.sensor0.translation = (1.0;-1.0;0.0)  # Translation (X;Y;Z) w.r.t. vehicle's center
 odsimirus.sensor0.angleFOV = 5                  # In degrees.
 odsimirus.sensor0.distanceFOV = 3               # In meters.
-odsimirus.sensor0.clampDistance = 5             # Any distances greater than this distance will be ignored and -1 will be returned.
+odsimirus.sensor0.clampDistance = 2.9           # Any distances greater than this distance will be ignored and -1 will be returned.
 odsimirus.sensor0.showFOV = 1                   # Show FOV in monitor.
 
 odsimirus.sensor1.id = 1                        # This ID is used in SensorBoardData structure.
@@ -157,7 +148,7 @@ odsimirus.sensor1.rotZ = -180                   # Rotation of the sensor around 
 odsimirus.sensor1.translation = (-1.0;0.0;0.0)  # Translation (X;Y;Z) w.r.t. vehicle's center
 odsimirus.sensor1.angleFOV = 5                  # In degrees.
 odsimirus.sensor1.distanceFOV = 3               # In meters.
-odsimirus.sensor1.clampDistance = 5            # Any distances greater than this distance will be ignored and -1 will be returned.
+odsimirus.sensor1.clampDistance = 2.9           # Any distances greater than this distance will be ignored and -1 will be returned.
 odsimirus.sensor1.showFOV = 1                   # Show FOV in monitor.
 
 odsimirus.sensor2.id = 2                        # This ID is used in SensorBoardData structure.
@@ -223,18 +214,21 @@ odsimvehicle.LinearBicycleModel.tauBrake=1.0
 odsimvehicle.LinearBicycleModel.KstaticBrake=100.0
 odsimvehicle.LinearBicycleModel.KdynamicBrake=60.0
 
-###############################################################################
-#
-# CONFIGURATION FOR PARALLEL PARKING
-#
-parallelParking.debug = 1      # set to 0 to disable any windows and further output
-parallelParking.sim = 0   # Set simulation true(1) or false(0)
 
 ###############################################################################
 ###############################################################################
 #
 # NEXT, THE CONFIGURATION FOR USER APPLICATIONS FOLLOWS. 
 #
+###############################################################################
+###############################################################################
+#
+# CONFIGURATION FOR LANEFOLLOWER
+#
+lanefollower.p = 1.4     #OG val = 1.3
+lanefollower.d = 0.50    #OG val = 0.10
+lanefollower.i= 0.1     #OG val = 0.01
+
 ###############################################################################
 ###############################################################################
 #
@@ -289,15 +283,8 @@ proxy.camera.id = 0 # Select here the proper ID for OpenCV
 proxy.camera.width = 640 #752-UEYE, 640-OpenCV 
 proxy.camera.height = 480
 proxy.camera.bpp = 3 #3- openCV, 1-UEYE
-
-#NEW CAMERA SETTING
-#proxy.camera.debug = 0 #1 = show recording(requires X11), 0 = otherwise.
-#proxy.camera.name = DocumentationCamera0
-#proxy.camera.id = 0 #Select here the proper ID for OpenCV.
-#proxy.camera.width = 640
-#proxy.camera.height = 480
-#proxy.camera.bpp = 3
-#proxy.camera.flipped = 0 #1 = flipped image, 0 =notflipped image.
+proxy.camera.flipped = 1 #1 = flipped image, 0 =notflipped image.
+#proxy.camera.dumpSharedData = 1
 
 Proxy.Actuator.UseRealSpeed=0
 proxy.Actuator.SerialPort=/dev/ttyACM0
@@ -323,6 +310,8 @@ driver.realSpeed = 11
 driver.startInBox = 1 # 1 - true, 0 - false
 driver.startboxLength = 2200 # in mm
 
+###############################################################################
+###############################################################################
 #
 # CONFIGURATION FOR PARKING
 #
@@ -347,7 +336,6 @@ driver.isSmallGapSize = 0
 driver.DesiredMoreStates = 5
 driver.MoreStates = 2
 
-
 ###############################################################################
 ###############################################################################
 #
@@ -363,7 +351,7 @@ lanedetector.inspect_rec = file://recording.rec # Config for lanedetector-inspec
 # filterAndMerge = 4
 # finalFilter = 5
 # finalResult = 6
-# createTrajectory = 7
+# createTrajectory = 6
 lanedetector.what_to_inspect = 7
 # Choose which windows to display. 0: no, 1: yes
 lanedetector.showRes_getContours = 1
@@ -371,7 +359,22 @@ lanedetector.showRes_getRectangles = 1
 lanedetector.showRes_classification = 1
 lanedetector.showRes_filterAndMerge = 1
 lanedetector.showRes_finalFilter = 1
-lanedetector.showRes_finalResult = 0
+lanedetector.showRes_finalResult = 1
 lanedetector.showRes_createTrajectory = 1
 lanedetector.threshBaseParameter=48
 
+###############################################################################
+###############################################################################
+#
+# CONFIGURATION FOR CommunicationLink
+#
+communicationlink.functionlane = 0
+communicationlink.function2 = 1
+
+###############################################################################
+###############################################################################
+#
+# GLOBAL CONFIGURATION
+#
+global.debug = 0      # set to 0 to disable any windows and further output
+global.sim = 0    # Set simulation true or false

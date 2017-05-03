@@ -127,7 +127,7 @@ namespace scaledcars {
                         vc.setSpeed(0);
                         vc.setSteeringWheelAngle(0);
                         if (irRearRight > 0 && parkingSit == 1) {
-                            stageMoving = 2;
+                            stageMoving = 3;
                         }
                         if (irRearRight < 0 && parkingSit == 2) {
                             stageMoving = 3;
@@ -143,6 +143,7 @@ namespace scaledcars {
                     }
                     if (stageMoving == 3 && (irRear < 0)) {
                         //Parking
+                        cerr<<"parking gap "<< parkingGap<<endl;
                         parkEnd = vd.getAbsTraveledPath();
                         backDist = parkEnd - parkStart;
                         double cosVal = cos(30 * PI / 180.0);
@@ -202,6 +203,94 @@ namespace scaledcars {
                     }
                 } else if (!sim) {
                     cerr << "This is for the real car!" << endl;
+                    irRear = sbd.getValueForKey_MapOfDistances(INFRARED_REAR);
+                    irRearRight = sbd.getValueForKey_MapOfDistances(INFRARED_REAR_RIGHT);
+                    usFront = sbd.getValueForKey_MapOfDistances(ULTRASONIC_FRONT);
+                    IFFRObstacle = obstacleDetect(sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT));
+                    if (stageMoving == 0) {
+                        // Go forward.
+                        vc.setSpeed(100);
+                        vc.setSteeringWheelAngle(0);
+                        parkStart = vd.getAbsTraveledPath();
+                    }
+                    if (stageMoving == 1) {
+                        vc.setSpeed(0);
+                        vc.setSteeringWheelAngle(0);
+                        if (irRearRight > 0 && parkingSit == 1) {
+                            stageMoving = 2;
+                        }
+                        if (irRearRight < 0 && parkingSit == 2) {
+                            stageMoving = 3;
+                            cerr << "parkingSit ==" << parkingSit << " moving to next stage" << endl;
+                        }
+                    }
+                    if (stageMoving == 2) {
+                        vc.setSpeed(1);
+                        if (irRear < 0) {
+                            stageMoving = 3;
+                            cerr<<"irRear smaller than 0 Stage Moving = 3"<<endl;
+                        }
+                    }
+                    if (stageMoving == 3 && (irRear < 0)) {
+                        //Parking
+                        parkEnd = vd.getAbsTraveledPath();
+                        backDist = parkEnd - parkStart;
+                        double cosVal = cos(30 * PI / 180.0);
+                        double adjDist = cosVal * backDist;
+                        cerr << "GAP: "<<gap<<endl;
+                        if (gap == 1) {
+                            if (irRear < 0 && adjDist < parkingGap / 2) {
+                                vc.setSpeed(-1);
+                                vc.setSteeringWheelAngle(2);
+                                counter++;
+                            }
+                            if (irRear < 0 && adjDist > parkingGap / 2 && counter > 1) {
+                                vc.setSpeed(-1);
+                                vc.setSteeringWheelAngle(-2);
+                                counter -= 1.6;
+                            }
+                        }
+                        if (gap == 2) {
+                            if (irRear < 0 && adjDist < parkingGap / 3) {
+                                vc.setSpeed(-1);
+                                vc.setSteeringWheelAngle(.3);
+                                counter++;
+                            }
+                            if (irRear < 0 && adjDist > parkingGap / 3 && counter > 1) {
+                                vc.setSpeed(-1);
+                                vc.setSteeringWheelAngle(-.3);
+                                counter -= 1.6;
+                            }
+                        }
+                    }
+                    if (counter < 1) {
+                        i = vd.getAbsTraveledPath();
+                        stageMoving = 4;
+                    }
+                    if (stageMoving == 4) {
+                        cerr << "Move one last bit" << endl;
+                        double j = vd.getAbsTraveledPath();
+                        vc.setSpeed(1);
+                        vc.setSteeringWheelAngle(.2);
+                        if(parkingSit ==2 && j-i < 2){
+                            cerr<<"stage4 #1 if"<<endl;
+                            stageMoving = 5;
+                        }
+                        if (usFront < 7 && usFront > 0) {
+                            stageMoving = 5;
+                            cerr<<"stage4 #2 if"<<endl;
+                        }
+                    }
+                    if (stageMoving == 5) {
+                        cerr<<"car stopped!!"<<endl;
+                        vc.setSpeed(0);
+                        vc.setSteeringWheelAngle(0);
+                    }
+                    if (irRear > 0 && irRear < 4) {
+                        //Emergency stop
+                        vc.setSpeed(0);
+                        cerr << "emergency stop!"<<endl;
+                    }
                 }
                 if (stageMoving == 0) {
                     switch (stageMeasuring) {
@@ -209,27 +298,32 @@ namespace scaledcars {
                             distance = sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT);
                             double parking = vd.getAbsTraveledPath();
                             absPathStart = vd.getAbsTraveledPath();
-                            //when there is no car parked for 7 units
-                            if (!IFFRObstacle && parking > 15) {
+                            cerr<<"parkingSit detection"<<endl;
+                            //when there is no car parked for 15 units
+                            if (!IFFRObstacle && parking >= 15) {
                                 GAP_SIZE = parking;
                                 parkingGap = parking;
                                 gap = 1;
                                 stageMoving = 1;
                                 parkingSit = 2;
                                 stageMeasuring ++;
+                                cerr<<"parkingSit 15 units"<<endl;
                             }
-                            //when there is something detected within 7 units
-                            if (parking < 7 && IFFRObstacle) {
-                                stageMeasuring++;
+                            //when there is something detected within 15 units
+                            if (IFFRObstacle && parking < 15) {
                                 parkingSit = 1;
+                                stageMeasuring++;
+                                cerr<<"parkingSit 2 < 15 units"<<endl;
                             }
                         }
                             break;
                         case 1: {
                             // Checking for sequence +, -.
                             if (parkingSit == 1) {
+                                cerr<<"in case 1 parkingSit==1"<<endl;
                                 if ((distance > 0) && (sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT) < 0)) {
                                     // Found sequence +, -.
+                                    cerr<<"Setting stageMeasuring to 2 "<<endl;
                                     stageMeasuring = 2;
                                     absPathStart = vd.getAbsTraveledPath();
                                 }
@@ -242,11 +336,14 @@ namespace scaledcars {
                             if (sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT) > 0) {
                                 absPathEnd = vd.getAbsTraveledPath();
                                 GAP_SIZE = (absPathEnd - absPathStart);
-                                cerr << "Size = " << GAP_SIZE << endl;
-                                if (GAP_SIZE <= 10) {
+                                cerr << "Sizeeee = " << GAP_SIZE << endl;
+                                if (GAP_SIZE <= 15) {
                                     gap = 1;
-                                } else if (GAP_SIZE > 10) {
+                                    cerr <<"set GAP = 1 from case 2"<<endl;
+                                } else if (GAP_SIZE > 15) {
                                     gap = 2;
+                                    cerr<< "set GAP = 2 from case 2"<<endl;
+
                                 }
                                 stageMeasuring = 1;
                                 if ((stageMoving < 1) &&
@@ -255,7 +352,7 @@ namespace scaledcars {
                                     parkingGap = GAP_SIZE;
                                     parkingSit = 1;
                                     stageMoving = 1;
-                                    cerr << "Size = " << GAP_SIZE << endl;
+                                    cerr << "Sizeeee = " << GAP_SIZE << endl;
                                 }
                                 //Extra, when there is only one box on the track
 //                                if ((stageMoving < 1) &&
