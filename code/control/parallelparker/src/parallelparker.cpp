@@ -100,19 +100,19 @@ namespace scaledcars {
             while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
                    odcore::data::dmcp::ModuleStateMessage::RUNNING) {
                 // 1. Get most recent vehicle data:
-                Container containerVehicleData = getKeyValueDataStore().get(automotive::VehicleData::ID());
+                Container containerVehicleData = getKeyValueDataStore().get(VehicleData::ID());
                 VehicleData vd = containerVehicleData.getData<VehicleData>();
 
                 // 2. Get most recent sensor board data:
                 Container containerSensorBoardData = getKeyValueDataStore().get(
-                        automotive::miniature::SensorBoardData::ID());
+                        SensorBoardData::ID());
                 SensorBoardData sbd = containerSensorBoardData.getData<SensorBoardData>();
 
                 // Create vehicle control data.
                 VehicleControl vc;
                 //irFrontRight = sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT);
 
-                if (sim) {
+                if (!sim) {
                     irRear = sbd.getValueForKey_MapOfDistances(INFRARED_REAR);
                     irRearRight = sbd.getValueForKey_MapOfDistances(INFRARED_REAR_RIGHT);
                     usFront = sbd.getValueForKey_MapOfDistances(ULTRASONIC_FRONT);
@@ -200,8 +200,10 @@ namespace scaledcars {
                         vc.setSpeed(0);
                         cerr << "emergency stop!"<<endl;
                     }
-                } else if (!sim) {
-                    cerr << "This is for the real car!" << endl;
+                } else if (sim) {
+                    cout << "This is for the real car!" << endl;
+                    
+                    cout << "Whatever " << sbd.getValueForKey_MapOfDistances(1) << endl;
                 }
                 if (stageMoving == 0) {
                     switch (stageMeasuring) {

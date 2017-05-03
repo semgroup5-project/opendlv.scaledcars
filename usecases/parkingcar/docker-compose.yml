@@ -31,19 +31,6 @@ services:
         restart: on-failure
         command: "/opt/od4/bin/odsupercomponent --cid=${CID} --configuration=/opt/configuration/configuration --freq=20"
 
-    # Micro-service for odsimvehicle.
-    odsimvehicle:
-        build: .
-        network_mode: host
-        ipc : host
-        depends_on:
-            - odsupercomponent
-        logging:
-            driver: "none"
-        privileged: true
-        restart: on-failure
-        command: "/opt/od4/bin/odsimvehicle --cid=${CID} --freq=20"
-
     #Micro-service for camera
     odsimcamera:
         build: .
@@ -66,6 +53,7 @@ services:
     serialhandler:
         build: .
         network_mode: host
+        ipc : host
         #group_add:
         #- dialout
         depends_on:
@@ -88,6 +76,7 @@ services:
     odcockpit:
         build: .
         network_mode: host
+        ipc : host
         environment:
         - DISPLAY=$DISPLAY
         volumes:
@@ -105,15 +94,13 @@ services:
     parallelparker:
         build: .
         network_mode: host
-        ipc: host
-        environment:
-        - DISPLAY=$DISPLAY
+        ipc : host
         volumes:
         - ./DIT-168:/opt/configuration
         depends_on:
             - odsupercomponent
-            - serialhandler
-            - odsimcamera
+        #    - serialhandler
+        #    - odsimcamera
         #    - decisionmaker
         restart: on-failure
         privileged: true

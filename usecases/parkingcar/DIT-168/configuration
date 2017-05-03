@@ -225,7 +225,7 @@ odsimvehicle.LinearBicycleModel.KdynamicBrake=60.0
 # CONFIGURATION FOR PARALLEL PARKING
 #
 parallelparking.debug = 1      # set to 0 to disable any windows and further output
-parallelparker.sim = 0   # Set simulation true(1) or false(0)
+parallelparker.sim = 1   # Set simulation true(1) or false(0)
 
 
 #
