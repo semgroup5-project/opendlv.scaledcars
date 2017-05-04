@@ -230,6 +230,13 @@ lanefollower.d = 0.50    #OG val = 0.10
 lanefollower.i= 0.1     #OG val = 0.01
 
 ###############################################################################
+
+###############################################################################
+#
+# CONFIGURATION FOR PARALLELPARKING
+#
+
+parallelparker.sim = 0   # Set simulation true or false
 ###############################################################################
 #
 # CONFIGURATION FOR VCR
