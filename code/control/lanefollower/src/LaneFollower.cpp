@@ -68,25 +68,17 @@ namespace scaledcars {
 
         LaneFollower::~LaneFollower() {}
 
-
         // This method will be call automatically _before_ running body().
         void LaneFollower::setUp() {
 
             // Get configuration data.
             KeyValueConfiguration kv = getKeyValueConfiguration();
-            m_debug = kv.getValue<int32_t>("lanefollower.debug") == 1;
-            Sim = kv.getValue<int32_t>("lanefollower.sim") == 1;
+            m_debug = kv.getValue<int32_t>("global.debug") == 1;
+            Sim = kv.getValue<int32_t>("global.sim") == 1;
             p_gain = kv.getValue<double>("lanefollower.p");
             d_gain = kv.getValue<double>("lanefollower.d");
             i_gain = kv.getValue<double>("lanefollower.i");
 
-
-            // debug, make sure we get the correct values
-            cerr << "Sim is" << Sim << endl;
-            cerr << "p is " << p_gain << endl;
-            cerr << "d is " << d_gain << endl;
-            cerr << "i is " << i_gain << endl;
-            cerr << "m_debug is " << m_debug << endl;
             // setup window for debugging
             if (m_debug) {
                 cvNamedWindow("Debug Image", CV_WINDOW_AUTOSIZE);
@@ -118,9 +110,7 @@ namespace scaledcars {
                 // Check if we have already attached to the shared memory.
                 if (!m_hasAttachedToSharedImageMemory) {
                     m_sharedImageMemory = odcore::wrapper::SharedMemoryFactory::attachToSharedMemory(si.getName());
-
                     m_hasAttachedToSharedImageMemory = true;
-
                 }
 
                 // Check if we could successfully attach to the shared memory.
@@ -142,12 +132,9 @@ namespace scaledcars {
                     }
                     retVal = true;
                 }
-
             }
-
             return retVal;
         }
-
 
         // Process Image
         void LaneFollower::processImage() {
@@ -157,7 +144,6 @@ namespace scaledcars {
 
             cvtColor(m_image, m_image_mat, COLOR_BGR2GRAY);
 
-
             GaussianBlur(m_image_mat, m_image_new, Size(5, 5), 0, 0);
             // calc median of pixel color
             double median;
@@ -166,25 +152,26 @@ namespace scaledcars {
             m_threshold1 = max(static_cast<double>(0), ((1.0 - 0.33) * median));
             m_threshold2 = min(static_cast<double>(255), (1.0 + 0.33) * median);
 
-            Canny(m_image_new, m_image_new, m_threshold1, m_threshold2 , 3); // see header for algorithm and threshold explanation
-
+            Canny(m_image_new, m_image_new, m_threshold1, m_threshold2,
+                  3); // see header for algorithm and threshold explanation
         }
 
-        double LaneFollower::Median( Mat mat )
-        {
-            double m = (mat.rows*mat.cols) / 2;
-            int bin = 0, histSize = 256;
+        double LaneFollower::Median(Mat mat) {
+            double m = (mat.rows * mat.cols) / 2;
+            int bin = 0;
             double med = -1.0;
-            float range[] = { 0, 256 };
-            const float* histRange = { range };
-            bool uniform = true, accumulate = false;
-            Mat hist;
-            calcHist( &mat, 1, 0, Mat(), hist, 1, &histSize, &histRange, uniform, accumulate );
 
-            for ( int i = 0; i < histSize && med < 0.0; ++i )
-            {
-                bin += cvRound( hist.at< float >( i ) );
-                if ( bin > m && med < 0.0 )
+            int histSize = 256;
+            float range[] = {0, 256};
+            const float *histRange = {range};
+            bool uniform = true;
+            bool accumulate = false;
+            Mat hist;
+            calcHist(&mat, 1, 0, Mat(), hist, 1, &histSize, &histRange, uniform, accumulate);
+
+            for (int i = 0; i < histSize && med < 0.0; ++i) {
+                bin += cvRound(hist.at<float>(i));
+                if (bin > m && med < 0.0)
                     med = i;
             }
 
@@ -212,11 +199,11 @@ namespace scaledcars {
                 }
             }
 
-
             right.y = y;
             right.x = -1;
             // Search from middle to the right
-            for (int x = m_image_new.cols / 2; x < m_image_new.cols - 80; x++) {  //cols - 50 to stop it from finding the wall
+            for (int x = m_image_new.cols / 2;
+                 x < m_image_new.cols - 80; x++) {  //cols - 50 to stop it from finding the wall
                 pixelRight = m_image_new.at<uchar>(Point(x, y));
                 if (pixelRight >= 150) {   //tentative value, might need adjustment: lower it closer to 100
                     right.x = x;
@@ -224,7 +211,7 @@ namespace scaledcars {
                 }
             }
 
-            if ( right.x == -1 && left.x == -1 ){  //setting state if the car does not see any line
+            if (right.x == -1 && left.x == -1) {  //setting state if the car does not see any line
                 state = "danger";
             }else{
                 if(oldState == "moving" || oldState == "stopLine" ){
@@ -336,7 +323,7 @@ namespace scaledcars {
                     line(m_image_new, cvPoint(m_image.cols / 2, y), right, Scalar(255, 0, 0), 1, 8);
                     std::string right_reading = std::to_string((right.x - m_image_new.cols / 2));
 
-                    putText(m_image_new, right_reading,Point(m_image_new.cols / 2 + 100, y - 2), FONT_HERSHEY_PLAIN, 1,
+                    putText(m_image_new, right_reading, Point(m_image_new.cols / 2 + 100, y - 2), FONT_HERSHEY_PLAIN, 1,
                             CV_RGB(255, 255, 255));
                 }
             }
@@ -345,16 +332,15 @@ namespace scaledcars {
 
 
 
+            static int counter = 0;
 
-
-            // is the detected stopline at a similar distance on both sides   && left_dist != 0 && right_dist != 0
-
-            if (counter < 5 && ((left_dist - right_dist) > -10) && ((left_dist - right_dist) < 10 ) && (left_dist != 0) && (right_dist != 0)) {
+            // is the detected stopline at a similar distance on both sides
+            if (counter < 5 && (left_dist - right_dist) > -10 && (left_dist - right_dist) < 10 && left_dist != 0 &&
+                right_dist != 0) {
                 counter++;
             }else{
                 counter = 0;
             }
-
             if (counter > 4) {
                 stop = true;
                 state2 = "Stopline";
@@ -365,9 +351,7 @@ namespace scaledcars {
             return e;
         }
 
-
         void LaneFollower::laneFollower(double e) {
-
             TimeStamp currentTime;
             double timeStep = (currentTime.toMicroseconds() - m_previousTime.toMicroseconds()) / (1000.0 * 1000.0);
             m_previousTime = currentTime;
@@ -393,7 +377,6 @@ namespace scaledcars {
             //Kd = d_gain-> derivative -> how frequent the reaction the car will be -> the smaller the better.
             //const double Kd = 0.030450210485408566;
 
-
             const double p = p_gain * e;
             const double i = i_gain * timeStep * m_eSum;
             const double d = d_gain * (e - m_eOld) / timeStep;
@@ -413,9 +396,7 @@ namespace scaledcars {
                 if (desiredSteering < -1.5) {
                     desiredSteering = -1.5;
                 }
-
             }
-
             // Show resulting features.
             if (m_debug) {
                 if (m_image.data != NULL) {
@@ -428,21 +409,18 @@ namespace scaledcars {
 
             int curveCheckerRight, curveCheckerLeft;
 
-            if (desiredSteering < 0){
+            if (desiredSteering < 0) {
                 curveCheckerLeft++;
-            }if (desiredSteering > 0){
+            }
+            if (desiredSteering > 0) {
                 curveCheckerRight++;
             }
 
-            if (curveCheckerLeft > 5){
+            if (curveCheckerLeft > 5) {
                 m_distance = 190;
-            }else if (curveCheckerRight > 5){
+            } else if (curveCheckerRight > 5) {
                 m_distance = 170;
             }
-
-
-
-
         }
 
         // This method will do the main data processing job.
@@ -451,21 +429,18 @@ namespace scaledcars {
             // Overall state machine handler.
             while (getModuleStateAndWaitForRemainingTimeInTimeslice() == ModuleStateMessage::RUNNING) {
 
-                Container decisionMakerContainer = getKeyValueDataStore().get(DecisionMakerMSG::ID());
-
-                if (decisionMakerContainer.getDataType() == DecisionMakerMSG::ID()) {
-                    const DecisionMakerMSG decisionMakerMSG = decisionMakerContainer.getData<DecisionMakerMSG>();
-
-                    _state = decisionMakerMSG.getState();
+                Container communicationLinkContainer = getKeyValueDataStore().get(CommunicationLinkMSG::ID());
+                if (communicationLinkContainer.getDataType() == CommunicationLinkMSG::ID()) {
+                    const CommunicationLinkMSG communicationLinkMSG = communicationLinkContainer.getData<CommunicationLinkMSG>();
+                    _state = communicationLinkMSG.getStateLaneFollower();
                 }
 
-
+                cerr << "STATE IS : " << _state << endl;
                 if (_state == 1) {
                     bool has_next_frame = false;
 
                     // Get the most recent available container for a SharedImage.
                     Container image_container = getKeyValueDataStore().get(SharedImage::ID());
-
 
                     if (image_container.getDataType() == SharedImage::ID()) {
                         has_next_frame = readSharedImage(image_container);
@@ -534,6 +509,5 @@ namespace scaledcars {
             }
             return ModuleExitCodeMessage::OKAY;
         }
-
     }
 } // scaledcars::contr

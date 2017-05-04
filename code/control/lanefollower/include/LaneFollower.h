@@ -44,7 +44,10 @@
 #include <automotivedata/GeneratedHeaders_AutomotiveData.h>
 #include "automotivedata/generated/automotive/VehicleData.h"
 #include "automotivedata/generated/automotive/miniature/SensorBoardData.h"
-#include "odvdscaledcarsdatamodel/generated/group5/DecisionMakerMSG.h"
+#include "odvdscaledcarsdatamodel/generated/group5/CommunicationLinkMSG.h"
+#include "odvdscaledcarsdatamodel/generated/group5/LaneFollowerMSG.h"
+#include "odvdscaledcarsdatamodel/generated/group5/OvertakerMSG.h"
+#include "odvdscaledcarsdatamodel/generated/group5/ParkerMSG.h"
 
 
 namespace scaledcars {

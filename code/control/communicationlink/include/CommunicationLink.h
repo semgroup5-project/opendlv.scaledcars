@@ -1,5 +1,5 @@
-#ifndef DECISIONMAKER_H_
-#define DECISIONMAKER_H_
+#ifndef COMMUNICATIONLINK_H_
+#define COMMUNICATIONLINK_H_
 
 
 #include <opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h>
@@ -9,16 +9,14 @@
 #include <opendavinci/odcore/wrapper/SharedMemory.h>
 #include <opendavinci/odcore/wrapper/SharedMemoryFactory.h>
 
-#include <opendavinci/odcore/io/StringListener.h>
-#include <opendavinci/odcore/io/udp/UDPReceiver.h>
-#include <opendavinci/odcore/io/udp/UDPSender.h>
-#include <opendavinci/odcore/io/udp/UDPFactory.h>
-
 #include "automotivedata/generated/automotive/VehicleData.h"
 #include "automotivedata/generated/automotive/miniature/SensorBoardData.h"
 #include <automotivedata/GeneratedHeaders_AutomotiveData.h>
 #include <opendavinci/GeneratedHeaders_OpenDaVINCI.h>
-#include "odvdscaledcarsdatamodel/generated/group5/DecisionMakerMSG.h"
+#include "odvdscaledcarsdatamodel/generated/group5/CommunicationLinkMSG.h"
+#include "odvdscaledcarsdatamodel/generated/group5/LaneFollowerMSG.h"
+#include "odvdscaledcarsdatamodel/generated/group5/OvertakerMSG.h"
+#include "odvdscaledcarsdatamodel/generated/group5/ParkerMSG.h"
 
 #include <iostream>
 #include <memory>
@@ -33,8 +31,6 @@
 using namespace std;
 
 using namespace odcore;
-using namespace odcore::io;
-using namespace odcore::io::udp;
 using namespace odcore::base::module;
 using namespace odcore::data;
 using namespace odcore::wrapper;
@@ -42,7 +38,7 @@ using namespace odcore::wrapper;
 namespace scaledcars {
     namespace control {
 
-        class DecisionMaker :
+        class CommunicationLink :
                 public odcore::base::module::TimeTriggeredConferenceClientModule {
 
         private:
@@ -55,7 +51,7 @@ namespace scaledcars {
              *
              * @param obj Reference to an object of this class.
              */
-            DecisionMaker(const DecisionMaker &/*obj*/);
+            CommunicationLink(const CommunicationLink &/*obj*/);
 
             /**
              * "Forbidden" assignment operator.
@@ -67,7 +63,7 @@ namespace scaledcars {
              * @param obj Reference to an object of this class.
              * @return Reference to this instance.
              */
-            DecisionMaker &operator=(const DecisionMaker &/*obj*/);
+            CommunicationLink &operator=(const CommunicationLink &/*obj*/);
 
         public:
             /**
@@ -76,30 +72,26 @@ namespace scaledcars {
              * @param argc Number of command line arguments.
              * @param argv Command line arguments.
              */
-            DecisionMaker(const int32_t &argc, char **argv);
+            CommunicationLink(const int32_t &argc, char **argv);
 
-            virtual ~DecisionMaker();
-
-            odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
-
-            virtual void nextContainer(odcore::data::Container &c);
-
-            int cycle = 0;
+            virtual ~CommunicationLink();
 
         private:
-
-            group5::DecisionMakerMSG decisionMakerMSG;
-
+            group5::CommunicationLinkMSG communicationLinkMSG;
+            group5::LaneFollowerMSG laneFollowerMSG;
+            group5::OvertakerMSG overtakerMSG;
+            group5::ParkerMSG parkerMSG;
             automotive::VehicleData vd;
-
             automotive::miniature::SensorBoardData sbd;
 
             virtual void setUp();
 
             virtual void tearDown();
 
+            odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
+
         };
     }//control
 }//scaledcars
 
-#endif /*DECISIONMAKER_H_*/
+#endif /*COMMUNICATIONLINK_H_*/
