@@ -59,8 +59,8 @@ namespace scaledcars {
                 m_threshold1(50),  //50
                 m_threshold2(200),  // 150
                 m_control_scanline(400),//needs testing with real c
-                m_stop_scanline(300),//needs testing with real car
-                m_distance(180),  //needs testing with real car as well
+                m_stop_scanline(250),//needs testing with real car
+                m_distance(245),  //needs testing with real car as well
                 p_gain(0),       // the gain values can be adjusted here outside of simulation scenario (see @setUp() )
                 i_gain(0),
                 d_gain(0),
@@ -204,7 +204,7 @@ namespace scaledcars {
             right.x = -1;
             // Search from middle to the right
             for (int x = m_image_new.cols / 2;
-                 x < m_image_new.cols - 80; x++) {  //cols - 50 to stop it from finding the wall
+                 x < m_image_new.cols ; x++) {  //cols - 50 to stop it from finding the wall
                 pixelRight = m_image_new.at<uchar>(Point(x, y));
                 if (pixelRight >= 150) {   //tentative value, might need adjustment: lower it closer to 100
                     right.x = x;
@@ -221,8 +221,8 @@ namespace scaledcars {
                 }
             }
 
-            
-            
+
+
             if (y == m_control_scanline) {
 
                 if (inRightLane) {
@@ -251,7 +251,7 @@ namespace scaledcars {
 
             int left_dist = 0;
 
-            stop_left.x = (m_image_new.cols / 2) - 20;   // stop line checker needs to be moved more towards the left side
+            stop_left.x = (m_image_new.cols / 2) - 40;   // stop line checker needs to be moved more towards the left side
             stop_left.y = m_control_scanline;
 
             // Find first grey pixel in the front of the car left side
@@ -266,7 +266,7 @@ namespace scaledcars {
 
             int right_dist = 0;
 
-            stop_right.x = (m_image_new.cols / 2) + 80;  // stop line checker needs to be moved more towards the left side
+            stop_right.x = (m_image_new.cols / 2) + 40;  // stop line checker needs to be moved more towards the left side
             stop_right.y = m_control_scanline;
 
             // Find first grey pixel in front of the car right side
@@ -409,20 +409,22 @@ namespace scaledcars {
             }
             m_vehicleControl.setSteeringWheelAngle(desiredSteering);
 
-            int curveCheckerRight, curveCheckerLeft;
 
-            if (desiredSteering < 0) {
-                curveCheckerLeft++;
-            }
-            if (desiredSteering > 0) {
-                curveCheckerRight++;
-            }
-
-            if (curveCheckerLeft > 5) {
-                m_distance = 190;
-            } else if (curveCheckerRight > 5) {
-                m_distance = 170;
-            }
+            // change this to use distance readings from image processing, same as line drawing
+//            int curveCheckerRight, curveCheckerLeft;
+//
+//            if (desiredSteering < 0) {
+//                curveCheckerLeft++;
+//            }
+//            if (desiredSteering > 0) {
+//                curveCheckerRight++;
+//            }
+//
+//            if (curveCheckerLeft > 5) {
+//                m_distance = 220;
+//            } else if (curveCheckerRight > 5) {
+//                m_distance = 190;
+//            }
         }
 
         // This method will do the main data processing job.
@@ -461,7 +463,7 @@ namespace scaledcars {
                             m_vehicleControl.setSpeed(1);
                         } else {
                             if (stop) {
-                                if (stopCounter < 3.0) {
+                                if (stopCounter < 2.0) {
                                     stopCounter += 0.5;
                                 }else{
                                     if (prevState == "stopLine"){
