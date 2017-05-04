@@ -23,4 +23,3 @@ add_subdirectory(serialsendhandler)
 add_subdirectory(communicationlink)
 add_subdirectory(udpconnection)
 add_subdirectory(parallelparker)
-

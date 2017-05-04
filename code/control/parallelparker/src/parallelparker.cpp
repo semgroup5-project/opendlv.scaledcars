@@ -69,14 +69,21 @@ namespace scaledcars {
 
         // This method will do the main data processing job.
         odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode parallelparker::body() {
+            if (sim) {
+                const double INFRARED_FRONT_RIGHT = 0;
+                const double INFRARED_REAR = 1;
+                const double INFRARED_REAR_RIGHT = 2;
+                const double ULTRASONIC_FRONT = 3;
+            } else if (!sim) {
+                const double INFRARED_FRONT_RIGHT = 3;
+                const double INFRARED_REAR = 5;
+                const double INFRARED_REAR_RIGHT = 4;
+                const double ULTRASONIC_FRONT = 1;
+                const double ENCODER = 6;
+                double travleDist = 0;
+            }
 
             bool IFFRObstacle;
-            //bool IFRRObstacle;
-            const double INFRARED_FRONT_RIGHT = 0;
-            const double INFRARED_REAR = 1;
-            const double INFRARED_REAR_RIGHT = 2;
-            const double ULTRASONIC_FRONT = 3;
-
             double GAP_SIZE = 0;
             double distance = 0;
             double absPathStart = 0;
@@ -108,7 +115,6 @@ namespace scaledcars {
                         automotive::miniature::SensorBoardData::ID());
                 SensorBoardData sbd = containerSensorBoardData.getData<SensorBoardData>();
 
-
                 // Create vehicle control data.
                 VehicleControl vc;
                 //irFrontRight = sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT);
@@ -139,12 +145,12 @@ namespace scaledcars {
                         vc.setSpeed(1);
                         if (irRear < 0) {
                             stageMoving = 3;
-                            cerr<<"irRear smaller than 0 Stage Moving = 3"<<endl;
+                            cerr << "irRear smaller than 0 Stage Moving = 3" << endl;
                         }
                     }
                     if (stageMoving == 3 && (irRear < 0)) {
                         //Parking
-                        cerr<<"parking gap "<< parkingGap<<endl;
+                        cerr << "parking gap " << parkingGap << endl;
                         parkEnd = vd.getAbsTraveledPath();
                         backDist = parkEnd - parkStart;
                         double cosVal = cos(30 * PI / 180.0);
@@ -183,31 +189,34 @@ namespace scaledcars {
                         double j = vd.getAbsTraveledPath();
                         vc.setSpeed(1);
                         vc.setSteeringWheelAngle(.2);
-                        if(parkingSit ==2 && j-i < 2){
-                            cerr<<"stage4 #1 if"<<endl;
+                        if (parkingSit == 2 && j - i < 2) {
+                            cerr << "stage4 #1 if" << endl;
                             stageMoving = 5;
                         }
                         if (usFront < 7 && usFront > 0) {
                             stageMoving = 5;
-                            cerr<<"stage4 #2 if"<<endl;
+                            cerr << "stage4 #2 if" << endl;
                         }
                     }
                     if (stageMoving == 5) {
-                        cerr<<"car stopped!!"<<endl;
+                        cerr << "car stopped!!" << endl;
                         vc.setSpeed(0);
                         vc.setSteeringWheelAngle(0);
                     }
                     if (irRear > 0 && irRear < 4) {
                         //Emergency stop
                         vc.setSpeed(0);
-                        cerr << "emergency stop!"<<endl;
+                        cerr << "emergency stop!" << endl;
                     }
                 } else if (!sim) {
                     cerr << "This is for the real car!" << endl;
+
                     irRear = sbd.getValueForKey_MapOfDistances(INFRARED_REAR);
                     irRearRight = sbd.getValueForKey_MapOfDistances(INFRARED_REAR_RIGHT);
                     usFront = sbd.getValueForKey_MapOfDistances(ULTRASONIC_FRONT);
+                    travleDist = sbd.getValueForKey_MapOfDistances(ENCODER);
                     IFFRObstacle = obstacleDetect(sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT));
+                    //Car is using degree.
                     if (stageMoving == 0) {
                         // Go forward.
                         vc.setSpeed(100);
@@ -215,91 +224,97 @@ namespace scaledcars {
                         parkStart = vd.getAbsTraveledPath();
                     }
                     if (stageMoving == 1) {
-                        vc.setSpeed(0);
+                        //to make the car stop
+                        vc.setSpeed(190);
                         vc.setSteeringWheelAngle(0);
-                        if (irRearRight > 0 && parkingSit == 1) {
+                        if (irRearRight > 1 && parkingSit == 1) {
                             stageMoving = 2;
                         }
-                        if (irRearRight < 0 && parkingSit == 2) {
+                        if (irRearRight < 1 && parkingSit == 2) {
                             stageMoving = 3;
                             cerr << "parkingSit ==" << parkingSit << " moving to next stage" << endl;
                         }
                     }
                     if (stageMoving == 2) {
-                        vc.setSpeed(1);
-                        if (irRear < 0) {
+                        vc.setSpeed(100);
+                        if (irRear < 20) {
                             stageMoving = 3;
-                            cerr<<"irRear smaller than 0 Stage Moving = 3"<<endl;
+                            cerr << "irRear smaller than 0 Stage Moving = 3" << endl;
                         }
                     }
-                    if (stageMoving == 3 && (irRear < 0)) {
+                    if (stageMoving == 3 && (irRear < 5)) {
                         //Parking
                         parkEnd = vd.getAbsTraveledPath();
                         backDist = parkEnd - parkStart;
-                        double cosVal = cos(30 * PI / 180.0);
+                        double cosVal = cos(60 * PI / 180.0);
                         double adjDist = cosVal * backDist;
-                        cerr << "GAP: "<<gap<<endl;
+                        cerr << "GAP: " << gap << endl;
                         if (gap == 1) {
-                            if (irRear < 0 && adjDist < parkingGap / 2) {
-                                vc.setSpeed(-1);
-                                vc.setSteeringWheelAngle(2);
+                            if (irRear < 5 && adjDist < parkingGap / 2) {
+                                vc.setSpeed(-100);
+                                vc.setSteeringWheelAngle(60);
                                 counter++;
                             }
-                            if (irRear < 0 && adjDist > parkingGap / 2 && counter > 1) {
-                                vc.setSpeed(-1);
-                                vc.setSteeringWheelAngle(-2);
+                            if (irRear < 5 && adjDist > parkingGap / 2 && counter > 1) {
+                                vc.setSpeed(-100);
+                                vc.setSteeringWheelAngle(-60);
                                 counter -= 1.6;
                             }
                         }
                         if (gap == 2) {
-                            if (irRear < 0 && adjDist < parkingGap / 3) {
-                                vc.setSpeed(-1);
-                                vc.setSteeringWheelAngle(.3);
+                            if (irRear < 5 && adjDist < parkingGap / 3) {
+                                vc.setSpeed(-100);
+                                vc.setSteeringWheelAngle(20);
                                 counter++;
                             }
-                            if (irRear < 0 && adjDist > parkingGap / 3 && counter > 1) {
-                                vc.setSpeed(-1);
-                                vc.setSteeringWheelAngle(-.3);
+                            if (irRear < 5 && adjDist > parkingGap / 3 && counter > 1) {
+                                vc.setSpeed(-100);
+                                vc.setSteeringWheelAngle(-20);
                                 counter -= 1.6;
                             }
                         }
                     }
                     if (counter < 1) {
-                        i = vd.getAbsTraveledPath();
+                        i = sbd.getValueForKey_MapOfDistances(ENCODER);
                         stageMoving = 4;
                     }
                     if (stageMoving == 4) {
                         cerr << "Move one last bit" << endl;
-                        double j = vd.getAbsTraveledPath();
-                        vc.setSpeed(1);
-                        vc.setSteeringWheelAngle(.2);
-                        if(parkingSit ==2 && j-i < 2){
-                            cerr<<"stage4 #1 if"<<endl;
+                        double j = sbd.getValueForKey_MapOfDistances(ENCODER);
+                        vc.setSpeed(100);
+                        vc.setSteeringWheelAngle(12);
+                        if (parkingSit == 1 && j - i < 2) {
+                            cerr << "stage4 #1 if" << endl;
                             stageMoving = 5;
                         }
-                        if (usFront < 7 && usFront > 0) {
+                        if (usFront < 25 && usFront > 1) {
                             stageMoving = 5;
-                            cerr<<"stage4 #2 if"<<endl;
+                            cerr << "stage4 #2 if" << endl;
                         }
                     }
                     if (stageMoving == 5) {
-                        cerr<<"car stopped!!"<<endl;
-                        vc.setSpeed(0);
+                        cerr << "car stopped!!" << endl;
+                        vc.setSpeed(190);
                         vc.setSteeringWheelAngle(0);
                     }
-                    if (irRear > 0 && irRear < 4) {
+                    if (irRear > 3 && irRear < 15) {
                         //Emergency stop
-                        vc.setSpeed(0);
-                        cerr << "emergency stop!"<<endl;
+                        vc.setSpeed(190);
+                        cerr << "emergency stop!" << endl;
                     }
                 }
-                if (stageMoving == 0) {
+
+
+
+
+                //Measuring parking gap
+                if (stageMoving == 0 && sim) {
                     switch (stageMeasuring) {
                         case 0: {
                             distance = sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT);
                             double parking = vd.getAbsTraveledPath();
                             absPathStart = vd.getAbsTraveledPath();
-                            cerr<<"parkingSit detection"<<endl;
+                            cerr << "parkingSit detection" << endl;
                             //when there is no car parked for 15 units
                             if (!IFFRObstacle && parking >= 15) {
                                 GAP_SIZE = parking;
@@ -307,24 +322,24 @@ namespace scaledcars {
                                 gap = 1;
                                 stageMoving = 1;
                                 parkingSit = 2;
-                                stageMeasuring ++;
-                                cerr<<"parkingSit 15 units"<<endl;
+                                stageMeasuring++;
+                                cerr << "parkingSit 15 units" << endl;
                             }
                             //when there is something detected within 15 units
                             if (IFFRObstacle && parking < 15) {
                                 parkingSit = 1;
                                 stageMeasuring++;
-                                cerr<<"parkingSit 2 < 15 units"<<endl;
+                                cerr << "parkingSit 2 < 15 units" << endl;
                             }
                         }
                             break;
                         case 1: {
                             // Checking for sequence +, -.
                             if (parkingSit == 1) {
-                                cerr<<"in case 1 parkingSit==1"<<endl;
+                                cerr << "in case 1 parkingSit==1" << endl;
                                 if ((distance > 0) && (sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT) < 0)) {
                                     // Found sequence +, -.
-                                    cerr<<"Setting stageMeasuring to 2 "<<endl;
+                                    cerr << "Setting stageMeasuring to 2 " << endl;
                                     stageMeasuring = 2;
                                     absPathStart = vd.getAbsTraveledPath();
                                 }
@@ -340,10 +355,10 @@ namespace scaledcars {
                                 cerr << "Sizeeee = " << GAP_SIZE << endl;
                                 if (GAP_SIZE <= 15) {
                                     gap = 1;
-                                    cerr <<"set GAP = 1 from case 2"<<endl;
+                                    cerr << "set GAP = 1 from case 2" << endl;
                                 } else if (GAP_SIZE > 15) {
                                     gap = 2;
-                                    cerr<< "set GAP = 2 from case 2"<<endl;
+                                    cerr << "set GAP = 2 from case 2" << endl;
 
                                 }
                                 stageMeasuring = 1;
@@ -369,6 +384,67 @@ namespace scaledcars {
                             distance = sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT);
                         }
                             break;
+                    }
+                } else if (!sim) {
+                    switch (stageMeasuring) {
+                        case 0: {
+                            distance = sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT);
+                            double parking = sbd.getValueForKey_MapOfDistances(ENCODER);
+                            absPathStart = sbd.getValueForKey_MapOfDistances(ENCODER);
+                            if (!IFFRObstacle && parking >= 100) {
+                                GAP_SIZE = parking;
+                                parkingGap = parking;
+                                gap = 1;
+                                stageMoving = 1;
+                                parkingSit = 2;
+                                stageMeasuring++;
+                                cerr << "parkingSit 100 units" << endl;
+                            }
+                            if (IFFRObstacle && parking < 100) {
+                                parkingSit = 1;
+                                stageMeasuring++;
+                                cerr << "parkingSit 2 < 15 units" << endl;
+                            }
+                        }
+                        case 1: {
+                            // Checking for sequence +, -.
+                            if (parkingSit == 1) {
+                                cerr << "in case 1 parkingSit==1" << endl;
+                                if ((distance > 0) && (sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT) < 5)) {
+                                    // Found sequence +, -.
+                                    cerr << "Setting stageMeasuring to 2 " << endl;
+                                    stageMeasuring = 2;
+                                    absPathStart = sbd.getValueForKey_MapOfDistances(ENCODER);
+                                }
+                                distance = sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT);
+                            }
+                        }
+                        case 2: {
+                            // Checking for sequence -, +.
+                            if (sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT) > 10) {
+                                absPathEnd = sbd.getValueForKey_MapOfDistances(ENCODER);
+                                GAP_SIZE = (absPathEnd - absPathStart);
+                                cerr << "Sizeeee = " << GAP_SIZE << endl;
+                                if (GAP_SIZE <= 150) {
+                                    gap = 1;
+                                    cerr << "set GAP = 1 from case 2" << endl;
+                                } else if (GAP_SIZE > 150) {
+                                    gap = 2;
+                                    cerr << "set GAP = 2 from case 2" << endl;
+
+                                }
+                                stageMeasuring = 1;
+                                if ((stageMoving < 1) &&
+                                    (sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT) > 10) &&
+                                    (GAP_SIZE > 150)) {
+                                    stageMeasuring = 1;
+                                    parkingGap = GAP_SIZE;
+                                    parkingSit = 1;
+                                    stageMoving = 1;
+                                    cerr << "Sizeeee = " << GAP_SIZE << endl;
+                                }
+                            }
+                        }
                     }
                 }
                 // Create container for finally sending the data.
