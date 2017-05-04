@@ -17,9 +17,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#include "ParallelParker.h"
+#include "parallelparker.h"
 
 int32_t main(int32_t argc, char **argv) {
-    scaledcars::control::ParallelParker prlp(argc, argv);
+    scaledcars::control::parallelparker prlp(argc, argv);
     return prlp.runModule();
 }

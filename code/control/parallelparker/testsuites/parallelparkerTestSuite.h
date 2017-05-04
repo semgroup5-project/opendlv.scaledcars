@@ -1,5 +1,5 @@
 /**
- * Parallelparker - Sample application for realizing a Parallel parking car.
+ * parallelparker - Sample application for realizing a Parallel parking car.
  * Copyright (C) 2012 - 2015 Christian Berger
  *
  * This program is free software; you can redistribute it and/or
@@ -23,7 +23,7 @@
 #include "cxxtest/TestSuite.h"
 
 // Include local header files.
-#include "../include/ParallelParker.h"
+#include "../include/parallelparker.h"
 
 using namespace std;
 using namespace odcore::data;
@@ -32,23 +32,23 @@ using namespace scaledcars::control;
 /**
  * This class derives from SensorBoard to allow access to protected methods.
  */
-class ParallelParkerTestling : public ParallelParker {
+class parallelparkerTestling : public parallelparker {
     private:
-        ParallelParkerTestling();
+        parallelparkerTestling();
     
     public:
-        ParallelParkerTestling(const int32_t &argc, char **argv) :
-            ParallelParker(argc, argv) {}
+        parallelparkerTestling(const int32_t &argc, char **argv) :
+            parallelparker(argc, argv) {}
 
-        // Here, you need to add all methods which are protected in ParallelParker and which are needed for the test cases.
+        // Here, you need to add all methods which are protected in parallelparker and which are needed for the test cases.
 };
 
 /**
  * The actual testsuite starts here.
  */
-class ParallelParkerTest : public CxxTest::TestSuite {
+class parallelparkerTest : public CxxTest::TestSuite {
     private:
-        ParallelParkerTestling *dt;
+        parallelparkerTestling *dt;
 
     public:
         /**
@@ -65,7 +65,7 @@ class ParallelParkerTest : public CxxTest::TestSuite {
             argv[1] = const_cast<char*>(argv1.c_str());
 
             // Create an instance of sensorboard through SensorBoardTestling which will be deleted in tearDown().
-            dt = new ParallelParkerTestling(argc, argv);
+            dt = new parallelparkerTestling(argc, argv);
         }
 
         /**
@@ -80,7 +80,7 @@ class ParallelParkerTest : public CxxTest::TestSuite {
         // Below this line the actual testcases are defined.
         ////////////////////////////////////////////////////////////////////////////////////
 
-        void testParallelParkerSuccessfullyCreated() {
+        void testparallelparkerSuccessfullyCreated() {
             TS_ASSERT(dt != NULL);
         }
 
@@ -95,7 +95,7 @@ class ParallelParkerTest : public CxxTest::TestSuite {
         /**
          * This constructor is only necessary to initialize the pointer variable.
          */
-        ParallelParkerTest() : dt(NULL) {}
+        parallelparkerTest() : dt(NULL) {}
 
     private:
         /**
@@ -105,7 +105,7 @@ class ParallelParkerTest : public CxxTest::TestSuite {
          *
          * @param obj Reference to an object of this class.
          */
-        ParallelParkerTest(const ParallelParkerTest &/*obj*/);
+        parallelparkerTest(const parallelparkerTest &/*obj*/);
 
         /**
          * "Forbidden" assignment operator. Goal: The compiler should warn
@@ -115,7 +115,7 @@ class ParallelParkerTest : public CxxTest::TestSuite {
          * @param obj Reference to an object of this class.
          * @return Reference to this instance.
          */
-        ParallelParkerTest& operator=(const ParallelParkerTest &/*obj*/);
+        parallelparkerTest& operator=(const parallelparkerTest &/*obj*/);
 
 };
 

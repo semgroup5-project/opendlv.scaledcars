@@ -26,7 +26,7 @@ services:
         ipc : host
         volumes:
             - ./DIT-168:/opt/configuration
-        command: "/opt/od4/bin/odsupercomponent --cid=${CID} --configuration=/opt/configuration/configuration --freq=20"
+        command: "/opt/od4/bin/odsupercomponent --cid=${CID} --configuration=/opt/configuration/configuration --freq=10"
 
     # Micro-service for odsimvehicle.
     odsimvehicle:
@@ -37,15 +37,7 @@ services:
             - odsupercomponent
         logging: 
             driver: "none"
-        command: "/opt/od4/bin/odsimvehicle --cid=${CID} --freq=20"
-
-    #serial
-    serialhandler:
-        build: .
-        network_mode: host
-        depends_on:
-            - odsupercomponent
-        command: bash -c "sleep 10; /opt/opendlv.scaledcars/bin/scaledcars-control-serialsendhandler --verbose=1 --cid=${CID} --rm=true --privileged --freq=20"
+        command: "/opt/od4/bin/odsimvehicle --cid=${CID} --freq=10"
     #odcockpit
     odcockpit:
         build: .
@@ -55,25 +47,42 @@ services:
         volumes:
         - ./DIT-168:/opt/configuration
         - /tmp/.X11-unix:/tmp/.X11-unix
-        - ~/CsvData/Overtaking:/opt/Datacsv
         ipc: host
         depends_on:
             - odsupercomponent
-        command: "/opt/od4/bin/odcockpit --cid=${CID} --configuration=/opt/configuration/configuration --freq=20"
-   #Micro-service for lanedtecter scenario.
-    lanefollower:
+        command: "/opt/od4/bin/odcockpit --cid=${CID} --configuration=/opt/configuration/configuration --freq=10"
+     #serial
+#    serialhandler:
+#        build: .
+#        network_mode: host
+#        depends_on:
+#            - odsupercomponent
+#        devices:
+#        - "/dev/ttyACM0"
+#        command: bash -c "sleep 10; /opt/opendlv.scaledcars/bin/scaledcars-control-serialsendhandler --verbose=1 --cid=${CID} --rm=true --privileged --device=/dev/ttyACM0 --freq=20"
+#odsimirus
+    odsimirus:
         build: .
         network_mode: host
         ipc: host
-        environment:
-        - DISPLAY=$DISPLAY
         volumes:
         - ./DIT-168:/opt/configuration
+        depends_on: 
+             - odsupercomponent
+        command: "/opt/od4/bin/odsimirus --cid=${CID} --configuration=/opt/configuration/configuration --freq=10"
+
+
+
+   #Micro-service for lanedtecter scenario.
+    parallelparker:
+        build: .
+        network_mode: host
+        ipc: host
         depends_on:
             - odsupercomponent
             - odsimvehicle
-            - odsimcamera
-        command: bash -c "sleep 5; /opt/opendlv.scaledcars/bin/scaledcars-control-lanefollwer --verbose=1  --cid=${CID} --freq=20 -e DISPLAY=$DISPLAY"
+            - odsimirus
+        command: "/opt/opendlv.scaledcars/bin/scaledcars-control-parallelparker --verbose=1  --cid=${CID} --freq=10"
 
 
 

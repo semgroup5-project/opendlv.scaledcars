@@ -40,6 +40,14 @@ global.session.expectedModules = HelloWorldExample,HelloWorldExample:2
 
 
 ###############################################################################
+
+###############################################################################
+#
+# CONFIGURATION FOR PARALLELPARKING
+#
+
+parallelparker.sim = 0   # Set simulation true or false
+
 ###############################################################################
 #
 # NEXT, THE CONFIGURATION FOR OpenDaVINCI TOOLS FOLLOWS. 
@@ -141,7 +149,7 @@ odsimirus.sensor0.rotZ = -90                    # Rotation of the sensor around 
 odsimirus.sensor0.translation = (1.0;-1.0;0.0)  # Translation (X;Y;Z) w.r.t. vehicle's center
 odsimirus.sensor0.angleFOV = 5                  # In degrees.
 odsimirus.sensor0.distanceFOV = 3               # In meters.
-odsimirus.sensor0.clampDistance = 2.9           # Any distances greater than this distance will be ignored and -1 will be returned.
+odsimirus.sensor0.clampDistance = 5             # Any distances greater than this distance will be ignored and -1 will be returned.
 odsimirus.sensor0.showFOV = 1                   # Show FOV in monitor.
 
 odsimirus.sensor1.id = 1                        # This ID is used in SensorBoardData structure.
@@ -150,7 +158,7 @@ odsimirus.sensor1.rotZ = -180                   # Rotation of the sensor around 
 odsimirus.sensor1.translation = (-1.0;0.0;0.0)  # Translation (X;Y;Z) w.r.t. vehicle's center
 odsimirus.sensor1.angleFOV = 5                  # In degrees.
 odsimirus.sensor1.distanceFOV = 3               # In meters.
-odsimirus.sensor1.clampDistance = 2.9           # Any distances greater than this distance will be ignored and -1 will be returned.
+odsimirus.sensor1.clampDistance = 5            # Any distances greater than this distance will be ignored and -1 will be returned.
 odsimirus.sensor1.showFOV = 1                   # Show FOV in monitor.
 
 odsimirus.sensor2.id = 2                        # This ID is used in SensorBoardData structure.
@@ -228,15 +236,6 @@ parallelParking.sim = 0   # Set simulation true(1) or false(0)
 #
 # NEXT, THE CONFIGURATION FOR USER APPLICATIONS FOLLOWS. 
 #
-###############################################################################
-###############################################################################
-#
-# CONFIGURATION FOR LANEFOLLOWER
-#
-lanefollower.camera_id = 2 # select here the proper camera
-lanefollower.debug = 1      # set to 0 to disable any windows and further output
-
-
 ###############################################################################
 ###############################################################################
 #
