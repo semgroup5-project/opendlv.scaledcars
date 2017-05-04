@@ -40,7 +40,7 @@ namespace scaledcars {
         Mat m_image_mat, m_image_new;
         bool stop = false;
         double stopCounter = 0, counter = 0;
-        String state = "moving", oldState = "moving", state2 = "??";
+        String state = "moving", prevState = "moving";
         bool inRightLane = true;   //the overtaker alters this value to signal a lane change
 
         LaneFollower::LaneFollower(const int32_t &argc, char **argv) :
@@ -154,6 +154,7 @@ namespace scaledcars {
 
             Canny(m_image_new, m_image_new, m_threshold1, m_threshold2,
                   3); // see header for algorithm and threshold explanation
+
         }
 
         double LaneFollower::Median(Mat mat) {
@@ -213,12 +214,15 @@ namespace scaledcars {
 
             if (right.x == -1 && left.x == -1) {  //setting state if the car does not see any line
                 state = "danger";
-            }else{
-                if(oldState == "moving" || oldState == "stopLine" ){
+            }
+            else{
+                if(state != "stop" && state != "resume"){
                     state = "moving";
                 }
             }
 
+            
+            
             if (y == m_control_scanline) {
 
                 if (inRightLane) {
@@ -247,7 +251,7 @@ namespace scaledcars {
 
             int left_dist = 0;
 
-            stop_left.x = (m_image_new.cols / 2) + 20;   // stop line checker needs to be moved more towards the left side
+            stop_left.x = (m_image_new.cols / 2) - 20;   // stop line checker needs to be moved more towards the left side
             stop_left.y = m_control_scanline;
 
             // Find first grey pixel in the front of the car left side
@@ -262,7 +266,7 @@ namespace scaledcars {
 
             int right_dist = 0;
 
-            stop_right.x = (m_image_new.cols / 2) + 100;  // stop line checker needs to be moved more towards the left side
+            stop_right.x = (m_image_new.cols / 2) + 80;  // stop line checker needs to be moved more towards the left side
             stop_right.y = m_control_scanline;
 
             // Find first grey pixel in front of the car right side
@@ -288,13 +292,22 @@ namespace scaledcars {
 
             //prints the lines for debugging purposes if debug flag is set to true
             if (m_debug) {
-                putText(m_image_new, state2 , Point(m_image_new.cols - 120, 20), FONT_HERSHEY_PLAIN, 1,
+                std::string speed = std::to_string(m_vehicleControl.getSpeed());
+                putText(m_image_new, "Speed is " + speed , Point(m_image_new.cols - 150, 20), FONT_HERSHEY_PLAIN, 1,
                         CV_RGB(255, 255, 255));
 
-                putText(m_image_new, state , Point(m_image_new.cols - 120, 40), FONT_HERSHEY_PLAIN, 1,
+                std::string steer = std::to_string(90+ (m_vehicleControl.getSteeringWheelAngle() * (180/3.14)));
+                putText(m_image_new, "Steering: " + steer , Point(m_image_new.cols - 150, 40), FONT_HERSHEY_PLAIN, 1,
                         CV_RGB(255, 255, 255));
 
-                putText(m_image_new, std::to_string(stopCounter) , Point(m_image_new.cols - 120, 60), FONT_HERSHEY_PLAIN, 1,
+                putText(m_image_new, "State: " + state , Point(m_image_new.cols - 150, 60), FONT_HERSHEY_PLAIN, 1,
+                        CV_RGB(255, 255, 255));
+
+                putText(m_image_new, "Old state: " + prevState  , Point(m_image_new.cols - 150, 80), FONT_HERSHEY_PLAIN, 1,
+                      CV_RGB(255, 255, 255));
+
+
+                putText(m_image_new, "Stop counter :" + std::to_string(stopCounter) , Point(m_image_new.cols - 150, 100), FONT_HERSHEY_PLAIN, 1,
                         CV_RGB(255, 255, 255));
 
 //                putText(m_image_new, state , Point(m_image_new.cols - 80, 20), FONT_HERSHEY_PLAIN, 1,
@@ -304,12 +317,9 @@ namespace scaledcars {
 //                putText(m_image_new, speed , Point(m_image_new.cols - 80, 40), FONT_HERSHEY_PLAIN, 1,
 //                        CV_RGB(255, 255, 255));
 //
-//                std::string steer = std::to_string(90+ (m_vehicleControl.getSteeringWheelAngle() * (180/3.14)));
-//                putText(m_image_new, steer , Point(m_image_new.cols - 80, 60), FONT_HERSHEY_PLAIN, 1,
-//                        CV_RGB(255, 255, 255));
-//                std::string speed3 = std::to_string(m_distance);
-//                putText(m_image_new, speed3 , Point(m_image_new.cols - 80, 80), FONT_HERSHEY_PLAIN, 1,
-//                        CV_RGB(255, 255, 255));
+
+                putText(m_image_new, "Distance " + std::to_string(m_distance) , Point(m_image_new.cols - 150, 120), FONT_HERSHEY_PLAIN, 1,
+                        CV_RGB(255, 255, 255));
 
                 if (left.x > 0) {
                     line(m_image_new, Point(m_image.cols / 2, y), left, Scalar(255, 0, 0), 1, 8);
@@ -328,12 +338,6 @@ namespace scaledcars {
                 }
             }
 
-
-
-
-
-            static int counter = 0;
-
             // is the detected stopline at a similar distance on both sides
             if (counter < 5 && (left_dist - right_dist) > -10 && (left_dist - right_dist) < 10 && left_dist != 0 &&
                 right_dist != 0) {
@@ -343,10 +347,8 @@ namespace scaledcars {
             }
             if (counter > 4) {
                 stop = true;
-                state2 = "Stopline";
             } else {
                 stop = false;
-                state2= " ";
             }
             return e;
         }
@@ -459,10 +461,19 @@ namespace scaledcars {
                             m_vehicleControl.setSpeed(1);
                         } else {
                             if (stop) {
-                                state = "stop";
+                                if (stopCounter < 3.0) {
+                                    stopCounter += 0.5;
+                                }else{
+                                    if (prevState == "stopLine"){
+                                        m_vehicleControl.setSpeed(100);
+                                    }else{
+                                        state = "stop";
+                                        stopCounter = 0;
+                                    }
+                                }
                             } else {
                                 m_vehicleControl.setSpeed(100);
-                                oldState = "moving";
+                                prevState = "moving";
                             }
                         }
                     }
@@ -471,16 +482,14 @@ namespace scaledcars {
                         if (Sim) {
                             m_vehicleControl.setSpeed(0);
                         } else {
-                            state = "stop";
                             m_vehicleControl.setSpeed(190);
                         }
 
                         stopCounter += 0.5;
 
                         if (stopCounter > 20.9999) {
-                            state = "moving";
-                            oldState = "stopLine";
-                            stopCounter = 0;
+                            state = "resume";
+                            prevState = "stopLine";
                             if (Sim) {
                                 m_vehicleControl.setSpeed(1);
                             } else {
@@ -489,13 +498,24 @@ namespace scaledcars {
 
                         }
                     }
+                    if (state == "resume"){
+                        if (stopCounter < 50) {
+                            stopCounter += 0.5;
+                        } else {
+                            stopCounter = 0;
+                            state = "moving";
+                            cerr << "Moving!" << endl;
+                        }
+                    }
                     if (state == "danger") {
-                        if (oldState ==
+                        if (prevState ==
                             "stopLine") {  // The idea here is, after a stop line, go forward and dont steer at all, it is expected to not find any reference line markings
                             m_vehicleControl.setSpeed(100);
                             m_vehicleControl.setSteeringWheelAngle(0);
                         }
-                        if (oldState == "moving") {
+                        if (prevState ==
+                            "moving") {
+                            prevState = "danger";
                             m_vehicleControl.setSpeed(190);
                             m_vehicleControl.setSteeringWheelAngle(0);
                         }
