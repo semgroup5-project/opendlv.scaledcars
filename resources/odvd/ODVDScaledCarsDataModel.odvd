@@ -35,6 +35,7 @@ message group5.CommunicationLinkMSG [id = 555 ] {
 
 message group5.LaneFollowerMSG [id = 556 ] {
     uint8 stateLane [id = 1];
+    string image [id = 2];
 }
 
 message group5.OvertakerMSG [id = 557 ] {
