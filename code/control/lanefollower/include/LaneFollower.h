@@ -46,14 +46,12 @@
 #include "automotivedata/generated/automotive/miniature/SensorBoardData.h"
 #include "odvdscaledcarsdatamodel/generated/group5/CommunicationLinkMSG.h"
 #include "odvdscaledcarsdatamodel/generated/group5/LaneFollowerMSG.h"
-#include "odvdscaledcarsdatamodel/generated/group5/OvertakerMSG.h"
-#include "odvdscaledcarsdatamodel/generated/group5/ParkerMSG.h"
-
 
 namespace scaledcars {
     namespace control {
 
         using namespace std;
+        using namespace group5;
 
         /**
          * This class is an exemplary skeleton for processing video data.
@@ -118,6 +116,8 @@ namespace scaledcars {
             double m_eOld;
 
             automotive::VehicleControl m_vehicleControl;
+            LaneFollowerMSG laneFollowerMSG;
+
             /**
              *Canny algoithm
              * http://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/canny_detector/canny_detector.html
