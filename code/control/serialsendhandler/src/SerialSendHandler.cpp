@@ -39,12 +39,14 @@ namespace scaledcars {
 
         void __on_read(uint8_t b)
         {
-            cout << ">> read " << (int)b << endl;
+            //cout << ">> read " << (int)b << endl;
+            b = b;
         }
 
         void __on_write(uint8_t b)
         {
-            cout << "<< write " << (int)b << endl;
+            //cout << "<< write " << (int)b << endl;
+            b = b;
         }
 
         SerialSendHandler::SerialSendHandler(const int32_t &argc, char **argv) :
@@ -119,7 +121,7 @@ namespace scaledcars {
 
                    int arduinoAngle = 0;
                    double angle = vd.getSteeringWheelAngle();
-                   cerr << "angle radius : " << angle << endl;
+                 //  cerr << "angle radius : " << angle << endl;
 
                    arduinoAngle = 90 + (angle * (180 / pi));
                    if (arduinoAngle < 0) {
@@ -127,10 +129,10 @@ namespace scaledcars {
                    } else if(arduinoAngle > 180){
                        arduinoAngle = 180;
                    }
-                   cerr << "angle degree " << arduinoAngle << endl;
+                //   cerr << "angle degree " << arduinoAngle << endl;
 
                    int speed = vd.getSpeed();
-                   cerr << "speed to arduino : " << speed << endl;
+                //   cerr << "speed to arduino : " << speed << endl;
 
                    this->motor = speed;
                    this->servo = arduinoAngle;
@@ -148,13 +150,13 @@ namespace scaledcars {
                 serial_send(this->serial, d_servo);
 
                 int pending = g_async_queue_length(this->serial->incoming_queue);
-                double valuesToNormalize[6];
-                int numbers[6];
+                double valuesToNormalize[6] = {0.0,0.0,0.0,0.0,0.0,0.0};
+                int numbers[6] = {0,0,0,0,0,0};
                 bool isSensorValues = false;
                 protocol_data incoming;
                 for (int i = 0; i < pending; i++) {
                     if (serial_receive(this->serial, &incoming)) {
-                        cerr << "RECEIVED : id=" << incoming.id << " value=" << incoming.value << endl;
+                      //  cerr << "RECEIVED : id=" << incoming.id << " value=" << incoming.value << endl;
                         filterData(incoming, valuesToNormalize, numbers);
                         isSensorValues = true;
                     }
@@ -165,7 +167,7 @@ namespace scaledcars {
                 	for(int i = 0; i < 6; i++){
                 		protocol_data d;
                 		d.id = i;
-                        cout << "sensoring" << numbers[i] << " " << valuesToNormalize[i] << endl;
+                      //  cout << "sensoring" << numbers[i] << " " << valuesToNormalize[i] << endl;
                 		if(numbers[i] > 0){
                 			d.value = (double)valuesToNormalize[i] / (double)numbers[i];
                 		} else {
@@ -193,13 +195,13 @@ namespace scaledcars {
         			if((data.id == 1 || data.id == 2) && data.value >= 1 && data.value <= 70){
         				values[data.id] += data.value;
         				numbers[data.id] += 1;
-        				cout << "filter " << data.id << "  " << data.value << endl;
+        			//	cout << "filter " << data.id << "  " << data.value << endl;
         				
 					//IR-SENSOR [ID 3] [ID 4] with value between 3 - 40
 					} else if ((data.id == 3 || data.id == 4 || data.id == 5) && data.value >= 3 && data.value <= 40){
 						values[data.id] += data.value;
         				numbers[data.id] += 1;
-        				cout << "filter " << data.id << "  " << data.value << endl;
+        			//	cout << "filter " << data.id << "  " << data.value << endl;
 							
 					//ODOMETER [ID 6] with value between 0 - 255
 					} else if (data.id == 6 && data.value >= 0 && data.value <= 255){ 
