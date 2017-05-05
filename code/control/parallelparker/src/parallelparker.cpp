@@ -100,6 +100,7 @@ namespace scaledcars {
             double parkingGap = 0;
             double counter = 1;
             double i = 0;
+            double timer = 0;
             // double travleDist = 0;
 
             //double irFrontRight = 0;
@@ -234,19 +235,26 @@ namespace scaledcars {
                     if (stageMoving == 1) {
 
                         //to make the car stop
-                        vc.setSpeed(190);
+                        vc.setSpeed(100);
                         vc.setSteeringWheelAngle(0);
                         if (irRearRight > 1 && parkingSit == 0) {
                             stageMoving = 2;
                         }
                         if (irRearRight < 1 && parkingSit == 1) {
-                            stageMoving = 3;
+                            stageMoving = 2;
                             cerr << "parkingSit ==" << parkingSit << " moving to next stage" << endl;
                         }
                     }
                     if (stageMoving == 2) {
-                        vc.setSpeed(100);
-                        if (irRear < 20) {
+                        vc.setSpeed(190);
+                        if (parkingSit == 1) {
+                            vc.setSpeed(190);
+                            timer++;
+                            if (timer > 50) {
+                                stageMoving = 3;
+                            }
+                        }
+                        if (parkingSit == 0 && irRear < 20) {
                             stageMoving = 3;
                             cerr << "irRear smaller than 0 Stage Moving = 3" << endl;
                         }
@@ -260,30 +268,30 @@ namespace scaledcars {
                         cerr << "GAP: " << gap << endl;
                         if (gap == 1) {
                             if (irRear < 5 && adjDist < parkingGap / 2) {
-                                vc.setSpeed(-100);
+                                vc.setSpeed(50);
                                 vc.setSteeringWheelAngle(60);
                                 counter++;
                             }
                             if (irRear < 5 && adjDist > parkingGap / 2 && counter > 1) {
-                                vc.setSpeed(-100);
+                                vc.setSpeed(50);
                                 vc.setSteeringWheelAngle(-60);
                                 counter -= 1.6;
                             }
                         }
                         if (gap == 2) {
                             if (irRear < 5 && adjDist < parkingGap / 3) {
-                                vc.setSpeed(-100);
+                                vc.setSpeed(50);
                                 vc.setSteeringWheelAngle(20);
                                 counter++;
                             }
                             if (irRear < 5 && adjDist > parkingGap / 3 && counter > 1) {
-                                vc.setSpeed(-100);
+                                vc.setSpeed(50);
                                 vc.setSteeringWheelAngle(-20);
                                 counter -= 1.6;
                             }
                         }
                     }
-                    if (counter < 1) {
+                    if (counter < 1 && stageMoving == 3) {
                         i = vd.getAbsTraveledPath();
                         stageMoving = 4;
                     }

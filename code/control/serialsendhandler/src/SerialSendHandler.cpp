@@ -150,31 +150,32 @@ namespace scaledcars {
                 int pending = g_async_queue_length(this->serial->incoming_queue);
                 double valuesToNormalize[6];
                 int numbers[6];
-              //  bool isSensorValues = false;
+                bool isSensorValues = false;
                 protocol_data incoming;
                 for (int i = 0; i < pending; i++) {
                     if (serial_receive(this->serial, &incoming)) {
                         cerr << "RECEIVED : id=" << incoming.id << " value=" << incoming.value << endl;
                         filterData(incoming, valuesToNormalize, numbers);
-                        //isSensorValues = true;
+                        isSensorValues = true;
                     }
                 }
                 
-//              	 if(isSensorValues){
-//                	map<uint32_t, double> sensor;
-//                	for(int i = 0; i < 6; i++){
-//                		protocol_data d;
-//                		d.id = i;
-//                		if(numbers[i] > 0){
-//                			d.value = (double)valuesToNormalize[i] / (double)numbers[i];
-//                		} else {
-//                			d.value = valuesToNormalize[i];
-//                		}
-//                		sensor[d.id] = d.value;
-//                		cout << "[SensorBoardData to conference] ID: " << d.id << " VALUE: " << d.value << endl;
-//                	}
-//                	sendSensorBoardData(sensor);
-//                }
+              	 if(isSensorValues){
+                	map<uint32_t, double> sensor;
+                	for(int i = 0; i < 6; i++){
+                		protocol_data d;
+                		d.id = i;
+                        cout << "sensoring" << numbers[i] << " " << valuesToNormalize[i] << endl;
+                		if(numbers[i] > 0){
+                			d.value = (double)valuesToNormalize[i] / (double)numbers[i];
+                		} else {
+                			d.value = valuesToNormalize[i];
+                		}
+                		sensor[d.id] = d.value;
+                		cout << "[SensorBoardData to conference] ID: " << d.id << " VALUE: " << d.value << endl;
+                	}
+                	sendSensorBoardData(sensor);
+                }
             }
 
             return ModuleExitCodeMessage::OKAY;
@@ -188,21 +189,16 @@ namespace scaledcars {
         * @param data to filter
         */
         void SerialSendHandler::filterData(protocol_data data, double *values, int *numbers){
-            map<uint32_t, double> sensor;
 					//US-SENSOR [ID 1] [ID 2] with value between 1 - 70
         			if((data.id == 1 || data.id == 2) && data.value >= 1 && data.value <= 70){
         				values[data.id] += data.value;
         				numbers[data.id] += 1;
-                        sensor[data.id] = data.value;
-                        sendSensorBoardData(sensor);
         				cout << "filter " << data.id << "  " << data.value << endl;
         				
 					//IR-SENSOR [ID 3] [ID 4] with value between 3 - 40
 					} else if ((data.id == 3 || data.id == 4 || data.id == 5) && data.value >= 3 && data.value <= 40){
 						values[data.id] += data.value;
         				numbers[data.id] += 1;
-                        sensor[data.id] = data.value;
-                        sendSensorBoardData(sensor);
         				cout << "filter " << data.id << "  " << data.value << endl;
 							
 					//ODOMETER [ID 6] with value between 0 - 255
