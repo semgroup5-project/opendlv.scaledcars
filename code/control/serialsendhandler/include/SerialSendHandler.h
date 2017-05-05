@@ -2,6 +2,9 @@
 #define SERIALSENDHANDLER_H
 
 #include <automotivedata/GeneratedHeaders_AutomotiveData.h>
+#include "automotivedata/generated/automotive/VehicleData.h"
+#include "automotivedata/generated/automotive/miniature/SensorBoardData.h"
+#include "odvdscaledcarsdatamodel/generated/group5/SensorsMSG.h"
 
 #include <opendavinci/GeneratedHeaders_OpenDaVINCI.h>
 #include <opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h>
@@ -20,6 +23,9 @@ using namespace odcore;
 using namespace odcore::base::module;
 using namespace odcore::data;
 using namespace odcore::wrapper;
+using namespace automotive;
+using namespace automotive::miniature;
+using namespace group5;
 
 namespace scaledcars {
     namespace control {
@@ -76,14 +82,16 @@ namespace scaledcars {
 
             virtual void tearDown();
 
-            void filterData(protocol_data data, double *values, int *numbers);
+            void filterData(int id, int value, double *values, int *numbers);
 
             void sendSensorBoardData(std::map<uint32_t, double> sensor);
 
-            void sendVehicleData();
-
             int motor;
             int servo;
+
+            SensorsMSG sbd;
+
+            map<uint32_t, double> sensors;
         };
     }
 }

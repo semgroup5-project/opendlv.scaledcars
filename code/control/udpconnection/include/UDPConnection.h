@@ -23,6 +23,10 @@
 #include <opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h>
 #include <opendavinci/odcore/data/Container.h>
 #include <opendavinci/odcore/data/TimeStamp.h>
+#include <opendavinci/odcore/base/Lock.h>
+
+#include <opencv2/opencv.hpp>
+#include <opencv2/highgui/highgui.hpp>
 
 #include <opendavinci/odcore/wrapper/SharedMemory.h>
 #include <opendavinci/odcore/wrapper/SharedMemoryFactory.h>
@@ -44,6 +48,8 @@
 #include <stdint.h>
 #include <string>
 #include <opendavinci/odcore/base/Thread.h>
+
+#include "Netstrings.hpp"
 
 #include <opendavinci/odcore/base/KeyValueConfiguration.h>
 
@@ -100,17 +106,42 @@ namespace scaledcars {
 
             virtual ~UDPConnection();
 
-        private:
-            group5::LaneFollowerMSG laneFollowerMSG;
+        protected:
+            /**
+             * This method is called to process an incoming container.
+             *
+             * @param c Container to process.
+             * @return true if c was successfully processed.
+             */
+            bool readSharedImage(odcore::data::Container &c);
 
+        private:
             void setUp();
 
             void tearDown();
 
+            double Median(cv::Mat mat);
+
+            void processImage();
+
             odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
+
+            group5::LaneFollowerMSG laneFollowerMSG;
 
             shared_ptr <UDPReceiver> udp_receiver;
 
+            shared_ptr <odcore::wrapper::SharedMemory> m_sharedImageMemory;
+            shared_ptr <odcore::wrapper::SharedMemory> m_sharedProcessedImageMemory;
+            odcore::data::image::SharedImage m_sharedProcessedImage;
+
+            bool m_hasAttachedToSharedImageMemory;
+
+            cv::Mat m_image;
+            cv::Mat m_image_mat;
+            cv::Mat m_image_new;
+
+            int32_t m_threshold1;
+            int32_t m_threshold2;
         };
     }
 } // scaledcars::control

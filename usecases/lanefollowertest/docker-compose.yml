@@ -66,18 +66,20 @@ services:
     serialhandler:
         build: .
         network_mode: host
+        ipc : host
         group_add:
         - dialout
         depends_on:
             - odsupercomponent
         restart: on-failure
         privileged: true
-        command: bash -c "sleep 10; /opt/opendlv.scaledcars/bin/scaledcars-control-serialsendhandler --verbose=1 --cid=${CID} --rm=true --freq=1"
+        command: bash -c "sleep 10; /opt/opendlv.scaledcars/bin/scaledcars-control-serialsendhandler --verbose=1 --cid=${CID} --rm=true --freq=10"
 
     #communicationlink
     communicationlink:
         build: .
         network_mode: host
+        ipc : host
         depends_on:
             - odsupercomponent
         restart: on-failure
@@ -88,6 +90,7 @@ services:
     udpconnection:
         build: .
         network_mode: host
+        ipc : host
         depends_on:
             - odsupercomponent
         restart: on-failure

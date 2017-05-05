@@ -51,3 +51,7 @@ message group5.UDPMSG [id = 559 ] {
     uint8 stateFunction [id = 1];
 }
 
+message group5.SensorsMSG [id = 560 ] {
+    uint64 travelledDistance [id = 1];
+    map<uint32, double> distances [id = 2];
+}

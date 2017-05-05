@@ -30,17 +30,6 @@ void Car::setUp() {
     Serial.begin(BAUD); //start the serial
     waitConnection();
     while (Serial.available()) { //empty any rubbish value from the buffer
-        red = 255;
-        green = 0;
-        blue = 0;
-#ifdef COMMON_ANODE
-        red = 255 - red;
-        green = 255 - green;
-        blue = 255 - blue;
-#endif
-        analogWrite(redPin, red);
-        analogWrite(greenPin, green);
-        analogWrite(bluePin, blue);
         byte clean = Serial.read();
     }
     establishContact('\n');
@@ -105,19 +94,7 @@ void Car::automatedDrive() {
 
     int value = 90, serial_size = 0, count = 0;
     byte in;
-    while ((serial_size = Serial.available()) <= 0 && !isRCControllerOn()) {
-        red = 0;
-        green = 0;
-        blue = 255;
-#ifdef COMMON_ANODE
-        red = 255 - red;
-        green = 255 - green;
-        blue = 255 - blue;
-#endif
-        analogWrite(redPin, red);
-        analogWrite(greenPin, green);
-        analogWrite(bluePin, blue);
-    }
+    while ((serial_size = Serial.available()) <= 0 && !isRCControllerOn());
 
     while (count++ < serial_size) {
         in = Serial.read();
@@ -136,16 +113,15 @@ void Car::automatedDrive() {
 
     if (data.id == ID_OUT_MOTOR) {
         value = data.value * 3;
-        if (value > 189) {
+        Serial.print("value");
+        Serial.println(value);
+        if (value > 185) {
             escMotor.brake();//applying values greater than 180 will be our indicative to brake
         } else {
             if (value >= 0 && value <= 180) {
                 escMotor.setSpeed(value);
             }
         }
-    }
-    if (isRCControllerOn()) {
-        escMotor.brake();
     }
 }
 

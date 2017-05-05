@@ -155,19 +155,6 @@ namespace scaledcars {
 
             Canny(m_image_new, m_image_new, m_threshold1, m_threshold2,
                   3); // see header for algorithm and threshold explanation
-
-
-            const int size = m_image_new.total() * m_image_new.elemSize();
-            unsigned char *bytes = new unsigned char[size];
-            memcpy(bytes,m_image_new.data, size * sizeof(unsigned char));
-
-            string s( reinterpret_cast<char const*>(bytes), size );
-
-            laneFollowerMSG.setImage(s);
-
-//            Container container(laneFollowerMSG);
-//
-//            getConference().send(container);
         }
 
         double LaneFollower::Median(Mat mat) {

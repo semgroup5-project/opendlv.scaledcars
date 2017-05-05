@@ -34,7 +34,6 @@ void ESCMotor::setSpeed(int speed) { //receives a speed in the scale of -100 to 
     }
     if (s != _speed) {
         _speed = s;
-
         write(_speed); //write the appropriate pwm signal to the servo
     }
 }
@@ -111,6 +110,7 @@ int ESCMotor::filterSpeed(int speed, int isRC) {
         }
     } else {
         if (speed >= FULL_BACKWARD && speed < IDLE_SPEED) {
+            filtered = map(filtered, FULL_BACKWARD, IDLE_SPEED - 1, FULL_BACKWARD + 25, IDLE_SPEED - 1);
             _direction = 0;
             red = 255;
             green = 0;
@@ -124,8 +124,9 @@ int ESCMotor::filterSpeed(int speed, int isRC) {
             analogWrite(greenPin, green);
             analogWrite(bluePin, blue);
         } else if (speed == IDLE_SPEED) {
-
+            filtered = IDLE_SPEED;
         } else if (speed > IDLE_SPEED && speed <= FULL_FORWARD) {
+            filtered = map(filtered, IDLE_SPEED + 1, FULL_FORWARD, IDLE_SPEED + 1, FULL_FORWARD - 30);
             _direction = 1;
             red = 255;
             green = 255;
@@ -139,7 +140,6 @@ int ESCMotor::filterSpeed(int speed, int isRC) {
             analogWrite(greenPin, green);
             analogWrite(bluePin, blue);
         }
-        filtered = speed;
     }
     return filtered;
 }

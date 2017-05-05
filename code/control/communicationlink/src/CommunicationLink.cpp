@@ -22,8 +22,7 @@ namespace scaledcars {
                 laneFollowerMSG(),
                 overtakerMSG(),
                 parkerMSG(),
-                vd(),
-                sbd(){}
+                sensorsMSG() {}
 
         CommunicationLink::~CommunicationLink() {}
 
@@ -50,29 +49,36 @@ namespace scaledcars {
 
         odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode CommunicationLink::body() {
             while (getModuleStateAndWaitForRemainingTimeInTimeslice() == ModuleStateMessage::RUNNING) {
-                Container vehicleDataContainer = getKeyValueDataStore().get(VehicleData::ID());
-                if (vehicleDataContainer.getDataType() == VehicleData::ID()) {
-                    vd = vehicleDataContainer.getData<VehicleData>();
-                    communicationLinkMSG.setWheelEncoder(vd.getAbsTraveledPath());
-                }
+                Container sensorBoardDataContainer = getKeyValueDataStore().get(SensorsMSG::ID());
+                if (sensorBoardDataContainer.getDataType() == SensorsMSG::ID()) {
+                    sensorsMSG = sensorBoardDataContainer.getData<SensorsMSG>();
 
-                Container sensorBoardDataContainer = getKeyValueDataStore().get(SensorBoardData::ID());
-                if (sensorBoardDataContainer.getDataType() == SensorBoardData::ID()) {
-                    sbd = sensorBoardDataContainer.getData<SensorBoardData>();
+                    communicationLinkMSG.setWheelEncoder(sensorsMSG.getTravelledDistance());
+                    cout << "ID: 6 VALUE: " << sensorsMSG.getTravelledDistance() << endl;
 
                     communicationLinkMSG.setUltraSonicFrontCenter(
-                            sbd.getValueForKey_MapOfDistances(ID_IN_ULTRASONIC_CENTER));
+                            sensorsMSG.getValueForKey_MapOfDistances(ID_IN_ULTRASONIC_CENTER));
+                    cout << "ID:  " << ID_IN_ULTRASONIC_CENTER << " VALUE: "
+                         << sensorsMSG.getValueForKey_MapOfDistances(ID_IN_ULTRASONIC_CENTER) << endl;
 
                     communicationLinkMSG.setUltrasonicFrontRight(
-                            sbd.getValueForKey_MapOfDistances(ID_IN_ULTRASONIC_SIDE_FRONT));
+                            sensorsMSG.getValueForKey_MapOfDistances(ID_IN_ULTRASONIC_SIDE_FRONT));
+                    cout << "ID:  " << ID_IN_ULTRASONIC_SIDE_FRONT << " VALUE: "
+                         << sensorsMSG.getValueForKey_MapOfDistances(ID_IN_ULTRASONIC_SIDE_FRONT) << endl;
 
                     communicationLinkMSG.setInfraredSideFront(
-                            sbd.getValueForKey_MapOfDistances(ID_IN_INFRARED_SIDE_FRONT));
+                            sensorsMSG.getValueForKey_MapOfDistances(ID_IN_INFRARED_SIDE_FRONT));
+                    cout << "ID:  " << ID_IN_INFRARED_SIDE_FRONT << " VALUE: "
+                         << sensorsMSG.getValueForKey_MapOfDistances(ID_IN_INFRARED_SIDE_FRONT) << endl;
 
                     communicationLinkMSG.setInfraredSideBack(
-                            sbd.getValueForKey_MapOfDistances(ID_IN_INFRARED_SIDE_BACK));
+                            sensorsMSG.getValueForKey_MapOfDistances(ID_IN_INFRARED_SIDE_BACK));
+                    cout << "ID:  " << ID_IN_INFRARED_SIDE_BACK << " VALUE: "
+                         << sensorsMSG.getValueForKey_MapOfDistances(ID_IN_INFRARED_SIDE_BACK) << endl;
 
-                    communicationLinkMSG.setInfraredBack(sbd.getValueForKey_MapOfDistances(ID_IN_INFRARED_BACK));
+                    communicationLinkMSG.setInfraredBack(sensorsMSG.getValueForKey_MapOfDistances(ID_IN_INFRARED_BACK));
+                    cout << "ID:  " << ID_IN_INFRARED_BACK << " VALUE: "
+                         << sensorsMSG.getValueForKey_MapOfDistances(ID_IN_INFRARED_BACK) << endl;
                 }
 
                 Container overtakerMSGContainer = getKeyValueDataStore().get(OvertakerMSG::ID());
