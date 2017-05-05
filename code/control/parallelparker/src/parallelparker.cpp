@@ -31,6 +31,8 @@ namespace scaledcars {
         parallelparker::parallelparker(const int32_t &argc, char **argv) :
                 TimeTriggeredConferenceClientModule(argc, argv, "parallelparker"),
                 sim(false),
+                guardGoodV(0),
+                guardBadV(0),
                 communicationLinkMSG(),
                 vc() {}
 
@@ -49,7 +51,7 @@ namespace scaledcars {
         }
 
         bool parallelparker::obstacleDetect(int i) {
-            bool ifObstacle = true;
+            bool ifObstacle;
             if (sim) {
                 if (i < 0) {
                     ifObstacle = false;
@@ -57,10 +59,18 @@ namespace scaledcars {
                     ifObstacle = true;
                 }
             } else if (!sim) {
-                if (i > 38 || i <= 2) {
-                    ifObstacle = false;
+                if (i > 38 || i < 0) {
+                    guardBadV++;
+                    if (guardBadV > 5) {
+                        ifObstacle = false;
+                        guardGoodV = 0;
+                    }
                 } else if (i <= 38 && i >= 3) {
-                    ifObstacle = true;
+                    guardGoodV++;
+                    if (guardGoodV > 5) {
+                        ifObstacle = true;
+                        guardBadV = 0;
+                    }
                 }
             }
 
@@ -80,7 +90,7 @@ namespace scaledcars {
 //            const int CAR_INFRARED_REAR_RIGHT = 4;
 //            const int CAR_ULTRASONIC_FRONT = 1;
 
-            bool IFFRObstacle;
+            bool IRFRObstacle;
             double GAP_SIZE = 0;
             double distance = 0;
             double absPathStart = 0;
@@ -98,6 +108,7 @@ namespace scaledcars {
             double usFront = 0;
             double irRear = 0;
             double irRearRight = 0;
+            double IRRRObstacle = 0;
             int parkingSit = 0; //1 -> Two boxes, 0 -> Enough space from beginning,
             int gap = 0;
             int stageMeasuring = 0;
@@ -106,23 +117,23 @@ namespace scaledcars {
             while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
                    odcore::data::dmcp::ModuleStateMessage::RUNNING) {
 
-                    // 1. Get most recent vehicle data:
-                    Container containerVehicleData = getKeyValueDataStore().get(automotive::VehicleData::ID());
-                    VehicleData vd = containerVehicleData.getData<VehicleData>();
+                // 1. Get most recent vehicle data:
+                Container containerVehicleData = getKeyValueDataStore().get(automotive::VehicleData::ID());
+                VehicleData vd = containerVehicleData.getData<VehicleData>();
 
-                    // 2. Get most recent sensor board data:
-                    Container containerSensorBoardData = getKeyValueDataStore().get(
-                            automotive::miniature::SensorBoardData::ID());
-                    SensorBoardData sbd = containerSensorBoardData.getData<SensorBoardData>();
+                // 2. Get most recent sensor board data:
+                Container containerSensorBoardData = getKeyValueDataStore().get(
+                        automotive::miniature::SensorBoardData::ID());
+                SensorBoardData sbd = containerSensorBoardData.getData<SensorBoardData>();
 
-                    Container communicationLinkMSGContainer = getKeyValueDataStore().get(CommunicationLinkMSG::ID());
-                    communicationLinkMSG = communicationLinkMSGContainer.getData<CommunicationLinkMSG>();
+                Container communicationLinkMSGContainer = getKeyValueDataStore().get(CommunicationLinkMSG::ID());
+                communicationLinkMSG = communicationLinkMSGContainer.getData<CommunicationLinkMSG>();
 
                 if (sim) {
                     irRear = sbd.getValueForKey_MapOfDistances(INFRARED_REAR);
                     irRearRight = sbd.getValueForKey_MapOfDistances(INFRARED_REAR_RIGHT);
                     usFront = sbd.getValueForKey_MapOfDistances(ULTRASONIC_FRONT);
-                    IFFRObstacle = obstacleDetect(sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT));
+                    IRFRObstacle = obstacleDetect(sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT));
                     if (stageMoving == 0) {
                         // Go forward.
                         vc.setSpeed(2);
@@ -208,12 +219,13 @@ namespace scaledcars {
                         cerr << "emergency stop!" << endl;
                     }
                 } else if (!sim) {
-                    int a = communicationLinkMSG.getInfraredSideFront();
-                    cerr << "This is the IFFRObs reading!!!" << a << endl;
                     irRear = communicationLinkMSG.getInfraredBack();
-                    irRearRight = communicationLinkMSG.getInfraredSideBack();
                     usFront = communicationLinkMSG.getUltraSonicFrontCenter();
-                    IFFRObstacle = obstacleDetect(a);
+                    int a = communicationLinkMSG.getInfraredSideFront();
+                    bool IRRObstacle = obstacleDetect(irRear);
+                    bool USFObstacle = obstacleDetect(usFront);
+                    cerr << "This is the IFFRObs reading!!!" << a << endl;
+                    IRFRObstacle = obstacleDetect(communicationLinkMSG.getInfraredSideFront());
 
                     //Car is using degree.
                     if (stageMoving == 0) {
@@ -223,14 +235,13 @@ namespace scaledcars {
                         parkStart = communicationLinkMSG.getWheelEncoder();
                     }
                     if (stageMoving == 1) {
-
                         //to make the car stop
                         vc.setSpeed(100);
                         vc.setSteeringWheelAngle(0);
-                        if (irRearRight > 1 && parkingSit == 0) {
+                        if (!IRRRObstacle && parkingSit == 0) {
                             stageMoving = 2;
                         }
-                        if (irRearRight < 1 && parkingSit == 1) {
+                        if (IRRRObstacle && parkingSit == 1) {
                             stageMoving = 2;
                             cerr << "parkingSit ==" << parkingSit << " moving to next stage" << endl;
                         }
@@ -249,7 +260,7 @@ namespace scaledcars {
                             cerr << "irRear smaller than 0 Stage Moving = 3" << endl;
                         }
                     }
-                    if (stageMoving == 3 && (irRear < 5)) {
+                    if (stageMoving == 3 && !IRRObstacle) {
                         //Parking
                         parkEnd = communicationLinkMSG.getWheelEncoder();
                         backDist = parkEnd - parkStart;
@@ -258,12 +269,12 @@ namespace scaledcars {
 
                         if (gap == 1) {
                             cerr << "GAP: " << gap << endl;
-                            if (irRear < 5 && adjDist < parkingGap / 2) {
+                            if (irRear < 10 && adjDist < parkingGap / 2) {
                                 vc.setSpeed(80);
                                 vc.setSteeringWheelAngle(1.5);
                                 counter++;
                             }
-                            if (irRear < 5 && adjDist > parkingGap / 2 && counter > 1) {
+                            if (irRear < 10 && adjDist > parkingGap / 2 && counter > 1) {
                                 vc.setSpeed(80);
                                 vc.setSteeringWheelAngle(-1.5);
                                 counter -= 1.6;
@@ -271,12 +282,12 @@ namespace scaledcars {
                         }
                         if (gap == 2) {
                             cerr << "GAP: " << gap << endl;
-                            if (irRear < 5 && adjDist < parkingGap / 3) {
+                            if (irRear < 10 && adjDist < parkingGap / 3) {
                                 vc.setSpeed(80);
                                 vc.setSteeringWheelAngle(.7);
                                 counter++;
                             }
-                            if (irRear < 5 && adjDist > parkingGap / 3 && counter > 1) {
+                            if (irRear < 10 && adjDist > parkingGap / 3 && counter > 1) {
                                 vc.setSpeed(80);
                                 vc.setSteeringWheelAngle(-.7);
                                 counter -= 1.6;
@@ -291,12 +302,12 @@ namespace scaledcars {
                         cerr << "Move one last bit" << endl;
                         double j = communicationLinkMSG.getWheelEncoder();
                         vc.setSpeed(100);
-                        vc.setSteeringWheelAngle(.18);
+                        vc.setSteeringWheelAngle(.1);
                         if (parkingSit == 1 && j - i < 2) {
                             cerr << "stage4 #1 if" << endl;
                             stageMoving = 5;
                         }
-                        if (usFront < 25 && usFront > 1) {
+                        if (usFront < 25 && USFObstacle) {
                             stageMoving = 5;
                             cerr << "stage4 #2 if" << endl;
                         }
@@ -306,7 +317,7 @@ namespace scaledcars {
                         vc.setSpeed(190);
                         vc.setSteeringWheelAngle(0);
                     }
-                    if (irRear > 3 && irRear < 15) {
+                    if (irRear > 3 && irRear < 15 && IRRObstacle) {
                         //Emergency stop
                         vc.setSpeed(190);
                         cerr << "emergency stop!" << endl;
@@ -324,7 +335,7 @@ namespace scaledcars {
                             absPathStart = vd.getAbsTraveledPath();
                             cerr << "parkingSit detection" << endl;
                             //when there is no car parked for 15 units
-                            if (!IFFRObstacle && parking >= 15) {
+                            if (!IRFRObstacle && parking >= 15) {
                                 GAP_SIZE = parking;
                                 parkingGap = parking;
                                 gap = 1;
@@ -334,7 +345,7 @@ namespace scaledcars {
                                 cerr << "parkingSit 15 units" << endl;
                             }
                             //when there is something detected within 15 units
-                            if (IFFRObstacle && parking < 15) {
+                            if (IRFRObstacle && parking < 15) {
                                 parkingSit = 0;
                                 stageMeasuring++;
                                 cerr << "parkingSit 2 < 15 units" << endl;
@@ -354,7 +365,8 @@ namespace scaledcars {
                                 distance = sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT);
                             }
                         }
-                            break;communicationLinkMSG.getWheelEncoder();
+                            break;
+                            communicationLinkMSG.getWheelEncoder();
                         case 2: {
                             // Checking for sequence -, +.
                             if (sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT) > 0) {
@@ -398,22 +410,22 @@ namespace scaledcars {
                         case 0: {
                             cerr << "case 0! " << endl;
                             distance = communicationLinkMSG.getInfraredSideFront();
-                            double parking = communicationLinkMSG.getWheelEncoder();
+                            double empty = communicationLinkMSG.getWheelEncoder();
                             absPathStart = communicationLinkMSG.getWheelEncoder();
-                            cerr << "IFFRObstacle :" << IFFRObstacle << endl;
-                            if (!IFFRObstacle && parking >= 100) {
-                                GAP_SIZE = parking;
-                                parkingGap = parking;
+                            cerr << "IRFRObstacle :" << IRFRObstacle << endl;
+                            if (!IRFRObstacle && empty >= 80) {
+                                GAP_SIZE = empty;
+                                parkingGap = empty;
                                 gap = 1;
                                 stageMoving = 1;
-                                parkingSit = 1;
-                                stageMeasuring = 1;
-                                cerr << "parkingSit 1 100 units" << endl;
-                            }
-                            if (IFFRObstacle && parking < 100) {
                                 parkingSit = 0;
                                 stageMeasuring = 1;
-                                cerr << "parkingSit 2 < 100 units" << endl;
+                                cerr << "parkingSit 1 80 units" << endl;
+                            }
+                            if (IRFRObstacle && empty < 80) {
+                                parkingSit = 1;
+                                stageMeasuring = 1;
+                                cerr << "parkingSit 2 < 80 units" << endl;
                             }
                         }
                             break;
@@ -421,10 +433,9 @@ namespace scaledcars {
                             cerr << "case 1! " << endl;
                             cerr << "parking sit  " << parkingSit << endl;
                             // Checking for sequence +, -.
-                            if (parkingSit == 0) {
+                            if (parkingSit == 1) {
                                 cerr << "in case 1 parkingSit==1 real car " << endl;
-                                if ((distance > 0) &&
-                                    (communicationLinkMSG.getInfraredSideFront() < 5)) {
+                                if ((distance > 0) && (!IRFRObstacle)) {
                                     // Found sequence +, -.
                                     cerr << "Setting stageMeasuring to 2 " << endl;
                                     stageMeasuring = 2;
@@ -437,22 +448,20 @@ namespace scaledcars {
                         case 2: {
                             cerr << "case 2! " << endl;
                             // Checking for sequence -, +.
-                            if (communicationLinkMSG.getInfraredSideFront() > 10) {
+                            if (IRFRObstacle) {
                                 absPathEnd = communicationLinkMSG.getWheelEncoder();
                                 GAP_SIZE = (absPathEnd - absPathStart);
                                 cerr << "Sizeeee = " << GAP_SIZE << endl;
 
-                                if (GAP_SIZE <= 150) {
+                                if (GAP_SIZE <= 100) {
                                     gap = 1;
                                     cerr << "set GAP = 1 from case 2" << endl;
-                                } else if (GAP_SIZE > 150) {
+                                } else if (GAP_SIZE > 100) {
                                     gap = 2;
                                     cerr << "set GAP = 2 from case 2" << endl;
                                 }
                                 stageMeasuring = 1;
-                                if ((stageMoving < 1) &&
-                                    (communicationLinkMSG.getInfraredSideFront() > 10) &&
-                                    (GAP_SIZE > 150)) {
+                                if ((stageMoving < 1) && (IRFRObstacle) && (GAP_SIZE > 100)) {
                                     stageMeasuring = 1;
                                     parkingGap = GAP_SIZE;
                                     parkingSit = 1;

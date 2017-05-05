@@ -115,22 +115,22 @@ services:
         command: "/opt/od4/bin/odcockpit --cid=${CID} --configuration=/opt/configuration/configuration --freq=20"
 
    #Micro-service for lanedtecter scenario.
-    lanefollower:
-        build: .
-        network_mode: host
-        ipc: host
-        environment:
-        - DISPLAY=$DISPLAY
-        volumes:
-        - ./DIT-168:/opt/configuration
-        depends_on:
-            - odsupercomponent
-            - odsimvehicle
-            - odsimcamera
-            - communicationlink
-        restart: on-failure
-        privileged: true
-        command: bash -c "sleep 5; /opt/opendlv.scaledcars/bin/scaledcars-control-lanefollwer --verbose=1  --cid=${CID} --freq=20"
+   # lanefollower:
+    #    build: .
+     #   network_mode: host
+      #  ipc: host
+       # environment:
+        #- DISPLAY=$DISPLAY
+ #       volumes:
+  #      - ./DIT-168:/opt/configuration
+   #     depends_on:
+    #        - odsupercomponent
+     #       - odsimvehicle
+      #      - odsimcamera
+       #     - communicationlink
+        #restart: on-failure
+#        privileged: true
+ #       command: bash -c "sleep 5; /opt/opendlv.scaledcars/bin/scaledcars-control-lanefollwer --verbose=1  --cid=${CID} --freq=20"
 
     #Micro-service for lanedtecter scenario.
     parallelparker:
@@ -142,9 +142,7 @@ services:
         depends_on:
             - odsupercomponent
             - odsimvehicle
-            - odsimcamera
             - communicationlink
-        restart: on-failure
         privileged: true
         command: bash -c "sleep 5; /opt/opendlv.scaledcars/bin/scaledcars-control-parallelparker --verbose=1  --cid=${CID} --freq=20"
 

@@ -88,7 +88,7 @@ namespace scaledcars {
 
             int motor;
             int servo;
-
+            int oldVal;
             SensorsMSG sbd;
 
             map<uint32_t, double> sensors;

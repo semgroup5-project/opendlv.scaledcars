@@ -50,6 +50,7 @@ namespace scaledcars {
                 serial(),
                 motor(90),
                 servo(90),
+                oldVal(0),
                 sbd(),
                 sensors() {}
 
@@ -196,15 +197,21 @@ namespace scaledcars {
 
                 //ODOMETER [ID 6] with value between 0 - 255
             } else if (id == 6 && value >= 0 && value <= 255) {
-
-                if ((int) odometerOldValue > value) {
-                    odometerCounter += (odometerOldValue - value);
-                } else {
-                    odometerCounter += value;
+                if (value > oldVal) {
+                    oldVal += (value - oldVal);
+                } else if (value < oldVal) {
+                    oldVal = oldVal;
                 }
-                odometerOldValue = value;
-                cout << "[VehicleData to conference] VALUE: " << odometerCounter << endl;
-                sbd.setTravelledDistance(odometerCounter);
+                sbd.setTravelledDistance(oldVal);
+                //  sbd.setTravlelledDistance(value);
+//                if ((int) odometerOldValue > value) {
+//                    odometerCounter += (odometerOldValue - value);
+//                } else {
+//                    odometerCounter += value;
+//                }
+//                odometerOldValue = value;
+//                cout << "[VehicleData to conference] VALUE: " << odometerCounter << endl;
+//                sbd.setTravelledDistance(odometerCounter);
             } else {
                 cerr << "[Filter no sensor] ID: " << id << " VALUE: " << value << endl;
             }

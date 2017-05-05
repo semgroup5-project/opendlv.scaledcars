@@ -88,6 +88,8 @@ namespace scaledcars {
 
         private:
             bool sim;
+            int guardGoodV;
+            int guardBadV;
 
             virtual void setUp();
 
