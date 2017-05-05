@@ -82,7 +82,7 @@ namespace scaledcars {
 
             virtual void tearDown();
 
-            void filterData(int id, int value, double *values, int *numbers);
+            void filterData(int id, int value);
 
             void sendSensorBoardData(std::map<uint32_t, double> sensor);
 

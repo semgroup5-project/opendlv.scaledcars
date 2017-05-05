@@ -87,15 +87,15 @@ services:
         command: bash -c "sleep 5; /opt/opendlv.scaledcars/bin/scaledcars-control-communicationlink --verbose=1 --cid=${CID} --rm=true --freq=20"
 
     #udpconnection
-    udpconnection:
-        build: .
-        network_mode: host
-        ipc : host
-        depends_on:
-            - odsupercomponent
-        restart: on-failure
-        privileged: true
-        command: bash -c "sleep 5; /opt/opendlv.scaledcars/bin/scaledcars-control-udpconnection --verbose=1 --cid=${CID} --rm=true --freq=20"
+    #udpconnection:
+     #   build: .
+      #  network_mode: host
+       # ipc : host
+        #depends_on:
+         #   - odsupercomponent
+        #restart: on-failure
+        #privileged: true
+        #command: bash -c "sleep 5; /opt/opendlv.scaledcars/bin/scaledcars-control-udpconnection --verbose=1 --cid=${CID} --rm=true --freq=20"
 
     #odcockpit
     odcockpit:

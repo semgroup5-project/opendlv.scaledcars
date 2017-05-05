@@ -148,29 +148,16 @@ namespace scaledcars {
 
                 int pending = g_async_queue_length(this->serial->incoming_queue);
                 bool isSensorValues = false;
-                double valuesToNormalize[] = {0,0,0,0,0};
-                int numbers[] = {0,0,0,0,0};
                 protocol_data incoming;
                 for (int i = 0; i < pending; i++) {
                     if (serial_receive(this->serial, &incoming)) {
                         cerr << "RECEIVED : id=" << incoming.id << " value=" << incoming.value << endl;
-                        filterData(incoming.id, incoming.value, valuesToNormalize, numbers);
+                        filterData(incoming.id, incoming.value);
                         isSensorValues = true;
                     }
                 }
 
                 if (isSensorValues) {
-                    for(int i = 0; i < 5; i++){
-                        int _id = i+1;
-                        int _value = 0;
-                        if(numbers[i] != 0){
-                            _value = valuesToNormalize[i] / numbers[i];
-                        } else {
-                            _value = valuesToNormalize[i];
-                        }
-                        sensors[_id] = _value;
-                        cout << "[SensorBoardData to conference] ID: " << _id << " VALUE: " << _value << endl;
-                    }
                     sendSensorBoardData(sensors);
                 }
             }
@@ -185,17 +172,27 @@ namespace scaledcars {
         *
         * @param data to filter
         */
-        void SerialSendHandler::filterData(int id, int value, double *values, int *numbers) {
+        void SerialSendHandler::filterData(int id, int value) {
 
             //US-SENSOR [ID 1] [ID 2] with value between 1 - 70
             if ((id == 1 || id == 2) && value >= 1 && value <= 70) {
-                values[id - 1] += value;
-                numbers[id - 1] += 1;
+                sensors[id] = value;
+                cout << "[SensorBoardData to conference] ID: " << id << " VALUE: " << value << endl;
+
+                //IR-SENSOR [ID 3] [ID 4] with value between 3 - 40
+            } else if ((id == 1 || id == 2) && value == 0) {
+                sensors[id] = -1;
+                cout << "[SensorBoardData to conference] ID: " << id << " VALUE: " << value << endl;
 
                 //IR-SENSOR [ID 3] [ID 4] with value between 3 - 40
             } else if ((id == 3 || id == 4 || id == 5) && value >= 3 && value <= 40) {
-                values[id - 1] += value;
-                numbers[id - 1] += 1;
+                sensors[id] = value;
+                cout << "[SensorBoardData to conference] ID: " << id << " VALUE: " << value << endl;
+
+                //ODOMETER [ID 6] with value between 0 - 255
+            } else if ((id == 3 || id == 4 || id == 5) && value == 0) {
+                sensors[id] = -1;
+                cout << "[SensorBoardData to conference] ID: " << id << " VALUE: " << value << endl;
 
                 //ODOMETER [ID 6] with value between 0 - 255
             } else if (id == 6 && value >= 0 && value <= 255) {
