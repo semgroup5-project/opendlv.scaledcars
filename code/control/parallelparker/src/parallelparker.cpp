@@ -16,21 +16,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-
-#include <cstdio>
-#include <cmath>
-#include <iostream>
-#include <math.h>
-
-#include "opendavinci/odcore/io/conference/ContainerConference.h"
-#include "opendavinci/odcore/data/Container.h"
-
-#include "opendavinci/GeneratedHeaders_OpenDaVINCI.h"
-#include "automotivedata/GeneratedHeaders_AutomotiveData.h"
-
 #include "parallelparker.h"
 
-#define PI 3.14159265359
 namespace scaledcars {
     namespace control {
 
@@ -39,18 +26,22 @@ namespace scaledcars {
         using namespace odcore::data;
         using namespace automotive;
         using namespace automotive::miniature;
+        using namespace group5;
 
         parallelparker::parallelparker(const int32_t &argc, char **argv) :
                 TimeTriggeredConferenceClientModule(argc, argv, "parallelparker"),
-                sim(false) {}
+                sim(false),
+                communicationLinkMSG(),
+                vc() {}
 
         parallelparker::~parallelparker() {}
 
         void parallelparker::setUp() {
             // This method will be call automatically _before_ running body().
-           // sim = getKeyValueConfiguration().getValue<int32_t>("parallelparking.simu");
+            // sim = getKeyValueConfiguration().getValue<int32_t>("parallelparking.simu");
             KeyValueConfiguration kv = getKeyValueConfiguration();
-            sim = (kv.getValue<int32_t>("parallelparker.sim") == 0);
+            sim = (kv.getValue<int32_t>("global.sim") == 1);
+
         }
 
         void parallelparker::tearDown() {
@@ -58,25 +49,38 @@ namespace scaledcars {
         }
 
         bool parallelparker::obstacleDetect(int i) {
-            bool ifObstacle;
-            if (i < 0) {
-                ifObstacle = false;
-            } else if (i >= 0) {
-                ifObstacle = true;
+            bool ifObstacle = true;
+            if (sim) {
+                if (i < 0) {
+                    ifObstacle = false;
+                } else if (i >= 0) {
+                    ifObstacle = true;
+                }
+            } else if (!sim) {
+                if (i > 38 || i <= 2) {
+                    ifObstacle = false;
+                } else if (i <= 38 && i >= 3) {
+                    ifObstacle = true;
+                }
             }
+
             return ifObstacle;
         }
 
         // This method will do the main data processing job.
         odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode parallelparker::body() {
 
-            bool IFFRObstacle;
-            //bool IFRRObstacle;
-            const double INFRARED_FRONT_RIGHT = 0;
-            const double INFRARED_REAR = 1;
-            const double INFRARED_REAR_RIGHT = 2;
-            const double ULTRASONIC_FRONT = 3;
+            const int INFRARED_FRONT_RIGHT = 0;
+            const int INFRARED_REAR = 1;
+            const int INFRARED_REAR_RIGHT = 2;
+            const int ULTRASONIC_FRONT = 3;
 
+//            const int CAR_INFRARED_FRONT_RIGHT = 3;
+//            const int CAR_INFRARED_REAR = 5;
+//            const int CAR_INFRARED_REAR_RIGHT = 4;
+//            const int CAR_ULTRASONIC_FRONT = 1;
+
+            bool IFFRObstacle;
             double GAP_SIZE = 0;
             double distance = 0;
             double absPathStart = 0;
@@ -86,29 +90,33 @@ namespace scaledcars {
             double parkEnd = 0;
             double parkingGap = 0;
             double counter = 1;
+            double i = 0;
+            double timer = 0;
+            // double travleDist = 0;
 
             //double irFrontRight = 0;
             double usFront = 0;
             double irRear = 0;
             double irRearRight = 0;
+            int parkingSit = 0; //1 -> Two boxes, 0 -> Enough space from beginning,
             int gap = 0;
             int stageMeasuring = 0;
             int stageMoving = 0;
 
             while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
                    odcore::data::dmcp::ModuleStateMessage::RUNNING) {
-                // 1. Get most recent vehicle data:
-                Container containerVehicleData = getKeyValueDataStore().get(automotive::VehicleData::ID());
-                VehicleData vd = containerVehicleData.getData<VehicleData>();
 
-                // 2. Get most recent sensor board data:
-                Container containerSensorBoardData = getKeyValueDataStore().get(
-                        automotive::miniature::SensorBoardData::ID());
-                SensorBoardData sbd = containerSensorBoardData.getData<SensorBoardData>();
+                    // 1. Get most recent vehicle data:
+                    Container containerVehicleData = getKeyValueDataStore().get(automotive::VehicleData::ID());
+                    VehicleData vd = containerVehicleData.getData<VehicleData>();
 
-                // Create vehicle control data.
-                VehicleControl vc;
-                //irFrontRight = sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT);
+                    // 2. Get most recent sensor board data:
+                    Container containerSensorBoardData = getKeyValueDataStore().get(
+                            automotive::miniature::SensorBoardData::ID());
+                    SensorBoardData sbd = containerSensorBoardData.getData<SensorBoardData>();
+
+                    Container communicationLinkMSGContainer = getKeyValueDataStore().get(CommunicationLinkMSG::ID());
+                    communicationLinkMSG = communicationLinkMSGContainer.getData<CommunicationLinkMSG>();
 
                 if (sim) {
                     irRear = sbd.getValueForKey_MapOfDistances(INFRARED_REAR);
@@ -124,128 +132,251 @@ namespace scaledcars {
                     if (stageMoving == 1) {
                         vc.setSpeed(0);
                         vc.setSteeringWheelAngle(0);
-                        if (irRearRight > 0) {
-                            stageMoving = 2;
+                        if (irRearRight > 0 && parkingSit == 0) {
+                            stageMoving = 3;
+                        }
+                        if (irRearRight < 0 && parkingSit == 1) {
+                            stageMoving = 3;
+                            cerr << "parkingSit ==" << parkingSit << " moving to next stage " << endl;
                         }
                     }
                     if (stageMoving == 2) {
-                        vc.setSpeed(-1);
-                        stageMoving = 2;
+                        vc.setSpeed(1);
                         if (irRear < 0) {
                             stageMoving = 3;
+                            cerr << "irRear smaller than 0 Stage Moving = 3" << endl;
                         }
                     }
-
                     if (stageMoving == 3 && (irRear < 0)) {
                         //Parking
+                        cerr << "parking gap " << parkingGap << endl;
                         parkEnd = vd.getAbsTraveledPath();
                         backDist = parkEnd - parkStart;
-
                         double cosVal = cos(30 * PI / 180.0);
                         double adjDist = cosVal * backDist;
                         if (gap == 1) {
                             if (irRear < 0 && adjDist < parkingGap / 2) {
-
                                 vc.setSpeed(-1);
                                 vc.setSteeringWheelAngle(2);
-
                                 counter++;
                             }
                             if (irRear < 0 && adjDist > parkingGap / 2 && counter > 1) {
-
                                 vc.setSpeed(-1);
                                 vc.setSteeringWheelAngle(-2);
-
-                                counter -= 1.5;
+                                counter -= 1.6;
                             }
                         }
                         if (gap == 2) {
                             if (irRear < 0 && adjDist < parkingGap / 3) {
-
                                 vc.setSpeed(-1);
                                 vc.setSteeringWheelAngle(.3);
-
                                 counter++;
                             }
                             if (irRear < 0 && adjDist > parkingGap / 3 && counter > 1) {
-
                                 vc.setSpeed(-1);
-
                                 vc.setSteeringWheelAngle(-.3);
-
-                                counter -= 1.5;
+                                counter -= 1.6;
                             }
                         }
                     }
                     if (counter < 1) {
+                        i = vd.getAbsTraveledPath();
                         stageMoving = 4;
                     }
                     if (stageMoving == 4) {
-                        cerr<< "Move one last bit"<<endl;
+                        cerr << "Move one last bit" << endl;
+                        double j = vd.getAbsTraveledPath();
                         vc.setSpeed(1);
                         vc.setSteeringWheelAngle(.2);
-
+                        if (parkingSit == 1 && j - i < 2) {
+                            cerr << "stage4 #1 if" << endl;
+                            stageMoving = 5;
+                        }
                         if (usFront < 7 && usFront > 0) {
                             stageMoving = 5;
+                            cerr << "stage4 #2 if" << endl;
                         }
                     }
                     if (stageMoving == 5) {
+                        cerr << "car stopped!!" << endl;
                         vc.setSpeed(0);
                         vc.setSteeringWheelAngle(0);
                     }
                     if (irRear > 0 && irRear < 4) {
                         //Emergency stop
                         vc.setSpeed(0);
+                        cerr << "emergency stop!" << endl;
                     }
-                }else if(!sim){
-                    cerr<<"This is for the car!"<<endl;
+                } else if (!sim) {
+                    int a = communicationLinkMSG.getInfraredSideFront();
+                    cerr << "This is the IFFRObs reading!!!" << a << endl;
+                    irRear = communicationLinkMSG.getInfraredBack();
+                    irRearRight = communicationLinkMSG.getInfraredSideBack();
+                    usFront = communicationLinkMSG.getUltraSonicFrontCenter();
+                    IFFRObstacle = obstacleDetect(a);
+
+                    //Car is using degree.
+                    if (stageMoving == 0) {
+                        // Go forward.
+                        vc.setSpeed(100);
+                        vc.setSteeringWheelAngle(0);
+                        parkStart = communicationLinkMSG.getWheelEncoder();
+                    }
+                    if (stageMoving == 1) {
+
+                        //to make the car stop
+                        vc.setSpeed(100);
+                        vc.setSteeringWheelAngle(0);
+                        if (irRearRight > 1 && parkingSit == 0) {
+                            stageMoving = 2;
+                        }
+                        if (irRearRight < 1 && parkingSit == 1) {
+                            stageMoving = 2;
+                            cerr << "parkingSit ==" << parkingSit << " moving to next stage" << endl;
+                        }
+                    }
+                    if (stageMoving == 2) {
+                        vc.setSpeed(190);
+                        if (parkingSit == 1) {
+                            vc.setSpeed(190);
+                            timer++;
+                            if (timer > 30) {
+                                stageMoving = 3;
+                            }
+                        }
+                        if (parkingSit == 0 && irRear < 20) {
+                            stageMoving = 3;
+                            cerr << "irRear smaller than 0 Stage Moving = 3" << endl;
+                        }
+                    }
+                    if (stageMoving == 3 && (irRear < 5)) {
+                        //Parking
+                        parkEnd = communicationLinkMSG.getWheelEncoder();
+                        backDist = parkEnd - parkStart;
+                        double cosVal = cos(60 * PI / 180.0);
+                        double adjDist = cosVal * backDist;
+
+                        if (gap == 1) {
+                            cerr << "GAP: " << gap << endl;
+                            if (irRear < 5 && adjDist < parkingGap / 2) {
+                                vc.setSpeed(80);
+                                vc.setSteeringWheelAngle(1.5);
+                                counter++;
+                            }
+                            if (irRear < 5 && adjDist > parkingGap / 2 && counter > 1) {
+                                vc.setSpeed(80);
+                                vc.setSteeringWheelAngle(-1.5);
+                                counter -= 1.6;
+                            }
+                        }
+                        if (gap == 2) {
+                            cerr << "GAP: " << gap << endl;
+                            if (irRear < 5 && adjDist < parkingGap / 3) {
+                                vc.setSpeed(80);
+                                vc.setSteeringWheelAngle(.7);
+                                counter++;
+                            }
+                            if (irRear < 5 && adjDist > parkingGap / 3 && counter > 1) {
+                                vc.setSpeed(80);
+                                vc.setSteeringWheelAngle(-.7);
+                                counter -= 1.6;
+                            }
+                        }
+                    }
+                    if (counter < 1 && stageMoving == 3) {
+                        i = communicationLinkMSG.getWheelEncoder();
+                        stageMoving = 4;
+                    }
+                    if (stageMoving == 4) {
+                        cerr << "Move one last bit" << endl;
+                        double j = communicationLinkMSG.getWheelEncoder();
+                        vc.setSpeed(100);
+                        vc.setSteeringWheelAngle(.18);
+                        if (parkingSit == 1 && j - i < 2) {
+                            cerr << "stage4 #1 if" << endl;
+                            stageMoving = 5;
+                        }
+                        if (usFront < 25 && usFront > 1) {
+                            stageMoving = 5;
+                            cerr << "stage4 #2 if" << endl;
+                        }
+                    }
+                    if (stageMoving == 5) {
+                        cerr << "car stopped!!" << endl;
+                        vc.setSpeed(190);
+                        vc.setSteeringWheelAngle(0);
+                    }
+                    if (irRear > 3 && irRear < 15) {
+                        //Emergency stop
+                        vc.setSpeed(190);
+                        cerr << "emergency stop!" << endl;
+                    }
                 }
 
 
-                if (stageMoving == 0) {
-
+                //Measuring parking gap
+                if (stageMoving == 0 && sim) {
                     switch (stageMeasuring) {
                         case 0: {
 
-                            // Initialize measurement.
-
                             distance = sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT);
-                            if ((IFFRObstacle)) {
+                            double parking = vd.getAbsTraveledPath();
+                            absPathStart = vd.getAbsTraveledPath();
+                            cerr << "parkingSit detection" << endl;
+                            //when there is no car parked for 15 units
+                            if (!IFFRObstacle && parking >= 15) {
+                                GAP_SIZE = parking;
+                                parkingGap = parking;
+                                gap = 1;
+                                stageMoving = 1;
+                                parkingSit = 1;
                                 stageMeasuring++;
+                                cerr << "parkingSit 15 units" << endl;
+                            }
+                            //when there is something detected within 15 units
+                            if (IFFRObstacle && parking < 15) {
+                                parkingSit = 0;
+                                stageMeasuring++;
+                                cerr << "parkingSit 2 < 15 units" << endl;
                             }
                         }
                             break;
                         case 1: {
-
                             // Checking for sequence +, -.
-                            if ((distance > 0) && (sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT) < 0)) {
-                                // Found sequence +, -.
-                                stageMeasuring = 2;
-                                absPathStart = vd.getAbsTraveledPath();
+                            if (parkingSit == 1) {
+                                cerr << "in case 1 parkingSit sim ==1" << endl;
+                                if ((distance > 0) && (sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT) < 0)) {
+                                    // Found sequence +, -.
+                                    cerr << "Setting stageMeasuring to 2 " << endl;
+                                    stageMeasuring = 2;
+                                    absPathStart = vd.getAbsTraveledPath();
+                                }
+                                distance = sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT);
                             }
-                            distance = sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT);
                         }
-                            break;
+                            break;communicationLinkMSG.getWheelEncoder();
                         case 2: {
                             // Checking for sequence -, +.
                             if (sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT) > 0) {
                                 absPathEnd = vd.getAbsTraveledPath();
                                 GAP_SIZE = (absPathEnd - absPathStart);
-                                cerr << "Size = " << GAP_SIZE << endl;
-                                if (GAP_SIZE < 15) {
+                                cerr << "Sizeeee = " << GAP_SIZE << endl;
+                                if (GAP_SIZE <= 15) {
                                     gap = 1;
+                                    cerr << "set GAP = 1 from case 2" << endl;
                                 } else if (GAP_SIZE > 15) {
                                     gap = 2;
+                                    cerr << "set GAP = 2 from case 2" << endl;
+
                                 }
-                                cerr << "gap: " << gap << endl;
                                 stageMeasuring = 1;
                                 if ((stageMoving < 1) &&
                                     (sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT) > 0) && (GAP_SIZE > 7)) {
                                     stageMeasuring = 1;
                                     parkingGap = GAP_SIZE;
-                                    //parkingGap = 15;
+                                    parkingSit = 1;
                                     stageMoving = 1;
-                                    cerr << "Size = " << GAP_SIZE << endl;
+                                    cerr << "Sizeeee = " << GAP_SIZE << endl;
                                 }
                                 //Extra, when there is only one box on the track
 //                                if ((stageMoving < 1) &&
@@ -262,9 +393,77 @@ namespace scaledcars {
                         }
                             break;
                     }
+                } else if (stageMoving == 0 && !sim) {
+                    switch (stageMeasuring) {
+                        case 0: {
+                            cerr << "case 0! " << endl;
+                            distance = communicationLinkMSG.getInfraredSideFront();
+                            double parking = communicationLinkMSG.getWheelEncoder();
+                            absPathStart = communicationLinkMSG.getWheelEncoder();
+                            cerr << "IFFRObstacle :" << IFFRObstacle << endl;
+                            if (!IFFRObstacle && parking >= 100) {
+                                GAP_SIZE = parking;
+                                parkingGap = parking;
+                                gap = 1;
+                                stageMoving = 1;
+                                parkingSit = 1;
+                                stageMeasuring = 1;
+                                cerr << "parkingSit 1 100 units" << endl;
+                            }
+                            if (IFFRObstacle && parking < 100) {
+                                parkingSit = 0;
+                                stageMeasuring = 1;
+                                cerr << "parkingSit 2 < 100 units" << endl;
+                            }
+                        }
+                            break;
+                        case 1: {
+                            cerr << "case 1! " << endl;
+                            cerr << "parking sit  " << parkingSit << endl;
+                            // Checking for sequence +, -.
+                            if (parkingSit == 0) {
+                                cerr << "in case 1 parkingSit==1 real car " << endl;
+                                if ((distance > 0) &&
+                                    (communicationLinkMSG.getInfraredSideFront() < 5)) {
+                                    // Found sequence +, -.
+                                    cerr << "Setting stageMeasuring to 2 " << endl;
+                                    stageMeasuring = 2;
+                                    absPathStart = communicationLinkMSG.getWheelEncoder();
+                                }
+                                distance = communicationLinkMSG.getInfraredSideFront();
+                            }
+                        }
+                            break;
+                        case 2: {
+                            cerr << "case 2! " << endl;
+                            // Checking for sequence -, +.
+                            if (communicationLinkMSG.getInfraredSideFront() > 10) {
+                                absPathEnd = communicationLinkMSG.getWheelEncoder();
+                                GAP_SIZE = (absPathEnd - absPathStart);
+                                cerr << "Sizeeee = " << GAP_SIZE << endl;
+
+                                if (GAP_SIZE <= 150) {
+                                    gap = 1;
+                                    cerr << "set GAP = 1 from case 2" << endl;
+                                } else if (GAP_SIZE > 150) {
+                                    gap = 2;
+                                    cerr << "set GAP = 2 from case 2" << endl;
+                                }
+                                stageMeasuring = 1;
+                                if ((stageMoving < 1) &&
+                                    (communicationLinkMSG.getInfraredSideFront() > 10) &&
+                                    (GAP_SIZE > 150)) {
+                                    stageMeasuring = 1;
+                                    parkingGap = GAP_SIZE;
+                                    parkingSit = 1;
+                                    stageMoving = 1;
+                                    cerr << "Sizeeee = " << GAP_SIZE << endl;
+                                }
+                            }
+                        }
+                            break;
+                    }
                 }
-
-
                 // Create container for finally sending the data.
                 Container c(vc);
                 // Send container.
@@ -274,5 +473,4 @@ namespace scaledcars {
         }
     }
 } // automotive::miniature
-
 

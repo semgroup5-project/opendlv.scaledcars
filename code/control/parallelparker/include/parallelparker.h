@@ -20,57 +20,84 @@
 #ifndef PARALLELPARKER_H_
 #define PARALLELPARKER_H_
 
+#include <cstdio>
+#include <cmath>
+#include <iostream>
+#include <math.h>
+
+#include "opendavinci/odcore/io/conference/ContainerConference.h"
+#include "opendavinci/odcore/data/Container.h"
+
+#include "opendavinci/GeneratedHeaders_OpenDaVINCI.h"
+#include "automotivedata/GeneratedHeaders_AutomotiveData.h"
+
 #include "opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h"
+#include "odvdscaledcarsdatamodel/generated/group5/CommunicationLinkMSG.h"
+#include <automotivedata/GeneratedHeaders_AutomotiveData.h>
+#include <opendavinci/GeneratedHeaders_OpenDaVINCI.h>
+
+#define PI 3.14159265859
 
 namespace scaledcars {
     namespace control {
 
         using namespace std;
+        using namespace odcore::base;
+        using namespace odcore::data;
+        using namespace automotive;
+        using namespace automotive::miniature;
+        using namespace group5;
+
 
         /**
          * This class is a skeleton to send driving commands to Hesperia-light's vehicle driving dynamics simulation.
          */
         class parallelparker : public odcore::base::module::TimeTriggeredConferenceClientModule {
-            private:
-                /**
-                 * "Forbidden" copy constructor. Goal: The compiler should warn
-                 * already at compile time for unwanted bugs caused by any misuse
-                 * of the copy constructor.
-                 *
-                 * @param obj Reference to an object of this class.
-                 */
-                parallelparker(const parallelparker &/*obj*/);
+        private:
+            /**
+             * "Forbidden" copy constructor. Goal: The compiler should warn
+             * already at compile time for unwanted bugs caused by any misuse
+             * of the copy constructor.
+             *
+             * @param obj Reference to an object of this class.
+             */
+            parallelparker(const parallelparker &/*obj*/);
 
-                /**
-                 * "Forbidden" assignment operator. Goal: The compiler should warn
-                 * already at compile time for unwanted bugs caused by any misuse
-                 * of the assignment operator.
-                 *
-                 * @param obj Reference to an object of this class.
-                 * @return Reference to this instance.
-                 */
-                parallelparker& operator=(const parallelparker &/*obj*/);
+            /**
+             * "Forbidden" assignment operator. Goal: The compiler should warn
+             * already at compile time for unwanted bugs caused by any misuse
+             * of the assignment operator.
+             *
+             * @param obj Reference to an object of this class.
+             * @return Reference to this instance.
+             */
+            parallelparker &operator=(const parallelparker &/*obj*/);
 
-            public:
-                /**
-                 * Constructor.
-                 *
-                 * @param argc Number of command line arguments.
-                 * @param argv Command line arguments.
-                 */
-                parallelparker(const int32_t &argc, char **argv);
+        public:
+            /**
+             * Constructor.
+             *
+             * @param argc Number of command line arguments.
+             * @param argv Command line arguments.
+             */
+            parallelparker(const int32_t &argc, char **argv);
 
-                virtual ~parallelparker();
+            virtual ~parallelparker();
 
-                odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
+            odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
 
-            private:
-                bool sim;
-                virtual void setUp();
+        private:
+            bool sim;
 
-                virtual void tearDown();
+            virtual void setUp();
 
-                bool obstacleDetect(int i);
+            virtual void tearDown();
+
+            bool obstacleDetect(int i);
+
+            CommunicationLinkMSG communicationLinkMSG;
+
+            VehicleControl vc;
 
         };
 

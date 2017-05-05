@@ -368,8 +368,8 @@ lanedetector.threshBaseParameter=48
 #
 # CONFIGURATION FOR CommunicationLink
 #
-communicationlink.functionlane = 1
-communicationlink.function2 = 0
+communicationlink.functionlane = 0
+communicationlink.function2 = 1
 
 ###############################################################################
 ###############################################################################
