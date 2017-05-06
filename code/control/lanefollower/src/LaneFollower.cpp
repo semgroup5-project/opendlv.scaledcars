@@ -101,6 +101,7 @@ namespace scaledcars {
         int32_t stageToRightLaneLeftTurn = 0;
         int32_t traveled_distance = 0;
 
+
         double distanceLtoL_0 = 0;
         double distanceLtoL_1 = 0;
 
@@ -110,12 +111,9 @@ namespace scaledcars {
         double distanceRtoR_0 = 0;
         double distanceRtoR_1 = 0;
 
+
         double distanceRtoL_0 = 0;
         double distanceRtoL_1 = 0;
-
-
-        //int32_t stageToRightLaneRightTurn2= 88;
-        //int32_t stageToRightLaneLeftTurn2 = 44;
 
         // Distance variables to ensure we are overtaking only stationary or slowly driving obstacles.
         double distanceToObstacle = 0;
@@ -418,10 +416,9 @@ namespace scaledcars {
                 bool sensorCondition = (fabs(IR_FR - IR_RR) < HEADING_PARALLEL);
                 bool stepsCondition = ((stageToRightLaneLeftTurn - stageToRightLaneRightTurn) > 0);
 
-                cerr << "sensorCondition=" << sensorCondition << " stepsCondition=" << stepsCondition;
+                cerr << "sensorCondition=" << sensorCondition << " stepsCondition= " << stepsCondition;
 
-                if (sensorCondition &&
-                    stepsCondition) {
+                if (sensorCondition && stepsCondition) {
                     // Straight forward again.
                     stageMoving = CONTINUE_ON_LEFT_LANE;
                     distanceLtoR_1 = vd.getAbsTraveledPath();
@@ -505,13 +502,6 @@ namespace scaledcars {
                 cout << "Stage RightLaneRightTurn is" << stageToRightLaneRightTurn << endl;
                 cout <<"Distance "<< traveled_distance << endl;
 
-                /*
-                if (stageToRightLaneRightTurn < 17) {
-                    cout << "Going left" << endl;
-                    stageMoving = TO_RIGHT_LANE_LEFT_TURN;
-
-                }*/
-
                 double traveledSoFar = vd.getAbsTraveledPath() - distanceRtoR_0;
                 double traveledRequired = distanceLtoR_1 - distanceLtoR_0;
                 cerr << "traveledRequired=" << traveledRequired << endl;
@@ -541,31 +531,7 @@ namespace scaledcars {
                     m_eOld = 0;
                 }
 
-                /*
-
-                stageToRightLaneLeftTurn--;
-                cout << "Stage  is" << stageToRightLaneLeftTurn << endl;
-                //TESTING steps
-                if (stageToRightLaneLeftTurn == 0) {
-                    // Start over.
-                    overtake = false;
-                    stageMoving = FORWARD;
-
-                    stageToRightLaneLeftTurn = 0;
-                    stageToRightLaneRightTurn = 0;
-
-                    stageMeasuring = FIND_OBJECT_INIT;
-
-                    distanceToObstacle = 0;
-                    distanceToObstacleOld = 0;
-
-                    // Reset PID controller.
-                    m_eSum = 0;
-                    m_eOld = 0;
-                }
-                 */
             }
-
 
         }
 
