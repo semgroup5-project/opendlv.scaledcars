@@ -190,7 +190,7 @@ namespace scaledcars {
                 if (value < oldOdometer) {
                     odometerToIncrease = value + odometerDifference;
                 } else if (value > oldOdometer) {
-                    odometerToIncrease = value;
+                    odometerToIncrease = value - oldOdometer;
                     odometerDifference = 255 - value;
                 }
                 realOdometer += odometerToIncrease;
