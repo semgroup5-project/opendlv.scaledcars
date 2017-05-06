@@ -1,2 +1,0 @@
-/usr/bin/ar qc libscaledcars-control-lanefollwer-static.a  CMakeFiles/scaledcars-control-lanefollwer-static.dir/src/LaneFollower.cpp.o
-/usr/bin/ranlib libscaledcars-control-lanefollwer-static.a

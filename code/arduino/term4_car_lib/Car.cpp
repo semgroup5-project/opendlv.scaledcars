@@ -3,6 +3,10 @@
 Car::Car() {}
 
 void Car::setUp() {
+    pinMode(RELAY_PIN, OUTPUT);
+
+    digitalWrite(RELAY_PIN, HIGH);
+
     pinMode(CH_1, INPUT);
     pinMode(CH_2, INPUT);
 
@@ -21,20 +25,11 @@ void Car::setUp() {
     wheelEncoder.attach(ENCODER_PIN_A, ENCODER_PIN_B, true);
     wheelEncoder.begin();
 
+    encoderPos = wheelEncoder.getDistance();
+
     Serial.begin(BAUD); //start the serial
     waitConnection();
     while (Serial.available()) { //empty any rubbish value from the buffer
-        red = 255;
-        green = 0;
-        blue = 0;
-#ifdef COMMON_ANODE
-        red = 255 - red;
-        green = 255 - green;
-        blue = 255 - blue;
-#endif
-        analogWrite(redPin, red);
-        analogWrite(greenPin, green);
-        analogWrite(bluePin, blue);
         byte clean = Serial.read();
     }
     establishContact('\n');
@@ -47,8 +42,6 @@ void Car::run() {
         rcControl();
     }
     provideSensorsData();
-
-
 }
 
 void Car::provideSensorsData() {
@@ -61,9 +54,8 @@ void Car::provideSensorsData() {
         encoderPos = wheelEncoder.getDistance();
         odometer -= 255;
     }
-    if (odometerStart) {
-        wheelEncoder.encodeAndWrite(ID_IN_ENCODER, odometer);
-    }
+
+    wheelEncoder.encodeAndWrite(ID_IN_ENCODER, odometer);
 
     ultrasonicFront.encodeAndWrite(ID_IN_ULTRASONIC_CENTER, ultrasonicFront.getDistance());
     ultrasonicRight.encodeAndWrite(ID_IN_ULTRASONIC_SIDE_FRONT, ultrasonicRight.getDistance());
@@ -100,18 +92,6 @@ void Car::automatedDrive() {
 
     func_is_changed = 0;
 
-    red = 0;
-    green = 0;
-    blue = 255;
-#ifdef COMMON_ANODE
-    red = 255 - red;
-    green = 255 - green;
-    blue = 255 - blue;
-#endif
-    analogWrite(redPin, red);
-    analogWrite(greenPin, green);
-    analogWrite(bluePin, blue);
-
     int value = 90, serial_size = 0, count = 0;
     byte in;
     while ((serial_size = Serial.available()) <= 0 && !isRCControllerOn());
@@ -123,9 +103,6 @@ void Car::automatedDrive() {
     protocol_frame frame;
     frame.a = in;
     protocol_data data = protocol_decode_t1(frame);
-//    Serial.print(data.id);
-//    Serial.print(" ");
-//    Serial.println(data.value);
 
     if (data.id == ID_OUT_SERVO) {
         value = data.value * 3;
@@ -136,22 +113,20 @@ void Car::automatedDrive() {
 
     if (data.id == ID_OUT_MOTOR) {
         value = data.value * 3;
-        if (value > 180){
+        Serial.print("value");
+        Serial.println(value);
+        if (value > 185) {
             escMotor.brake();//applying values greater than 180 will be our indicative to brake
-        }
-        else {
+        } else {
             if (value >= 0 && value <= 180) {
                 escMotor.setSpeed(value);
             }
         }
     }
-    if (isRCControllerOn()) {
-        escMotor.brake();
-    }
 }
 
 int Car::readChannel1() {
-    return pulseIn(CH_1, HIGH); // steer
+    return pulseIn(CH_1, HIGH, 10000); // steer
 }
 
 int Car::readChannel2() {

@@ -1,47 +1,44 @@
 #include "SerialSendHandler.h"
-
-#include <iostream>
-#include <memory>
-#include <stdint.h>
-#include <string>
-
-#include <opendavinci/odcore/base/Thread.h>
-#include <opendavinci/odcore/wrapper/SerialPort.h>
-#include <opendavinci/odcore/wrapper/SerialPortFactory.h>
-
 #include "protocol.c"
 #include "serial.c"
 #include "arduino.c"
 
-#define pi 3.1415926535897
-
-using namespace std;
-
-using namespace odcore;
-using namespace odcore::base::module;
-using namespace odcore::data;
-using namespace odcore::wrapper;
-using namespace odcore::data::dmcp;
-
 namespace scaledcars {
     namespace control {
+
+        using namespace std;
+        using namespace odcore;
+        using namespace odcore::base::module;
+        using namespace odcore::data;
+        using namespace odcore::wrapper;
+        using namespace odcore::data::dmcp;
+        using namespace automotive;
+        using namespace automotive::miniature;
+
         int port = 0;
         const string SERIAL_PORTS[] = {"/dev/ttyACM0", "/dev/ttyACM1", "/dev/ttyACM2", "/dev/ttyACM3"};
         int BAUD_RATE = 115200;
 
-        void __on_read(uint8_t b)
-        {
-            cout << ">> read " << (int)b << endl;
+        void __on_read(uint8_t b) {
+            cout << ">> read " << (int) b << endl;
         }
 
-        void __on_write(uint8_t b)
-        {
-            cout << "<< write " << (int)b << endl;
+        void __on_write(uint8_t b) {
+            cout << "<< write " << (int) b << endl;
         }
 
         SerialSendHandler::SerialSendHandler(const int32_t &argc, char **argv) :
-            TimeTriggeredConferenceClientModule(argc, argv, "SerialSendHandler")
-        {}
+                TimeTriggeredConferenceClientModule(argc, argv, "SerialSendHandler"),
+                serial(),
+                motor(90),
+                servo(90),
+                sbd(),
+                sensors(),
+                oldOdometer(0),
+                odometerDifference(0),
+                realOdometer(0),
+                odometerToIncrease(0),
+                counter(0) {}
 
         SerialSendHandler::~SerialSendHandler() {}
 
@@ -57,7 +54,7 @@ namespace scaledcars {
                 this->serial->on_write = &__on_write;
                 this->serial->on_read = &__on_read;
 
-                const char * _port = SERIAL_PORTS[port].c_str();
+                const char *_port = SERIAL_PORTS[port].c_str();
                 serial_open(this->serial, _port, BAUD_RATE);
                 cerr << "serial open" << endl;
                 serial_handshake(this->serial, '\n');
@@ -68,7 +65,7 @@ namespace scaledcars {
 
                 serial_start(this->serial);
                 cerr << "serial start" << endl;
-            }catch (const char* msg){
+            } catch (const char *msg) {
                 cerr << "Serial error : " << msg << endl;
                 port++;
                 if (port < 4) {
@@ -91,14 +88,43 @@ namespace scaledcars {
             serial_send(this->serial, d_motor);
             serial_send(this->serial, d_servo);
 
+            const uint32_t ONE_SECOND = 1000 * 1000;
+            odcore::base::Thread::usleepFor(10 * ONE_SECOND);
+
             serial_stop(this->serial);
             serial_free(this->serial);
         }
 
         odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode SerialSendHandler::body() {
             while (getModuleStateAndWaitForRemainingTimeInTimeslice() == ModuleStateMessage::RUNNING) {
-                cout << "CYCLE " << cycle << endl;
-                cycle++;
+
+                Container vehicleControlContainer = getKeyValueDataStore().get(automotive::VehicleControl::ID());
+                if (vehicleControlContainer.getDataType() == automotive::VehicleControl::ID()) {
+                    const automotive::VehicleControl vc =
+                            vehicleControlContainer.getData<automotive::VehicleControl>();
+
+                    int arduinoAngle = 90;
+                    int speed = 190;
+
+                    if (!vc.getBrakeLights()) {
+                        double angle = vc.getSteeringWheelAngle();
+                        cerr << "angle radius : " << angle << endl;
+
+                        arduinoAngle = 90 + (angle * (180 / PI));
+                        if (arduinoAngle < 0) {
+                            arduinoAngle = 0;
+                        } else if (arduinoAngle > 180) {
+                            arduinoAngle = 180;
+                        }
+
+                        speed = vc.getSpeed();
+                    }
+                    cerr << "angle degree " << arduinoAngle << endl;
+                    cerr << "speed to arduino : " << speed << endl;
+
+                    this->motor = speed;
+                    this->servo = arduinoAngle;
+                }
 
                 protocol_data d_motor;
                 d_motor.id = ID_OUT_MOTOR;
@@ -112,51 +138,89 @@ namespace scaledcars {
                 serial_send(this->serial, d_servo);
 
                 int pending = g_async_queue_length(this->serial->incoming_queue);
+                bool isSensorValues = false;
                 protocol_data incoming;
                 for (int i = 0; i < pending; i++) {
                     if (serial_receive(this->serial, &incoming)) {
                         cerr << "RECEIVED : id=" << incoming.id << " value=" << incoming.value << endl;
+                        filterData(incoming.id, incoming.value);
+                        isSensorValues = true;
                     }
                 }
-                
+
+                if (isSensorValues) {
+                    sendSensorBoardData(sensors);
+                }
             }
 
             return ModuleExitCodeMessage::OKAY;
         }
 
-        void SerialSendHandler::nextContainer(Container &c) {
-                cerr << "NEXT CONTAINER " << c.getDataType() << endl;
-                if (c.getDataType() == automotive::VehicleControl::ID()) {
-                    const automotive::VehicleControl vd =
-                            c.getData<automotive::VehicleControl>();
-                    int arduinoAngle = 0;
-                    double angle = vd.getSteeringWheelAngle();
-                    cerr << "angle radius : " << angle << endl;
+        /**
+        * Filters the data according to what sensor it represents and that sensors ranges.
+        * Ultrasonic and IR-sensor values are added to the "values", incrementing the "numbers".
+        * Every odometer value is passed forward for packing and sending.
+        *
+        * @param data to filter
+        */
+        void SerialSendHandler::filterData(int id, int value) {
 
-                    arduinoAngle = 90 + (angle * (180 / pi));
-                    if (arduinoAngle < 0) {
-                        arduinoAngle = 0;
-                    } else if(arduinoAngle > 180){
-                        arduinoAngle = 180;
-                    }
-                    cerr << "angle degree " << arduinoAngle << endl;
+            //US-SENSOR [ID 1] [ID 2] with value between 1 - 70
+            if ((id == 1 || id == 2) && value >= 1 && value <= 70) {
+                sensors[id] = value;
+                cout << "[SensorBoardData to conference] ID: " << id << " VALUE: " << value << endl;
 
-                    int speed = vd.getSpeed();
-                    cerr << "speed to arduino : " << speed << endl;
+                //IR-SENSOR [ID 3] [ID 4] with value between 3 - 40
+            } else if ((id == 1 || id == 2) && value == 0) {
+                sensors[id] = -1;
+                cout << "[SensorBoardData to conference] ID: " << id << " VALUE: " << value << endl;
 
-//                    // TODO: int odometer = vd.getOdometer();
+                //IR-SENSOR [ID 3] [ID 4] with value between 3 - 40
+            } else if ((id == 3 || id == 4 || id == 5) && value >= 3 && value <= 40) {
+                sensors[id] = value;
+                cout << "[SensorBoardData to conference] ID: " << id << " VALUE: " << value << endl;
 
+                //ODOMETER [ID 6] with value between 0 - 255
+            } else if ((id == 3 || id == 4 || id == 5) && value == 0) {
+                sensors[id] = -1;
+                cout << "[SensorBoardData to conference] ID: " << id << " VALUE: " << value << endl;
 
-
-//  TODO SEND
-//                    string speedMessage = pack(ID_OUT_MOTOR, speed);
-//                    string angleMessage = pack(ID_OUT_SERVO, arduinoAngle);
-//                    TODO: string odometerMessage = pack(ID_OUT_ODOMETER, odometer);
-
-                    this->motor = speed;
-                    this->servo = arduinoAngle;
-
+                //ODOMETER [ID 6] with value between 0 - 255
+            } else if (id == 6 && value >= 0 && value <= 255) {
+                if (value < oldOdometer) {
+                    odometerToIncrease = value + odometerDifference;
+                } else if (value > oldOdometer) {
+                    odometerToIncrease = value;
+                    odometerDifference = 255 - value;
                 }
+                realOdometer += odometerToIncrease;
+                odometerToIncrease = 0;
+                oldOdometer = value;
+
+                if (realOdometer >= KM_IN_CM) {
+                    realOdometer -= KM_IN_CM;
+                    counter++;
+                }
+
+                cout << "[VehicleData to conference] VALUE: " << realOdometer << endl;
+                sbd.setTravelledDistance(realOdometer);
+                sbd.setTravelledKm(counter);
+            } else {
+                cerr << "[Filter no sensor] ID: " << id << " VALUE: " << value << endl;
+            }
+        }
+
+        /**
+      	* Pack a map of sensor values ad SensorBoardData.
+      	* Then put the SensorBoardData into a Container and send the
+      	* Container to the Conference.
+      	*
+      	* @param a map of sensor data from every ultrasonic and ir-sensor
+			*/
+        void SerialSendHandler::sendSensorBoardData(map<uint32_t, double> sensor) {
+            sbd.setMapOfDistances(sensor);
+            Container c(sbd);
+            getConference().send(c);
         }
     }
 }

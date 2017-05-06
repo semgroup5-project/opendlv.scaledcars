@@ -20,3 +20,39 @@ message chalmersrevere.scaledcars.ExampleMessage [id = 801] {
     uint32 field1   [id = 1];
 }
 
+message group5.CommunicationLinkMSG [id = 555 ] {
+    uint8 stateLaneFollower [id = 1];
+    uint8 stateOvertaker [id = 2];
+    uint8 stateParker [id = 3];
+    double ultraSonicFrontCenter [id = 4];
+    double ultrasonicFrontRight [id = 5];
+    double infraredSideFront [id = 6];
+    double infraredSideBack [id = 7];
+    double infraredBack [id = 8];
+    double wheelEncoder [id = 9];
+    uint8 drivingLane [id = 10];
+}
+
+message group5.LaneFollowerMSG [id = 556 ] {
+    uint8 stateLane [id = 1];
+    string image [id = 2];
+}
+
+message group5.OvertakerMSG [id = 557 ] {
+    uint8 stateStop [id = 1];
+    uint8 stateLane [id = 2];
+}
+
+message group5.ParkerMSG [id = 558 ] {
+    uint8 stateStop [id = 1];
+}
+
+message group5.UDPMSG [id = 559 ] {
+    uint8 stateFunction [id = 1];
+}
+
+message group5.SensorsMSG [id = 560 ] {
+    uint64 travelledDistance [id = 1];
+    map<uint32, double> distances [id = 2];
+    uint64 travelledKm [id = 3];
+}
