@@ -103,19 +103,23 @@ namespace scaledcars {
                     const automotive::VehicleControl vc =
                             vehicleControlContainer.getData<automotive::VehicleControl>();
 
-                    int arduinoAngle = 0;
-                    double angle = vc.getSteeringWheelAngle();
-                    cerr << "angle radius : " << angle << endl;
+                    int arduinoAngle = 90;
+                    int speed = 190;
 
-                    arduinoAngle = 90 + (angle * (180 / PI));
-                    if (arduinoAngle < 0) {
-                        arduinoAngle = 0;
-                    } else if (arduinoAngle > 180) {
-                        arduinoAngle = 180;
+                    if (!vc.getBrakeLights()) {
+                        double angle = vc.getSteeringWheelAngle();
+                        cerr << "angle radius : " << angle << endl;
+
+                        arduinoAngle = 90 + (angle * (180 / PI));
+                        if (arduinoAngle < 0) {
+                            arduinoAngle = 0;
+                        } else if (arduinoAngle > 180) {
+                            arduinoAngle = 180;
+                        }
+
+                        speed = vc.getSpeed();
                     }
                     cerr << "angle degree " << arduinoAngle << endl;
-
-                    int speed = vc.getSpeed();
                     cerr << "speed to arduino : " << speed << endl;
 
                     this->motor = speed;
