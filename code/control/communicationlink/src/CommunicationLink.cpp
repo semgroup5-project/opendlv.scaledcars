@@ -1,20 +1,18 @@
 #include "CommunicationLink.h"
 
-using namespace std;
-
-using namespace odcore;
-using namespace odcore::base::module;
-using namespace odcore::data;
-using namespace odcore::wrapper;
-using namespace odcore::data::dmcp;
-
-using namespace odcore::base;
-using namespace automotive;
-using namespace automotive::miniature;
-using namespace group5;
-
 namespace scaledcars {
     namespace control {
+
+        using namespace std;
+        using namespace odcore;
+        using namespace odcore::base::module;
+        using namespace odcore::data;
+        using namespace odcore::wrapper;
+        using namespace odcore::data::dmcp;
+        using namespace odcore::base;
+        using namespace automotive;
+        using namespace automotive::miniature;
+        using namespace group5;
 
         CommunicationLink::CommunicationLink(const int32_t &argc, char **argv) :
                 TimeTriggeredConferenceClientModule(argc, argv, "CommunicationLink"),

@@ -1,41 +1,23 @@
 #include "SerialSendHandler.h"
-
-#include <iostream>
-#include <memory>
-#include <stdint.h>
-#include <string>
-
-#include <opendavinci/odcore/base/Thread.h>
-#include <opendavinci/odcore/wrapper/SerialPort.h>
-#include <opendavinci/odcore/wrapper/SerialPortFactory.h>
-
-#include "automotivedata/generated/automotive/VehicleData.h"
-#include "automotivedata/generated/automotive/miniature/SensorBoardData.h"
-
 #include "protocol.c"
 #include "serial.c"
 #include "arduino.c"
 
-#define pi 3.1415926535897
-
-using namespace std;
-
-using namespace odcore;
-using namespace odcore::base::module;
-using namespace odcore::data;
-using namespace odcore::wrapper;
-using namespace odcore::data::dmcp;
-using namespace automotive;
-using namespace automotive::miniature;
-
 namespace scaledcars {
     namespace control {
+
+        using namespace std;
+        using namespace odcore;
+        using namespace odcore::base::module;
+        using namespace odcore::data;
+        using namespace odcore::wrapper;
+        using namespace odcore::data::dmcp;
+        using namespace automotive;
+        using namespace automotive::miniature;
+
         int port = 0;
         const string SERIAL_PORTS[] = {"/dev/ttyACM0", "/dev/ttyACM1", "/dev/ttyACM2", "/dev/ttyACM3"};
         int BAUD_RATE = 115200;
-
-        double odometerCounter;
-        double odometerOldValue;
 
         void __on_read(uint8_t b) {
             cout << ">> read " << (int) b << endl;
@@ -50,9 +32,13 @@ namespace scaledcars {
                 serial(),
                 motor(90),
                 servo(90),
-                oldVal(0),
                 sbd(),
-                sensors() {}
+                sensors(),
+                oldOdometer(0),
+                odometerDifference(0),
+                realOdometer(0),
+                odometerToIncrease(0),
+                counter(0) {}
 
         SerialSendHandler::~SerialSendHandler() {}
 
@@ -103,7 +89,7 @@ namespace scaledcars {
             serial_send(this->serial, d_servo);
 
             const uint32_t ONE_SECOND = 1000 * 1000;
-            odcore::base::Thread::usleepFor(5 * ONE_SECOND);
+            odcore::base::Thread::usleepFor(10 * ONE_SECOND);
 
             serial_stop(this->serial);
             serial_free(this->serial);
@@ -121,7 +107,7 @@ namespace scaledcars {
                     double angle = vc.getSteeringWheelAngle();
                     cerr << "angle radius : " << angle << endl;
 
-                    arduinoAngle = 90 + (angle * (180 / pi));
+                    arduinoAngle = 90 + (angle * (180 / PI));
                     if (arduinoAngle < 0) {
                         arduinoAngle = 0;
                     } else if (arduinoAngle > 180) {
@@ -197,21 +183,24 @@ namespace scaledcars {
 
                 //ODOMETER [ID 6] with value between 0 - 255
             } else if (id == 6 && value >= 0 && value <= 255) {
-                if (value > oldVal) {
-                    oldVal += (value - oldVal);
-                } else if (value < oldVal) {
-                    oldVal = oldVal;
+                if (value < oldOdometer) {
+                    odometerToIncrease = value + odometerDifference;
+                } else if (value > oldOdometer) {
+                    odometerToIncrease = value;
+                    odometerDifference = 255 - value;
                 }
-                sbd.setTravelledDistance(oldVal);
-                //  sbd.setTravlelledDistance(value);
-//                if ((int) odometerOldValue > value) {
-//                    odometerCounter += (odometerOldValue - value);
-//                } else {
-//                    odometerCounter += value;
-//                }
-//                odometerOldValue = value;
-//                cout << "[VehicleData to conference] VALUE: " << odometerCounter << endl;
-//                sbd.setTravelledDistance(odometerCounter);
+                realOdometer += odometerToIncrease;
+                odometerToIncrease = 0;
+                oldOdometer = value;
+
+                if (realOdometer >= KM_IN_CM) {
+                    realOdometer -= KM_IN_CM;
+                    counter++;
+                }
+
+                cout << "[VehicleData to conference] VALUE: " << realOdometer << endl;
+                sbd.setTravelledDistance(realOdometer);
+                sbd.setTravelledKm(counter);
             } else {
                 cerr << "[Filter no sensor] ID: " << id << " VALUE: " << value << endl;
             }

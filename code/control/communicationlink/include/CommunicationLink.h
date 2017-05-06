@@ -9,8 +9,6 @@
 #include <opendavinci/odcore/wrapper/SharedMemory.h>
 #include <opendavinci/odcore/wrapper/SharedMemoryFactory.h>
 
-#include "automotivedata/generated/automotive/VehicleData.h"
-#include "automotivedata/generated/automotive/miniature/SensorBoardData.h"
 #include <automotivedata/GeneratedHeaders_AutomotiveData.h>
 #include <opendavinci/GeneratedHeaders_OpenDaVINCI.h>
 #include "odvdscaledcarsdatamodel/generated/group5/CommunicationLinkMSG.h"
@@ -30,15 +28,14 @@
 
 #include "defines.h"
 
-using namespace std;
-
-using namespace odcore;
-using namespace odcore::base::module;
-using namespace odcore::data;
-using namespace odcore::wrapper;
-
 namespace scaledcars {
     namespace control {
+
+        using namespace std;
+        using namespace odcore;
+        using namespace odcore::base::module;
+        using namespace odcore::data;
+        using namespace odcore::wrapper;
 
         class CommunicationLink :
                 public odcore::base::module::TimeTriggeredConferenceClientModule {

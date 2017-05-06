@@ -54,4 +54,5 @@ message group5.UDPMSG [id = 559 ] {
 message group5.SensorsMSG [id = 560 ] {
     uint64 travelledDistance [id = 1];
     map<uint32, double> distances [id = 2];
+    uint64 travelledKm [id = 3];
 }
