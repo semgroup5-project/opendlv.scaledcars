@@ -95,7 +95,7 @@ namespace scaledcars {
 
             virtual void tearDown();
 
-            bool obstacleDetect(int i);
+            bool obstacleDetect(int i,int id);
 
             CommunicationLinkMSG communicationLinkMSG;
 
