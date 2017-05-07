@@ -166,8 +166,14 @@ namespace scaledcars {
 
                     if (stageMoving == 0) {
                         // Go forward.
-                        vc.setSpeed(2);
-                        vc.setSteeringWheelAngle(0);
+                        communicationLinkMSG.setStateLaneFollower(1);
+                        communicationLinkMSG.setStateOvertaker(0);
+                			communicationLinkMSG.setStateParker(0);
+                			Container temp(communicationLinkMSG);
+                			getConference().send(temp);
+                        
+                        //vc.setSpeed(2);
+                        //vc.setSteeringWheelAngle(0);
                         parkStart = vd.getAbsTraveledPath();
                     }
                     if (stageMoving == 1) {
@@ -425,6 +431,12 @@ namespace scaledcars {
                                     parkingGap = GAP_SIZE;
                                     parkingSit = 1;
                                     stageMoving = 1;
+                                    
+                                    communicationLinkMSG.setStateLaneFollower(0);
+                        				communicationLinkMSG.setStateOvertaker(0);
+                							communicationLinkMSG.setStateParker(1);
+                							Container temp(communicationLinkMSG);
+                							getConference().send(temp);
                                     cerr << "Sizeeee = " << GAP_SIZE << endl;
                                 }
                                 //Extra, when there is only one box on the track
