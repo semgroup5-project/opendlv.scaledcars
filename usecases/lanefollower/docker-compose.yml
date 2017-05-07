@@ -60,7 +60,7 @@ services:
         depends_on:
             - odsupercomponent
             - odsimvehicle
-        command: "/opt/od4/bin/odsimcamera --cid=${CID} --rm=true --privileged=true --freq=20 --configuration=/opt/configuration/configuration"
+        #command: "/opt/od4/bin/odsimcamera --cid=${CID} --rm=true --privileged=true --freq=20 --configuration=/opt/configuration/configuration"
 
         privileged: true
         restart: on-failure
