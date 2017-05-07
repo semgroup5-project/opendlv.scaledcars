@@ -146,19 +146,19 @@ namespace scaledcars {
                 serial_send(this->serial, d_servo);
 
                 int pending = g_async_queue_length(this->serial->incoming_queue);
-                bool isSensorValues = false;
+                //bool isSensorValues = false;
                 protocol_data incoming;
                 for (int i = 0; i < pending; i++) {
                     if (serial_receive(this->serial, &incoming)) {
                         cerr << "RECEIVED : id=" << incoming.id << " value=" << incoming.value << endl;
-                        filterData(incoming.id, incoming.value);
-                        isSensorValues = true;
+//                        filterData(incoming.id, incoming.value);
+//                        isSensorValues = true;
                     }
                 }
 
-                if (isSensorValues) {
-                    sendSensorBoardData(sensors);
-                }
+//                if (isSensorValues) {
+//                    sendSensorBoardData(sensors);
+//                }
             }
 
             return ModuleExitCodeMessage::OKAY;
