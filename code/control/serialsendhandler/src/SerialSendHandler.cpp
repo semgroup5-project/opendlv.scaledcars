@@ -103,6 +103,8 @@ namespace scaledcars {
                     const automotive::VehicleControl vc =
                             vehicleControlContainer.getData<automotive::VehicleControl>();
 
+                    int arduinoStopAngle = 90;
+                    int arduinoBrake = 190;
                     int arduinoAngle = 90;
                     int speed = 190;
 
@@ -118,12 +120,18 @@ namespace scaledcars {
                         }
 
                         speed = vc.getSpeed();
-                    }
-                    cerr << "angle degree " << arduinoAngle << endl;
-                    cerr << "speed to arduino : " << speed << endl;
 
-                    this->motor = speed;
-                    this->servo = arduinoAngle;
+                        cerr << "angle degree " << arduinoAngle << endl;
+                        cerr << "speed to arduino : " << speed << endl;
+
+                        this->motor = speed;
+                        this->servo = arduinoAngle;
+                    } else {
+                        cerr << "Brake signal sent..." << endl;
+                        this->motor = arduinoBrake;
+                        this->servo = arduinoStopAngle;
+                    }
+
                 }
 
                 protocol_data d_motor;
