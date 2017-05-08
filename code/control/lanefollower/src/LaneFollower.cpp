@@ -106,16 +106,16 @@ namespace scaledcars {
         //const int32_t INFRARED_BACK = 1;
         //const int32_t WHEEL_ENCODER = 5;
 
-        const double OVERTAKING_DISTANCE = 5.0;
-        const double HEADING_PARALLEL = 0.04;
+        const double OVERTAKING_DISTANCE = 40.0;
+        const double HEADING_PARALLEL = 2;
 
         const double TURN_SPEED_SIM = 0.7;
         const double TURN_ANGLE_SIM_LEFT = -15;
         const double TURN_ANGLE_SIM_RIGHT = 15;
 
         const double TURN_SPEED_CAR = 100;
-        const double TURN_ANGLE_CAR_LEFT = 60;
-        const double TURN_ANGLE_CAR_RIGHT = 120;
+        const double TURN_ANGLE_CAR_LEFT = TURN_ANGLE_SIM_LEFT;
+        const double TURN_ANGLE_CAR_RIGHT = TURN_ANGLE_SIM_RIGHT;
 
         // Overall state machines for moving and measuring.
         enum StateMachineMoving {
@@ -522,6 +522,7 @@ namespace scaledcars {
             if (!m_vehicleControl.getBrakeLights()) {
                 m_vehicleControl.setSteeringWheelAngle(desiredSteering);
             }
+        }
 
 
         void LaneFollower::measuring_state_machine() {
@@ -578,7 +579,7 @@ namespace scaledcars {
                     distance = clm.getUltraSonicFrontCenter();
                 }
 
-                if (distance < OVERTAKING_DISTANCE) {
+                if (distance > 0 && distance < OVERTAKING_DISTANCE) {
                     overtake = true;
 
                     stageMoving = OUT_TO_LEFT;
@@ -648,7 +649,7 @@ namespace scaledcars {
                 double distanceOUTtoL = distanceOUTtoL_1 - distanceOUTtoL_0;
                 double distanceOUTtoR = traveled - distanceOUTtoR_0;
 
-                bool sensorCondition = (fabs(IR_FR - IR_RR) < HEADING_PARALLEL);
+                bool sensorCondition = IR_FR > 0 && IR_RR > 0 && (fabs(IR_FR - IR_RR) < HEADING_PARALLEL);
                 bool distanceCondition = distanceOUTtoR > distanceOUTtoL;
 
                 if (sensorCondition && distanceCondition) {
@@ -757,7 +758,10 @@ namespace scaledcars {
                 double traveledSoFar = traveled - distanceINtoR_0;
                 double traveledRequired = distanceOUTtoR_1 - distanceOUTtoR_0;
 
-                if (traveledSoFar > (traveledRequired * 0.8)) {
+                cerr << "traveledSoFar=" << traveledSoFar << endl;
+                cerr << "traveledRequired=" << traveledRequired << endl;
+
+                if (traveledSoFar > (traveledRequired * 0.1)) {
                     stageMoving = IN_TO_LEFT;
                     if (Sim) {
                         distanceINtoL_0 = vd.getAbsTraveledPath();
@@ -787,7 +791,10 @@ namespace scaledcars {
                 double traveledSoFar = traveled - distanceINtoL_0;
                 double traveledRequired = distanceOUTtoL_1 - distanceOUTtoL_0;
 
-                if (traveledSoFar > (traveledRequired * 0.0)) {
+                cerr << "traveledSoFar=" << traveledSoFar << endl;
+                cerr << "traveledRequired=" << traveledRequired << endl;
+
+                if (traveledSoFar > (traveledRequired * 0.8)) {
                     overtake = false;
 
                     stageMoving = FORWARD;
@@ -816,6 +823,16 @@ namespace scaledcars {
                     _state = communicationLinkMSG.getStateLaneFollower();
                 }
 
+                m_vehicleControl.setBrakeLights(false);
+                m_vehicleControl.setSpeed(100);
+
+                movingMachine(true);
+                measuring_state_machine();
+
+                Container c3(m_vehicleControl);
+                getConference().send(c3);
+
+
                 cerr << "STATE IS : " << _state << endl;
                 if (_state == 1) {
                     bool has_next_frame = false;
@@ -827,15 +844,15 @@ namespace scaledcars {
                         has_next_frame = readSharedImage(image_container);
                     }
 
-                    // If we have an image from the previous call, it is then processed
+                    // If we have an image from the previous call, it is then processedodsimcamera
                     if (has_next_frame) {
                         processImage();
                         double error = errorCalculation();
                         laneFollower(error);
                     }
 
-                    movingMachine(has_next_frame) ;
-                    measuring_state_machine();
+                    //movingMachine(has_next_frame);
+                    //measuring_state_machine();
 
                     // State control for intersection stop
                     if (state == "moving")
@@ -933,6 +950,8 @@ namespace scaledcars {
                             m_vehicleControl.setSteeringWheelAngle(0);
                         }
                     }
+
+
                     // Create container for finally sending the set values for the control algorithm.
                     Container c2(m_vehicleControl);
                     // Send container.

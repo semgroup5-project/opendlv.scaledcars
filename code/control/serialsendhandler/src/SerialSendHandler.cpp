@@ -39,9 +39,7 @@ namespace scaledcars {
                 arduinoStopAngle(90),
                 arduinoBrake(190),
                 arduinoAngle(90),
-                speed(190),
-                oldSpeed(190),
-                oldAngle(90) {}
+                speed(190){}
 
         SerialSendHandler::~SerialSendHandler() {}
 
@@ -133,22 +131,19 @@ namespace scaledcars {
                     }
                 }
 
-                if (oldSpeed != this->motor) {
-                    protocol_data d_motor;
-                    d_motor.id = ID_OUT_MOTOR;
-                    d_motor.value = this->motor / 3;
 
-                    serial_send(this->serial, d_motor);
-                }
-                if (oldAngle != this->servo) {
-                    protocol_data d_servo;
-                    d_servo.id = ID_OUT_SERVO;
-                    d_servo.value = this->servo / 3;
+                protocol_data d_motor;
+                d_motor.id = ID_OUT_MOTOR;
+                d_motor.value = this->motor / 3;
 
-                    serial_send(this->serial, d_servo);
-                }
-                oldSpeed = this->motor;
-                oldAngle = this->servo;
+                serial_send(this->serial, d_motor);
+
+                protocol_data d_servo;
+                d_servo.id = ID_OUT_SERVO;
+                d_servo.value = this->servo / 3;
+
+                serial_send(this->serial, d_servo);
+
 
                 int pending = g_async_queue_length(this->serial->incoming_queue);
                 bool isSensorValues = false;
