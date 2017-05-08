@@ -38,7 +38,13 @@ namespace scaledcars {
                 odometerDifference(0),
                 realOdometer(0),
                 odometerToIncrease(0),
-                counter(0) {}
+                counter(0),
+                arduinoStopAngle(90),
+                arduinoBrake(190),
+                arduinoAngle(90),
+                speed(190),
+                oldSpeed(190),
+                oldAngle(90) {}
 
         SerialSendHandler::~SerialSendHandler() {}
 
@@ -89,7 +95,7 @@ namespace scaledcars {
             serial_send(this->serial, d_servo);
 
             const uint32_t ONE_SECOND = 1000 * 1000;
-            odcore::base::Thread::usleepFor(10 * ONE_SECOND);
+            odcore::base::Thread::usleepFor(15 * ONE_SECOND);
 
             serial_stop(this->serial);
             serial_free(this->serial);
@@ -103,11 +109,7 @@ namespace scaledcars {
                     const automotive::VehicleControl vc =
                             vehicleControlContainer.getData<automotive::VehicleControl>();
 
-                    int arduinoStopAngle = 90;
-                    int arduinoBrake = 190;
-                    int arduinoAngle = 90;
-                    int speed = 190;
-
+                    cerr << "BRAKE LIGHTS " << vc.getBrakeLights() << endl;
                     if (!vc.getBrakeLights()) {
                         double angle = vc.getSteeringWheelAngle();
                         cerr << "angle radius : " << angle << endl;
@@ -126,39 +128,45 @@ namespace scaledcars {
 
                         this->motor = speed;
                         this->servo = arduinoAngle;
+
                     } else {
                         cerr << "Brake signal sent..." << endl;
                         this->motor = arduinoBrake;
                         this->servo = arduinoStopAngle;
                     }
-
                 }
 
-                protocol_data d_motor;
-                d_motor.id = ID_OUT_MOTOR;
-                d_motor.value = this->motor / 3;
+                if (oldSpeed != this->motor) {
+                    protocol_data d_motor;
+                    d_motor.id = ID_OUT_MOTOR;
+                    d_motor.value = this->motor / 3;
 
-                protocol_data d_servo;
-                d_servo.id = ID_OUT_SERVO;
-                d_servo.value = this->servo / 3;
+                    serial_send(this->serial, d_motor);
+                }
+                if (oldAngle != this->servo) {
+                    protocol_data d_servo;
+                    d_servo.id = ID_OUT_SERVO;
+                    d_servo.value = this->servo / 3;
 
-                serial_send(this->serial, d_motor);
-                serial_send(this->serial, d_servo);
+                    serial_send(this->serial, d_servo);
+                }
+                oldSpeed = this->motor;
+                oldAngle = this->servo;
 
                 int pending = g_async_queue_length(this->serial->incoming_queue);
-                //bool isSensorValues = false;
+                bool isSensorValues = false;
                 protocol_data incoming;
                 for (int i = 0; i < pending; i++) {
                     if (serial_receive(this->serial, &incoming)) {
                         cerr << "RECEIVED : id=" << incoming.id << " value=" << incoming.value << endl;
-//                        filterData(incoming.id, incoming.value);
-//                        isSensorValues = true;
+                        filterData(incoming.id, incoming.value);
+                        isSensorValues = true;
                     }
                 }
 
-//                if (isSensorValues) {
-//                    sendSensorBoardData(sensors);
-//                }
+                if (isSensorValues) {
+                    sendSensorBoardData(sensors);
+                }
             }
 
             return ModuleExitCodeMessage::OKAY;

@@ -104,6 +104,15 @@ namespace scaledcars {
             int odometerToIncrease;
             long counter;
 
+            int arduinoStopAngle;
+            int arduinoBrake;
+
+            int arduinoAngle;
+            int speed;
+
+            int oldSpeed;
+            int oldAngle;
+
         };
     }
 }

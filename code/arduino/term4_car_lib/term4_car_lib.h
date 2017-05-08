@@ -128,7 +128,8 @@ public:
 private:
     void setFreqsAndSpeeds();
     unsigned short _pin; //the pin the ESC is attached to
-    int filterSpeed(int speed, int isRC);
+    int filterSpeed(int speed);
+    void indicateDirection(int speed);
     int _speed, _direction;
     unsigned short FULL_FORWARD, FULL_BACKWARD, IDLE_SPEED; //what percentage of the motor's power is allowed be used at most
     int IDLE_RAW_SPEED, MAX_FRONT_RAW_SPEED, MAX_BACK_RAW_SPEED; //the raw value (in whatever metric, usually pwm signal) that the motors are idle, throttling full speed backwards and forward
@@ -179,6 +180,8 @@ private:
     int encoderPos, odometerStart, odometer;
     unsigned long currentMillis;
     long interval;
+    protocol_data dataMotor;
+    protocol_data dataServo;
 };
 
 #endif

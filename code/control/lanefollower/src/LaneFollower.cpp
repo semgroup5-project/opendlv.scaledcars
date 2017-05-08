@@ -89,6 +89,8 @@ namespace scaledcars {
                 m_control_scanline = 462; // calibrated length to right: 280px
                 m_distance = 250;  // distance from right lane marking
             }
+
+            m_vehicleControl.setBrakeLights(true);
         }
 
         // This method will be call automatically _after_ return from body().
@@ -407,7 +409,10 @@ namespace scaledcars {
                     waitKey(10);
                 }
             }
-            m_vehicleControl.setSteeringWheelAngle(desiredSteering);
+
+            if (!m_vehicleControl.getBrakeLights()) {
+                m_vehicleControl.setSteeringWheelAngle(desiredSteering);
+            }
 
 
             // change this to use distance readings from image processing, same as line drawing
@@ -458,66 +463,97 @@ namespace scaledcars {
                     }
 
                     // State control for intersection stop
-                    if (state == "moving") {
-                        if (Sim) {
+                    if (state == "moving")
+                    {
+                        m_vehicleControl.setBrakeLights(false);
+                        if (Sim)
+                        {
                             m_vehicleControl.setSpeed(1);
-                        } else {
-                            if (stop) {
-                                if (stopCounter < 2.0) {
+                        }
+                        else
+                        {
+                            if (stop)
+                            {
+                                if (stopCounter < 2.0)
+                                {
                                     stopCounter += 0.5;
-                                }else{
-                                    if (prevState == "stopLine"){
+                                }
+                                else
+                                {
+                                    if (prevState == "stopLine")
+                                    {
                                         m_vehicleControl.setSpeed(100);
-                                    }else{
+                                    }
+                                    else
+                                    {
                                         state = "stop";
                                         stopCounter = 0;
                                     }
                                 }
-                            } else {
+                            }
+                            else
+                            {
                                 m_vehicleControl.setSpeed(100);
                                 prevState = "moving";
                             }
                         }
                     }
-                    if (state == "stop") {
+                    if (state == "stop")
+                    {
                         m_vehicleControl.setSteeringWheelAngle(0);
-                        if (Sim) {
+                        m_vehicleControl.setBrakeLights(true);
+                        if (Sim)
+                        {
                             m_vehicleControl.setSpeed(0);
-                        } else {
+                        }
+                        else
+                        {
                             m_vehicleControl.setSpeed(190);
                         }
 
                         stopCounter += 0.5;
 
-                        if (stopCounter > 20.9999) {
+                        if (stopCounter > 20.9999)
+                        {
                             state = "resume";
                             prevState = "stopLine";
-                            if (Sim) {
+                            m_vehicleControl.setBrakeLights(false);
+                            if (Sim)
+                            {
                                 m_vehicleControl.setSpeed(1);
-                            } else {
+                            }
+                            else
+                            {
                                 m_vehicleControl.setSpeed(100);
                             }
 
                         }
                     }
-                    if (state == "resume"){
-                        if (stopCounter < 50) {
+                    if (state == "resume")
+                    {
+                        if (stopCounter < 50)
+                        {
                             stopCounter += 0.5;
-                        } else {
+                        }
+                        else
+                        {
                             stopCounter = 0;
                             state = "moving";
                             cerr << "Moving!" << endl;
                         }
                     }
-                    if (state == "danger") {
-                        if (prevState ==
-                            "stopLine") {  // The idea here is, after a stop line, go forward and dont steer at all, it is expected to not find any reference line markings
+                    if (state == "danger")
+                    {
+                        if (prevState == "stopLine")
+                        {  // The idea here is, after a stop line, go forward and dont steer at all, it is expected to not find any reference line markings
                             m_vehicleControl.setSpeed(100);
                             m_vehicleControl.setSteeringWheelAngle(0);
+                            m_vehicleControl.setBrakeLights(false);
                         }
-                        if (prevState ==
-                            "moving") {
+                        if (prevState == "moving")
+                        {
                             prevState = "danger";
+                            m_vehicleControl.setBrakeLights(true);
                             m_vehicleControl.setSpeed(190);
                             m_vehicleControl.setSteeringWheelAngle(0);
                         }

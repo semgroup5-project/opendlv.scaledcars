@@ -93,28 +93,32 @@ void Car::automatedDrive() {
     func_is_changed = 0;
 
     int value = 90, serial_size = 0, count = 0;
-    byte in;
     while ((serial_size = Serial.available()) <= 0 && !isRCControllerOn());
-
+    dataMotor.id = 0;
+    dataMotor.value = 0;
+    dataServo.id = 0;
+    dataServo.value = 0;
     while (count++ < serial_size) {
-        in = Serial.read();
+        protocol_frame frame;
+        frame.a = Serial.read();
+        protocol_data data = protocol_decode_t1(frame);
+
+        if (data.id == ID_OUT_SERVO) {
+            dataServo = data;
+        } else if (data.id == ID_OUT_MOTOR) {
+            dataMotor = data;
+        }
     }
 
-    protocol_frame frame;
-    frame.a = in;
-    protocol_data data = protocol_decode_t1(frame);
-
-    if (data.id == ID_OUT_SERVO) {
-        value = data.value * 3;
+    if (dataServo.id == ID_OUT_SERVO) {
+        value = dataServo.value * 3;
         if (value >= 0 && value <= 180) {
             steeringMotor.setAngle(value, 0);
         }
     }
 
-    if (data.id == ID_OUT_MOTOR) {
-        value = data.value * 3;
-        Serial.print("value");
-        Serial.println(value);
+    if (dataMotor.id == ID_OUT_MOTOR) {
+        value = dataMotor.value * 3;
         if (value > 185) {
             escMotor.brake();//applying values greater than 180 will be our indicative to brake
         } else {
@@ -156,6 +160,7 @@ void Car::establishContact(char toSend) {
         analogWrite(bluePin, blue);
         Serial.println(toSend);   // send a char
     }
+    Serial.read();
 }
 
 void Car::waitConnection() {
