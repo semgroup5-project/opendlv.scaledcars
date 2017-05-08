@@ -76,11 +76,11 @@ namespace scaledcars {
 
             virtual void tearDown();
 
-            void filterData(protocol_data data, double *values, int *numbers);
+            //void filterData(protocol_data data, double *values, int *numbers);
 
             void sendSensorBoardData(std::map<uint32_t, double> sensor);
 
-            void sendVehicleData();
+            void sendVehicleData(double value);
 
             int motor;
             int servo;

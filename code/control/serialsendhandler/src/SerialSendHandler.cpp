@@ -15,6 +15,7 @@
 #include "protocol.c"
 #include "serial.c"
 #include "arduino.c"
+#include "Filter.h"
 
 #define pi 3.1415926535897
 
@@ -34,9 +35,6 @@ namespace scaledcars {
         const string SERIAL_PORTS[] = {"/dev/ttyACM0", "/dev/ttyACM1", "/dev/ttyACM2", "/dev/ttyACM3"};
         int BAUD_RATE = 115200;
         
-        double odometerCounter;
-        double odometerOldValue;
-
         void __on_read(uint8_t b)
         {
             cout << ">> read " << (int)b << endl;
@@ -148,31 +146,25 @@ namespace scaledcars {
                 serial_send(this->serial, d_servo);
 
                 int pending = g_async_queue_length(this->serial->incoming_queue);
-                double valuesToNormalize[5];
-                int numbers[5];
+                Filter filter;
                 bool isSensorValues = false;
                 protocol_data incoming;
                 for (int i = 0; i < pending; i++) {
                     if (serial_receive(this->serial, &incoming)) {
                         cerr << "RECEIVED : id=" << incoming.id << " value=" << incoming.value << endl;
-                        filterData(incoming, valuesToNormalize, numbers);
-                        isSensorValues = true;
+                        if(filter.isOdometer(incoming)){
+                        	sendVehicleData(filter.handleOdometerValue(incoming));
+                        } else {
+                        	filter.filter(incoming);
+                        	isSensorValues = true;
+                        }
+                        
                     }
                 }
                 
               	 if(isSensorValues){
                 	map<uint32_t, double> sensor;
-                	for(int i = 0; i < 5; i++){
-                		protocol_data d;
-                		d.id = i+1;
-                		if(numbers[i] != 0){
-                			d.value = valuesToNormalize[i] / numbers[i];
-                		} else {
-                			d.value = valuesToNormalize[i];
-                		}
-                		sensor[d.id] = d.value;
-                		cout << "[SensorBoardData to conference] ID: " << d.id << " VALUE: " << d.value << endl;
-                	}
+                	sensor = filter.normalize();
                 	sendSensorBoardData(sensor);
                 }
             }
@@ -180,43 +172,6 @@ namespace scaledcars {
             return ModuleExitCodeMessage::OKAY;
         }
         
-        /**
-        * Filters the data according to what sensor it represents and that sensors ranges.
-        * Ultrasonic and IR-sensor values are added to the "values", incrementing the "numbers".
-        * Every odometer value is passed forward for packing and sending.
-        *
-        * @param data to filter
-        */
-        void SerialSendHandler::filterData(protocol_data data, double *values, int *numbers){
-				
-					//US-SENSOR [ID 1] [ID 2] with value between 1 - 70
-        			if((data.id == 1 || data.id == 2) && data.value >= 1 && data.value <= 70){
-        				values[data.id - 1] += data.value;
-        				numbers[data.id - 1] += 1;
-        				cout << "filter " << data.id << "  " << data.value << endl;
-        				
-					//IR-SENSOR [ID 3] [ID 4] with value between 3 - 40
-					} else if ((data.id == 3 || data.id == 4 || data.id == 5) && data.value >= 3 && data.value <= 40){
-						values[data.id - 1] += data.value;
-        				numbers[data.id - 1] += 1;
-        				cout << "filter " << data.id << "  " << data.value << endl;
-							
-					//ODOMETER [ID 6] with value between 0 - 255
-					} else if (data.id == 6 && data.value >= 0 && data.value <= 255){ 
-						
-						if((int)odometerOldValue > data.value){
-							odometerCounter += (odometerOldValue - data.value);
-						} else {
-							odometerCounter += data.value;
-						}
-						odometerOldValue = data.value;
-						sendVehicleData();
-						//cout << "filter " << data.id << "  " << odometerCounter << endl;	
-						
-					} else {
-						cerr << "[Filter no sensor] ID: " << data.id << " VALUE: " << data.value << endl;
-        			}
-			}
         
         /**
       	* Pack a map of sensor values ad SensorBoardData.
@@ -239,15 +194,15 @@ namespace scaledcars {
       	* Pack the odometerCounter value as a VehicleData. Then put the VehicleData 
       	* into a Container and send the Container to the Conference.
 			*/      
-        void SerialSendHandler::sendVehicleData(){
+        void SerialSendHandler::sendVehicleData(double value){
         		VehicleData vd;
         		
-        		vd.setAbsTraveledPath(odometerCounter);
+        		vd.setAbsTraveledPath(value);
         		
 				Container c(vd);
 				getConference().send(c);
 				
-				cout << "[VehicleData to conference] VALUE: " << odometerCounter << endl;
+				//cout << "[VehicleData to conference] VALUE: " << odometerCounter << endl;
         }
     }
 }
