@@ -106,10 +106,6 @@ namespace scaledcars {
 
             int arduinoAngle;
             int speed;
-
-            int oldSpeed;
-            int oldAngle;
-
         };
     }
 }

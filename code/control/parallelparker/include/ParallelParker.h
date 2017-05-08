@@ -52,7 +52,7 @@ namespace scaledcars {
         /**
          * This class is a skeleton to send driving commands to Hesperia-light's vehicle driving dynamics simulation.
          */
-        class parallelparker : public odcore::base::module::TimeTriggeredConferenceClientModule {
+        class ParallelParker : public odcore::base::module::TimeTriggeredConferenceClientModule {
         private:
             /**
              * "Forbidden" copy constructor. Goal: The compiler should warn
@@ -61,7 +61,7 @@ namespace scaledcars {
              *
              * @param obj Reference to an object of this class.
              */
-            parallelparker(const parallelparker &/*obj*/);
+            ParallelParker(const ParallelParker &/*obj*/);
 
             /**
              * "Forbidden" assignment operator. Goal: The compiler should warn
@@ -71,7 +71,7 @@ namespace scaledcars {
              * @param obj Reference to an object of this class.
              * @return Reference to this instance.
              */
-            parallelparker &operator=(const parallelparker &/*obj*/);
+            ParallelParker &operator=(const ParallelParker &/*obj*/);
 
         public:
             /**
@@ -80,9 +80,9 @@ namespace scaledcars {
              * @param argc Number of command line arguments.
              * @param argv Command line arguments.
              */
-            parallelparker(const int32_t &argc, char **argv);
+            ParallelParker(const int32_t &argc, char **argv);
 
-            virtual ~parallelparker();
+            virtual ~ParallelParker();
 
             odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
 

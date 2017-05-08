@@ -1,5 +1,5 @@
 /**
- * parallelparker - Sample application for realizing a Parallel parking car.
+ * ParallelParker - Sample application for realizing a Parallel parking car.
  * Copyright (C) 2012 - 2015 Christian Berger
  *
  * This program is free software; you can redistribute it and/or
@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-#include "parallelparker.h"
+#include "ParallelParker.h"
 
 namespace scaledcars {
     namespace control {
@@ -28,17 +28,17 @@ namespace scaledcars {
         using namespace automotive::miniature;
         using namespace group5;
 
-        parallelparker::parallelparker(const int32_t &argc, char **argv) :
-                TimeTriggeredConferenceClientModule(argc, argv, "parallelparker"),
+        ParallelParker::ParallelParker(const int32_t &argc, char **argv) :
+                TimeTriggeredConferenceClientModule(argc, argv, "ParallelParker"),
                 sim(false),
                 guardGoodV(0),
                 guardBadV(0),
                 communicationLinkMSG(),
                 vc() {}
 
-        parallelparker::~parallelparker() {}
+        ParallelParker::~ParallelParker() {}
 
-        void parallelparker::setUp() {
+        void ParallelParker::setUp() {
             // This method will be call automatically _before_ running body().
             // sim = getKeyValueConfiguration().getValue<int32_t>("parallelparking.simu");
             KeyValueConfiguration kv = getKeyValueConfiguration();
@@ -46,11 +46,11 @@ namespace scaledcars {
 
         }
 
-        void parallelparker::tearDown() {
+        void ParallelParker::tearDown() {
             // This method will be call automatically _after_ return from body().
         }
 
-        bool parallelparker::obstacleDetect(int i, int id) {
+        bool ParallelParker::obstacleDetect(int i, int id) {
             // This method will return true/false basedon the sensor data input whether if
             // it detects a obstacle. id 1 -> ultrasonic, 2 -> infrared.
             bool ifObstacle;
@@ -63,15 +63,15 @@ namespace scaledcars {
                             ifObstacle = true;
                         }
                     } else if (!sim) {
-                        if (i > 50 || i < 0) {
+                        if (i > 70 || i < 0) {
                             guardBadV++;
-                            if (guardBadV > 5) {
+                            if (guardBadV > 8) {
                                 ifObstacle = false;
                                 guardGoodV = 0;
                             }
-                        } else if (i <= 38 && i >= 3) {
+                        } else if (i <= 70 && i > 0) {
                             guardGoodV++;
-                            if (guardGoodV > 5) {
+                            if (guardGoodV > 8) {
                                 ifObstacle = true;
                                 guardBadV = 0;
                             }
@@ -89,13 +89,13 @@ namespace scaledcars {
                     } else if (!sim) {
                         if (i > 38 || i < 0) {
                             guardBadV++;
-                            if (guardBadV > 5) {
+                            if (guardBadV > 8) {
                                 ifObstacle = false;
                                 guardGoodV = 0;
                             }
-                        } else if (i <= 38 && i >= 3) {
+                        } else if (i <= 38 && i > 0) {
                             guardGoodV++;
-                            if (guardGoodV > 5) {
+                            if (guardGoodV > 8) {
                                 ifObstacle = true;
                                 guardBadV = 0;
                             }
@@ -108,7 +108,7 @@ namespace scaledcars {
         }
 
         // This method will do the main data processing job.
-        odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode parallelparker::body() {
+        odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode ParallelParker::body() {
 
             const int INFRARED_FRONT_RIGHT = 0;
             const int INFRARED_REAR = 1;
@@ -268,12 +268,14 @@ namespace scaledcars {
                     //Car is using degree.
                     if (stageMoving == 0) {
                         // Go forward.
+                        vc.setBrakeLights(false);
                         vc.setSpeed(100);
                         vc.setSteeringWheelAngle(0);
                         parkStart = communicationLinkMSG.getWheelEncoder();
                     }
                     if (stageMoving == 1) {
                         //to make the car stop
+                        vc.setBrakeLights(false);
                         vc.setSpeed(100);
                         vc.setSteeringWheelAngle(0);
                         if (!IRRObstacle && parkingSit == 0) {
@@ -285,9 +287,10 @@ namespace scaledcars {
                         }
                     }
                     if (stageMoving == 2) {
-                        vc.setSpeed(190);
+                        vc.setBrakeLights(true);
+                        //vc.setSpeed(190);
                         if (parkingSit == 1) {
-                            vc.setSpeed(190);
+                            //vc.setSpeed(190);
                             timer++;
                             if (timer > 30) {
                                 stageMoving = 3;
@@ -308,12 +311,14 @@ namespace scaledcars {
                         if (gap == 1) {
                             cerr << "GAP: " << gap << endl;
                             if (irRear < 10 && adjDist < parkingGap / 2) {
-                                vc.setSpeed(80);
+                                vc.setBrakeLights(false);
+                                vc.setSpeed(75);
                                 vc.setSteeringWheelAngle(1.5);
                                 counter++;
                             }
                             if (irRear < 10 && adjDist > parkingGap / 2 && counter > 1) {
-                                vc.setSpeed(80);
+                                vc.setBrakeLights(false);
+                                vc.setSpeed(75);
                                 vc.setSteeringWheelAngle(-1.5);
                                 counter -= 1.6;
                             }
@@ -321,12 +326,14 @@ namespace scaledcars {
                         if (gap == 2) {
                             cerr << "GAP: " << gap << endl;
                             if (irRear < 10 && adjDist < parkingGap / 3) {
-                                vc.setSpeed(80);
+                                vc.setBrakeLights(false);
+                                vc.setSpeed(75);
                                 vc.setSteeringWheelAngle(.7);
                                 counter++;
                             }
                             if (irRear < 10 && adjDist > parkingGap / 3 && counter > 1) {
-                                vc.setSpeed(80);
+                                vc.setBrakeLights(false);
+                                vc.setSpeed(75);
                                 vc.setSteeringWheelAngle(-.7);
                                 counter -= 1.6;
                             }
@@ -339,9 +346,10 @@ namespace scaledcars {
                     if (stageMoving == 4) {
                         cerr << "Move one last bit" << endl;
                         double j = communicationLinkMSG.getWheelEncoder();
+                        vc.setBrakeLights(false);
                         vc.setSpeed(100);
                         vc.setSteeringWheelAngle(.1);
-                        if (parkingSit == 1 && j - i < 2) {
+                        if (parkingSit == 1 && j - i < 20) {
                             cerr << "stage4 #1 if" << endl;
                             stageMoving = 5;
                         }
@@ -352,12 +360,14 @@ namespace scaledcars {
                     }
                     if (stageMoving == 5) {
                         cerr << "car stopped!!" << endl;
-                        vc.setSpeed(190);
+                        vc.setBrakeLights(true);
+                       // vc.setSpeed(190);
                         vc.setSteeringWheelAngle(0);
                     }
                     if (irRear > 3 && irRear < 15 && IRRObstacle) {
                         //Emergency stop
-                        vc.setSpeed(190);
+                        vc.setBrakeLights(true);
+                       // vc.setSpeed(190);
                         cerr << "emergency stop!" << endl;
                     }
                 }
@@ -450,28 +460,29 @@ namespace scaledcars {
                             double empty = communicationLinkMSG.getWheelEncoder();
                             absPathStart = communicationLinkMSG.getWheelEncoder();
                             cerr << "IRFRObstacle :" << IRFRObstacle << endl;
-                            if (!IRFRObstacle && empty >= 80) {
+                            if (!IRFRObstacle && empty >= 50) {
                                 GAP_SIZE = empty;
                                 parkingGap = empty;
                                 gap = 1;
                                 stageMoving = 1;
                                 parkingSit = 0;
                                 stageMeasuring = 1;
-                                cerr << "parkingSit 1 80 units" << endl;
+                                cerr << "parkingSit 1 = 50 units" << endl;
                             }
-                            if (IRFRObstacle && empty < 80) {
+                            if (IRFRObstacle && empty < 50) {
                                 parkingSit = 1;
                                 stageMeasuring = 1;
-                                cerr << "parkingSit 2 < 80 units" << endl;
+                                cerr << "parkingSit 2 < 50 units" << endl;
                             }
                         }
                             break;
                         case 1: {
-                            cerr << "case 1! " << endl;
-                            cerr << "parking sit  " << parkingSit << endl;
                             // Checking for sequence +, -.
                             if (parkingSit == 1) {
+                                cerr << "case 1! parkSit 1 " << endl;
                                 cerr << "in case 1 parkingSit==1 real car " << endl;
+                                cerr<< "distance "<<distance<<endl;
+                                cerr<< "IRFRObstacle !"<<IRFRObstacle<<endl;
                                 if ((distance > 0) && (!IRFRObstacle)) {
                                     // Found sequence +, -.
                                     cerr << "Setting stageMeasuring to 2 " << endl;
@@ -490,15 +501,15 @@ namespace scaledcars {
                                 GAP_SIZE = (absPathEnd - absPathStart);
                                 cerr << "Sizeeee = " << GAP_SIZE << endl;
 
-                                if (GAP_SIZE <= 100) {
+                                if (stageMoving < 1 && GAP_SIZE <= 30) {
                                     gap = 1;
-                                    cerr << "set GAP = 1 from case 2" << endl;
-                                } else if (GAP_SIZE > 100) {
+                                    cerr << "Start Parking!!!!! gap 1" << endl;
+                                } else if (stageMoving < 1 && GAP_SIZE > 30) {
                                     gap = 2;
-                                    cerr << "set GAP = 2 from case 2" << endl;
+                                    cerr << "Start Parking!!!!! gap 2" << endl;
                                 }
                                 stageMeasuring = 1;
-                                if ((stageMoving < 1) && (IRFRObstacle) && (GAP_SIZE > 100)) {
+                                if ((stageMoving < 1) && (IRFRObstacle) && (GAP_SIZE > 30)) {
                                     stageMeasuring = 1;
                                     parkingGap = GAP_SIZE;
                                     parkingSit = 1;

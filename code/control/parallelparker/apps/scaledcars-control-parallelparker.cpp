@@ -1,5 +1,5 @@
 /**
- * parallelparker - Sample application for realizing a parallel parking car.
+ * ParallelParker - Sample application for realizing a parallel parking car.
  * Copyright (C) 2012 - 2015 Christian Berger
  *
  * This program is free software; you can redistribute it and/or
@@ -17,9 +17,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#include "parallelparker.h"
+#include "ParallelParker.h"
 
 int32_t main(int32_t argc, char **argv) {
-    scaledcars::control::parallelparker prlp(argc, argv);
+    scaledcars::control::ParallelParker prlp(argc, argv);
     return prlp.runModule();
 }

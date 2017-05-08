@@ -52,14 +52,14 @@ services:
             - odsupercomponent
         command: "/opt/od4/bin/odcockpit --cid=${CID} --configuration=/opt/configuration/configuration --freq=10"
      #serial
-#    serialhandler:
-#        build: .
-#        network_mode: host
-#        depends_on:
-#            - odsupercomponent
-#        devices:
-#        - "/dev/ttyACM0"
-#        command: bash -c "sleep 10; /opt/opendlv.scaledcars/bin/scaledcars-control-serialsendhandler --verbose=1 --cid=${CID} --rm=true --privileged --device=/dev/ttyACM0 --freq=20"
+    serialhandler:
+        build: .
+        network_mode: host
+        depends_on:
+            - odsupercomponent
+        devices:
+        - "/dev/ttyACM0"
+        command: bash -c "sleep 10; /opt/opendlv.scaledcars/bin/scaledcars-control-serialsendhandler --verbose=1 --cid=${CID} --rm=true --privileged --device=/dev/ttyACM0 --freq=10"
 #odsimirus
     odsimirus:
         build: .
