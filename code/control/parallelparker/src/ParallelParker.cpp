@@ -73,14 +73,14 @@ namespace scaledcars {
                     } else if (!sim) {
                         if (i > 70 || i < 0) {
                             guardBadV++;
-                            if (guardBadV > 5) {
+                            if (guardBadV > 3) {
                                 ifObstacle = false;
                                 guardGoodV = 0;
                                 guardBadV = 0;
                             }
                         } else if (i <= 70 && i > 0) {
                             guardGoodV++;
-                            if (guardGoodV > 5) {
+                            if (guardGoodV > 3) {
                                 ifObstacle = true;
                                 guardBadV = 0;
                                 guardGoodV = 0;
@@ -100,7 +100,7 @@ namespace scaledcars {
                         if (i > 28 || i < 0) {
                             guardBadV++;
                             if (guardBadV > 5) {
-                                cerr<<"guard bad value: "<<guardBadV++<<endl;
+                                cerr<<"guard bad value: "<<guardBadV<<endl;
                                 ifObstacle = false;
                                 guardGoodV = 0;
                                 guardBadV = 0;
@@ -108,7 +108,7 @@ namespace scaledcars {
                         } else if (i <= 28 && i > 0) {
                             guardGoodV++;
                             if (guardGoodV > 5) {
-                                cerr<<"guard good value: "<<guardBadV++<<endl;
+                                cerr<<"guard good value: "<<guardBadV<<endl;
                                 ifObstacle = true;
                                 guardBadV = 0;
                                 guardGoodV = 0;
@@ -478,7 +478,7 @@ namespace scaledcars {
 
                     IRRObstacle = obstacleDetect(irRear, IR);
                     IRFRObstacle = obstacleDetect(irFrontRight, IR);
-
+                    cerr << "irFrontRight in case 0:" << irFrontRight << endl;
                     switch (stageMeasuring) {
                         case 0: {
                             cerr << "case 0! real car" << endl;
