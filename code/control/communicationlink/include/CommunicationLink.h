@@ -81,10 +81,14 @@ namespace scaledcars {
             group5::OvertakerMSG overtakerMSG;
             group5::ParkerMSG parkerMSG;
             group5::SensorsMSG sensorsMSG;
+            
+            bool sim;
 
             virtual void setUp();
 
             virtual void tearDown();
+            
+            void setSensors();
 
             odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
 
