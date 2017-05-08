@@ -34,10 +34,7 @@ namespace scaledcars {
                 servo(90),
                 sbd(),
                 sensors(),
-                oldOdometer(0),
-                odometerDifference(0),
                 realOdometer(0),
-                odometerToIncrease(0),
                 counter(0),
                 arduinoStopAngle(90),
                 arduinoBrake(190),
@@ -203,15 +200,7 @@ namespace scaledcars {
 
                 //ODOMETER [ID 6] with value between 0 - 255
             } else if (id == 6 && value >= 0 && value <= 255) {
-                if (value < oldOdometer) {
-                    odometerToIncrease = value + odometerDifference;
-                } else if (value > oldOdometer) {
-                    odometerToIncrease = value - oldOdometer;
-                    odometerDifference = 255 - value;
-                }
-                realOdometer += odometerToIncrease;
-                odometerToIncrease = 0;
-                oldOdometer = value;
+                realOdometer += value;
 
                 if (realOdometer >= KM_IN_CM) {
                     realOdometer -= KM_IN_CM;

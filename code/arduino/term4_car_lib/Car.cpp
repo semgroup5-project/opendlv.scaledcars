@@ -25,8 +25,6 @@ void Car::setUp() {
     wheelEncoder.attach(ENCODER_PIN_A, ENCODER_PIN_B, true);
     wheelEncoder.begin();
 
-    encoderPos = wheelEncoder.getDistance();
-
     Serial.begin(BAUD); //start the serial
     waitConnection();
     while (Serial.available()) { //empty any rubbish value from the buffer
@@ -36,6 +34,7 @@ void Car::setUp() {
 }
 
 void Car::run() {
+    encoderPos = wheelEncoder.getDistance();
     if (!isRCControllerOn()) {
         automatedDrive();
     } else {
@@ -50,13 +49,9 @@ void Car::provideSensorsData() {
     infraredSideBack.encodeAndWrite(ID_IN_INFRARED_SIDE_BACK, infraredSideBack.getDistance());
 
     odometer = wheelEncoder.getDistance() - encoderPos;
-    if (odometer > 255) {
-        encoderPos = wheelEncoder.getDistance();
-        odometer -= 255;
+    if (odometer <= 255) {
+        wheelEncoder.encodeAndWrite(ID_IN_ENCODER, odometer);
     }
-
-    wheelEncoder.encodeAndWrite(ID_IN_ENCODER, odometer);
-
     ultrasonicFront.encodeAndWrite(ID_IN_ULTRASONIC_CENTER, ultrasonicFront.getDistance());
     ultrasonicRight.encodeAndWrite(ID_IN_ULTRASONIC_SIDE_FRONT, ultrasonicRight.getDistance());
 }
