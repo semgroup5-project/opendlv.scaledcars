@@ -184,12 +184,12 @@ namespace scaledcars {
                 cout << "[SensorBoardData to conference] ID: " << id << " VALUE: " << -1 << endl;
 
                 //IR-SENSOR [ID 3] [ID 4] with value between 3 - 40
-            } else if ((id == 3 || id == 4 || id == 5) && value >= 3 && value <= 40) {
+            } else if ((id == 3 || id == 4 || id == 5) && value >= 3 && value <= 30) {
                 sensors[id] = value;
                 cout << "[SensorBoardData to conference] ID: " << id << " VALUE: " << value << endl;
 
                 //ODOMETER [ID 6] with value between 0 - 255
-            } else if ((id == 3 || id == 4 || id == 5) && (value < 3 || value > 40)) {
+            } else if ((id == 3 || id == 4 || id == 5) && (value < 3 || value > 30)) {
                 sensors[id] = -1;
                 cout << "[SensorBoardData to conference] ID: " << id << " VALUE: " << -1 << endl;
 
@@ -200,6 +200,7 @@ namespace scaledcars {
                 if (realOdometer >= KM_IN_CM) {
                     realOdometer -= KM_IN_CM;
                     counter++;
+                    cout << "LOOPED +1 KM! " << endl;
                 }
 
                 cout << "[VehicleData to conference] VALUE: " << realOdometer << endl;

@@ -90,8 +90,6 @@ odplayer.remoteControl = 0 # 0 = no remote control, 1 = allowing remote control 
 odplayer.timeScale = 1.0 # A time scale factor of 1.0 means real time, a factor of 0 means as fast as possible. The smaller the time scale factor is the faster runs the replay.
 
 
-parallelparker.sim = 1;
-
 ###############################################################################
 ###############################################################################
 #
@@ -378,5 +376,5 @@ communicationlink.function2 = 1
 #
 # GLOBAL CONFIGURATION
 #
-global.debug = 0      # set to 0 to disable any windows and further output
+global.debug = 1      # set to 0 to disable any windows and further output
 global.sim = 0    # Set simulation true or false
