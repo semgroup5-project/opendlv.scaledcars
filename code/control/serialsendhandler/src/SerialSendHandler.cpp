@@ -178,18 +178,18 @@ namespace scaledcars {
                 sensors[id] = value;
                 cout << "[SensorBoardData to conference] ID: " << id << " VALUE: " << value << endl;
 
-                //IR-SENSOR [ID 3] [ID 4] with value between 3 - 40
+                //IR-SENSOR [ID 3] [ID 4] with value between 3 - 30
             } else if ((id == 1 || id == 2) && ((value >= 0 && value <= 1) || (value > 70))) {
                 sensors[id] = -1;
                 cout << "[SensorBoardData to conference] ID: " << id << " VALUE: " << value << endl;
 
-                //IR-SENSOR [ID 3] [ID 4] with value between 3 - 40
-            } else if ((id == 3 || id == 4 || id == 5) && value >= 3 && value <= 40) {
+                //IR-SENSOR [ID 3] [ID 4] with value between 3 - 30
+            } else if ((id == 3 || id == 4 || id == 5) && value >= 3 && value <= 30) {
                 sensors[id] = value;
                 cout << "[SensorBoardData to conference] ID: " << id << " VALUE: " << value << endl;
 
                 //ODOMETER [ID 6] with value between 0 - 255
-            } else if ((id == 3 || id == 4 || id == 5) && (value < 3 || value > 40)) {
+            } else if ((id == 3 || id == 4 || id == 5) && (value < 3 || value > 30)) {
                 sensors[id] = -1;
                 cout << "[SensorBoardData to conference] ID: " << id << " VALUE: " << value << endl;
 
