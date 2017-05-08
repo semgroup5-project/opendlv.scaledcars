@@ -98,11 +98,17 @@ namespace scaledcars {
 
             map<uint32_t, double> sensors;
 
-            int oldOdometer;
-            int odometerDifference;
             int realOdometer;
-            int odometerToIncrease;
             long counter;
+
+            int arduinoStopAngle;
+            int arduinoBrake;
+
+            int arduinoAngle;
+            int speed;
+
+            int oldSpeed;
+            int oldAngle;
 
         };
     }
