@@ -57,6 +57,10 @@ namespace scaledcars {
                         cerr << "RECEIVED : id=" << incoming.id << " value=" << incoming.value << endl;
                         filterData(incoming.id, incoming.value);
                     }
+                    for (int j = 0; j < 5; ++j) {
+                        sensors[j + 1] = _values[j];
+                    }
+                    isSensorValues = true;
                 }
 
                 const uint32_t ONE_SECOND = 1000 * 1000;
@@ -74,7 +78,7 @@ namespace scaledcars {
         void MyService::filterData(int id, int value) {
 
             //US-SENSOR [ID 1] [ID 2] with value between 1 - 70
-            if ((id == 1 || id == 2) && value >= 1 && value <= 70) {
+            if ((id == 1 || id == 2) && value > 0) {
                 if (sensors[id] > -1) {
                     _values[id-1] += value;
                 } else {
@@ -82,13 +86,13 @@ namespace scaledcars {
                 }
                 count_values[id-1] += 1;
 
-                //IR-SENSOR [ID 3] [ID 4] with value between 3 - 40
-            } else if ((id == 1 || id == 2) && ((value >= 0 && value <= 1) || (value > 70))) {
+                //IR-SENSOR [ID 3] [ID 4] with value between 3 - 30
+            } else if ((id == 1 || id == 2) && value == 0) {
                 _values[id-1] = -1;
                 cout << "[SensorBoardData to conference] ID: " << id << " VALUE: " << -1 << endl;
 
                 //IR-SENSOR [ID 3] [ID 4] with value between 3 - 40
-            } else if ((id == 3 || id == 4 || id == 5) && value >= 3 && value <= 30) {
+            } else if ((id == 3 || id == 4 || id == 5) && value > 2) {
                 if (sensors[id] > -1) {
                     _values[id-1] += value;
                 } else {
@@ -97,7 +101,7 @@ namespace scaledcars {
                 count_values[id-1] += 1;
 
                 //ODOMETER [ID 6] with value between 0 - 255
-            } else if ((id == 3 || id == 4 || id == 5) && (value < 3 || value > 30)) {
+            } else if ((id == 3 || id == 4 || id == 5) && value == 0) {
                 _values[id-1] = -1;
                 cout << "[SensorBoardData to conference] ID: " << id << " VALUE: " << -1 << endl;
 
@@ -117,11 +121,6 @@ namespace scaledcars {
             } else {
                 cerr << "[Filter no sensor] ID: " << id << " VALUE: " << value << endl;
             }
-
-            for (int j = 0; j < 5; ++j) {
-                sensors[j + 1] = _values[j];
-            }
-            isSensorValues = true;
         }
 
         void __on_read(uint8_t b) {
