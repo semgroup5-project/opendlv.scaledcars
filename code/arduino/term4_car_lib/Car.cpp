@@ -44,16 +44,22 @@ void Car::run() {
 }
 
 void Car::provideSensorsData() {
-    infraredBack.encodeAndWrite(ID_IN_INFRARED_BACK, infraredBack.getDistance());
-    infraredSideFront.encodeAndWrite(ID_IN_INFRARED_SIDE_FRONT, infraredSideFront.getDistance());
-    infraredSideBack.encodeAndWrite(ID_IN_INFRARED_SIDE_BACK, infraredSideBack.getDistance());
+    int count = 0;
+    while (count++ < 5) {
+        infraredBack.encodeAndWrite(ID_IN_INFRARED_BACK, infraredBack.getDistance());
+        infraredSideFront.encodeAndWrite(ID_IN_INFRARED_SIDE_FRONT, infraredSideFront.getDistance());
+        infraredSideBack.encodeAndWrite(ID_IN_INFRARED_SIDE_BACK, infraredSideBack.getDistance());
+
+        ultrasonicFront.encodeAndWrite(ID_IN_ULTRASONIC_CENTER, ultrasonicFront.getDistance());
+        ultrasonicRight.encodeAndWrite(ID_IN_ULTRASONIC_SIDE_FRONT, ultrasonicRight.getDistance());
+    }
 
     odometer = wheelEncoder.getDistance() - encoderPos;
     if (odometer <= 255) {
         wheelEncoder.encodeAndWrite(ID_IN_ENCODER, odometer);
+    }else {
+        wheelEncoder.encodeAndWrite(ID_IN_ENCODER, 255);
     }
-    ultrasonicFront.encodeAndWrite(ID_IN_ULTRASONIC_CENTER, ultrasonicFront.getDistance());
-    ultrasonicRight.encodeAndWrite(ID_IN_ULTRASONIC_SIDE_FRONT, ultrasonicRight.getDistance());
 }
 
 void Car::rcControl() {
