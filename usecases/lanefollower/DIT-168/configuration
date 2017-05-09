@@ -226,8 +226,8 @@ odsimvehicle.LinearBicycleModel.KdynamicBrake=60.0
 # CONFIGURATION FOR LANEFOLLOWER
 #
 lanefollower.p = 1.4     #OG val = 1.3
-lanefollower.d = 0.50    #OG val = 0.10
-lanefollower.i= 0.1     #OG val = 0.01
+lanefollower.d = 0.1    #OG val = 0.10
+lanefollower.i= 0.6     #OG val = 0.01
 
 ###############################################################################
 ###############################################################################
@@ -368,8 +368,8 @@ lanedetector.threshBaseParameter=48
 #
 # CONFIGURATION FOR CommunicationLink
 #
-communicationlink.functionlane = 0
-communicationlink.function2 = 1
+communicationlink.functionlane = 1
+communicationlink.function2 = 0
 
 ###############################################################################
 ###############################################################################

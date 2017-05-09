@@ -34,6 +34,7 @@ attach	KEYWORD2
 init	KEYWORD2
 encodeAndWrite	KEYWORD2
 getDistance	KEYWORD2
+getDistance2	KEYWORD2
 setMinAndMax	KEYWORD2
 setGain	KEYWORD2
 setRange	KEYWORD2

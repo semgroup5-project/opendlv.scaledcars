@@ -1,3 +1,3 @@
 lanefollowerp=1.4
-lanefollowerd=0.50
-lanefolloweri=0.1
+lanefollowerd=0.1
+lanefolloweri=0.6

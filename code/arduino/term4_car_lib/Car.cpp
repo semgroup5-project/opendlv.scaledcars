@@ -47,7 +47,7 @@ void Car::provideSensorsData() {
     int count = 0;
     while (count++ < 5) {
         infraredBack.encodeAndWrite(ID_IN_INFRARED_BACK, infraredBack.getDistance());
-        infraredSideFront.encodeAndWrite(ID_IN_INFRARED_SIDE_FRONT, infraredSideFront.getDistance());
+        infraredSideFront.encodeAndWrite(ID_IN_INFRARED_SIDE_FRONT, infraredSideFront.getDistance2());
         infraredSideBack.encodeAndWrite(ID_IN_INFRARED_SIDE_BACK, infraredSideBack.getDistance());
 
         ultrasonicFront.encodeAndWrite(ID_IN_ULTRASONIC_CENTER, ultrasonicFront.getDistance());

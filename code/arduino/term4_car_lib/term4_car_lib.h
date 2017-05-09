@@ -54,10 +54,12 @@ public:
     explicit InfraredSensor();
     void attach(unsigned short pin);
     unsigned int getDistance();
+    unsigned int getDistance2();
     void setMinAndMax(unsigned int min, unsigned int max);
 private:
     unsigned int readAnalogInput();
     unsigned int voltsToCentimeters(unsigned int volts);
+    unsigned int voltsToCentimeters2(unsigned int volts);
     unsigned short _pin;
 protected:
     unsigned int _maxDistance, _minDistance;
