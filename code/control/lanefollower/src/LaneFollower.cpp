@@ -107,15 +107,24 @@ namespace scaledcars {
         //const int32_t WHEEL_ENCODER = 5;
 
         const double OVERTAKING_DISTANCE = 40.0;
-        const double HEADING_PARALLEL = 2;
+        const double HEADING_PARALLEL = 1;
 
         const double TURN_SPEED_SIM = 0.7;
-        const double TURN_ANGLE_SIM_LEFT = -15;
-        const double TURN_ANGLE_SIM_RIGHT = 15;
+        const double TURN_ANGLE_SIM_LEFT = -5;
+        const double TURN_ANGLE_SIM_RIGHT = 5;
+        const double STRAIGHT_ANGLE_SIM = 0;
 
         const double TURN_SPEED_CAR = 100;
         const double TURN_ANGLE_CAR_LEFT = TURN_ANGLE_SIM_LEFT;
         const double TURN_ANGLE_CAR_RIGHT = TURN_ANGLE_SIM_RIGHT;
+        const double STRAIGHT_ANGLE_CAR = STRAIGHT_ANGLE_SIM;
+
+        const int IR_FR_BLIND_COUNT = 3;
+
+        long cycles = 0;
+        const bool USE_CYCLES = true;
+
+        int IR_FR_blindCount = 0;
 
         // Overall state machines for moving and measuring.
         enum StateMachineMoving {
@@ -541,6 +550,9 @@ namespace scaledcars {
             if (stageMeasuring == FIND_OBJECT_INIT) {
                 cerr << "FIND_OBJECT_INIT" << endl;
 
+                // Reset counters
+                IR_FR_blindCount = 0;
+
                 // Read initial distance to obstacle
                 if (Sim) {
                     distanceToObstacleOld = sbd.getValueForKey_MapOfDistances(ULTRASONIC_FRONT_CENTER);
@@ -583,10 +595,14 @@ namespace scaledcars {
                     overtake = true;
 
                     stageMoving = OUT_TO_LEFT;
-                    if (Sim) {
-                        distanceOUTtoL_0 = vd.getAbsTraveledPath();
+                    if (USE_CYCLES) {
+                        distanceOUTtoL_0 = cycles;
                     } else {
-                        distanceOUTtoL_0 = clm.getWheelEncoder();
+                        if (Sim) {
+                            distanceOUTtoL_0 = vd.getAbsTraveledPath();
+                        } else {
+                            distanceOUTtoL_0 = clm.getWheelEncoder();
+                        }
                     }
 
                     stageMeasuring = DISABLE;
@@ -608,20 +624,28 @@ namespace scaledcars {
                     infraredRearRightDistance = clm.getInfraredSideBack();
                 }
 
-                if ((infraredFrontRightDistance > 0) &&
-                    (infraredRearRightDistance > 0)) {
+                if ((infraredFrontRightDistance > 1) &&
+                    (infraredRearRightDistance > 1)) {
 
-                    if (Sim) {
-                        distanceOUTtoL_1 = vd.getAbsTraveledPath();
+                    if (USE_CYCLES) {
+                        distanceOUTtoL_1 = cycles;
                     } else {
-                        distanceOUTtoL_1 = clm.getWheelEncoder();
+                        if (Sim) {
+                            distanceOUTtoL_1 = vd.getAbsTraveledPath();
+                        } else {
+                            distanceOUTtoL_1 = clm.getWheelEncoder();
+                        }
                     }
 
                     stageMoving = OUT_TO_RIGHT;
-                    if (Sim) {
-                        distanceOUTtoR_0 = vd.getAbsTraveledPath();
+                    if (USE_CYCLES) {
+                        distanceOUTtoR_0 = cycles;
                     } else {
-                        distanceOUTtoR_0 = clm.getWheelEncoder();
+                        if (Sim) {
+                            distanceOUTtoR_0 = vd.getAbsTraveledPath();
+                        } else {
+                            distanceOUTtoR_0 = clm.getWheelEncoder();
+                        }
                     }
                 }
 
@@ -640,25 +664,53 @@ namespace scaledcars {
                 }
 
                 double traveled;
-                if (Sim) {
-                    traveled = vd.getAbsTraveledPath();
+                if (USE_CYCLES) {
+                    traveled = cycles;
                 } else {
-                    traveled = clm.getWheelEncoder();
+                    if (Sim) {
+                        traveled = vd.getAbsTraveledPath();
+                    } else {
+                        traveled = clm.getWheelEncoder();
+                    }
                 }
 
                 double distanceOUTtoL = distanceOUTtoL_1 - distanceOUTtoL_0;
                 double distanceOUTtoR = traveled - distanceOUTtoR_0;
 
-                bool sensorCondition = IR_FR > 0 && IR_RR > 0 && (fabs(IR_FR - IR_RR) < HEADING_PARALLEL);
+                cerr << "IR_FR=" << IR_FR << endl;
+                cerr << "IR_RR=" << IR_RR << endl;
+
+                bool sensorCondition = IR_FR > 0 && IR_RR > 0 && (fabs(IR_FR - IR_RR) <= HEADING_PARALLEL);
                 bool distanceCondition = distanceOUTtoR > distanceOUTtoL;
 
-                if (sensorCondition && distanceCondition) {
+                if (IR_FR < 0) {
+                    IR_FR_blindCount++;
+                } else {
+                    IR_FR_blindCount = 0;
+                }
+
+                cerr << "IR_FR_blindCount=" << IR_FR_blindCount << endl;
+
+                bool blindCountCondition = IR_FR_blindCount >= IR_FR_BLIND_COUNT;
+
+                cerr << "sensorCondition=" << sensorCondition << endl;
+                cerr << "distanceCondition=" << distanceCondition << endl;
+
+                cerr << "blindCountCondition=" << distanceCondition << endl;
+
+                blindCountCondition = false;
+
+                if ((sensorCondition && distanceCondition) || blindCountCondition) {
                     stageMoving = CONTINUE_STRAIGHT;
 
-                    if (Sim) {
-                        distanceOUTtoR_1 = vd.getAbsTraveledPath();
+                    if (USE_CYCLES) {
+                        distanceOUTtoR_1 = cycles;
                     } else {
-                        distanceOUTtoR_1 = clm.getWheelEncoder();
+                        if (Sim) {
+                            distanceOUTtoR_1 = vd.getAbsTraveledPath();
+                        } else {
+                            distanceOUTtoR_1 = clm.getWheelEncoder();
+                        }
                     }
 
                     // Reset PID controller.
@@ -675,12 +727,31 @@ namespace scaledcars {
                     distanceToObstacle = clm.getUltraSonicFrontCenter();
                 }
 
-                if (distanceToObstacle < 0) {
+                double IR_FR;
+                double IR_RR;
+
+                if (Sim) {
+                    IR_FR = sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT);
+                    IR_RR = sbd.getValueForKey_MapOfDistances(INFRARED_REAR_RIGHT);
+                } else {
+                    IR_FR = clm.getInfraredSideFront();
+                    IR_RR = clm.getInfraredSideBack();
+                }
+
+                IR_FR = IR_FR;
+                IR_RR = IR_RR;
+
+                // if (distanceToObstacle < 0) {
+                if (IR_FR < 0) {
                     stageMoving = IN_TO_RIGHT;
-                    if (Sim) {
-                        distanceINtoR_0 = vd.getAbsTraveledPath();
+                    if (USE_CYCLES) {
+                        distanceINtoR_0 = cycles;
                     } else {
-                        distanceINtoR_0 = clm.getWheelEncoder();
+                        if (Sim) {
+                            distanceINtoR_0 = vd.getAbsTraveledPath();
+                        } else {
+                            distanceINtoR_0 = clm.getWheelEncoder();
+                        }
                     }
 
                     stageMeasuring = DISABLE;
@@ -704,7 +775,13 @@ namespace scaledcars {
             if (stageMoving == FORWARD && has_next_frame) {
                 cerr << "FORWARD" << endl;
 
-                // Reset counters
+                if (Sim) {
+                    m_vehicleControl.setSpeed(TURN_SPEED_SIM);
+                    m_vehicleControl.setSteeringWheelAngle(STRAIGHT_ANGLE_SIM);
+                } else {
+                    m_vehicleControl.setSpeed(TURN_SPEED_CAR);
+                    m_vehicleControl.setSteeringWheelAngle(STRAIGHT_ANGLE_CAR);
+                }
 
             } else if (stageMoving == OUT_TO_LEFT) {
                 cerr << "OUT_TO_LEFT" << endl;
@@ -737,6 +814,14 @@ namespace scaledcars {
 
                 stageMeasuring = END_OF_OBJECT;
 
+                if (Sim) {
+                    m_vehicleControl.setSpeed(TURN_SPEED_SIM);
+                    m_vehicleControl.setSteeringWheelAngle(STRAIGHT_ANGLE_SIM);
+                } else {
+                    m_vehicleControl.setSpeed(TURN_SPEED_CAR);
+                    m_vehicleControl.setSteeringWheelAngle(STRAIGHT_ANGLE_CAR);
+                }
+
             } else if (stageMoving == IN_TO_RIGHT) {
                 cerr << "IN_TO_RIGHT" << endl;
 
@@ -749,10 +834,14 @@ namespace scaledcars {
                 }
 
                 double traveled;
-                if (Sim) {
-                    traveled = vd.getAbsTraveledPath();
+                if (USE_CYCLES) {
+                    traveled = cycles;
                 } else {
-                    traveled = clm.getWheelEncoder();
+                    if (Sim) {
+                        traveled = vd.getAbsTraveledPath();
+                    } else {
+                        traveled = clm.getWheelEncoder();
+                    }
                 }
 
                 double traveledSoFar = traveled - distanceINtoR_0;
@@ -761,13 +850,18 @@ namespace scaledcars {
                 cerr << "traveledSoFar=" << traveledSoFar << endl;
                 cerr << "traveledRequired=" << traveledRequired << endl;
 
-                if (traveledSoFar > (traveledRequired * 0.1)) {
+                if (traveledSoFar > (traveledRequired * 1.0)) {
                     stageMoving = IN_TO_LEFT;
-                    if (Sim) {
-                        distanceINtoL_0 = vd.getAbsTraveledPath();
+                    if (USE_CYCLES) {
+                        distanceINtoL_0 = cycles;
                     } else {
-                        distanceINtoL_0 = clm.getWheelEncoder();
+                        if (Sim) {
+                            distanceINtoL_0 = vd.getAbsTraveledPath();
+                        } else {
+                            distanceINtoL_0 = clm.getWheelEncoder();
+                        }
                     }
+
                 }
 
             } else if (stageMoving == IN_TO_LEFT) {
@@ -782,10 +876,14 @@ namespace scaledcars {
                 }
 
                 double traveled;
-                if (Sim) {
-                    traveled = vd.getAbsTraveledPath();
+                if (USE_CYCLES) {
+                    traveled = cycles;
                 } else {
-                    traveled = clm.getWheelEncoder();
+                    if (Sim) {
+                        traveled = vd.getAbsTraveledPath();
+                    } else {
+                        traveled = clm.getWheelEncoder();
+                    }
                 }
 
                 double traveledSoFar = traveled - distanceINtoL_0;
@@ -794,7 +892,7 @@ namespace scaledcars {
                 cerr << "traveledSoFar=" << traveledSoFar << endl;
                 cerr << "traveledRequired=" << traveledRequired << endl;
 
-                if (traveledSoFar > (traveledRequired * 0.8)) {
+                if (traveledSoFar > (traveledRequired * 1.0)) {
                     overtake = false;
 
                     stageMoving = FORWARD;
@@ -816,6 +914,8 @@ namespace scaledcars {
         ModuleExitCodeMessage::ModuleExitCode LaneFollower::body() {    // this method still needs
             // Overall state machine handler.
             while (getModuleStateAndWaitForRemainingTimeInTimeslice() == ModuleStateMessage::RUNNING) {
+
+                cycles++;
 
                 Container communicationLinkContainer = getKeyValueDataStore().get(CommunicationLinkMSG::ID());
                 if (communicationLinkContainer.getDataType() == CommunicationLinkMSG::ID()) {
