@@ -31,36 +31,6 @@ services:
         restart: on-failure
         command: "/opt/od4/bin/odsupercomponent --cid=111 --configuration=/opt/configuration/configuration --freq=20"
 
-    # Micro-service for odsimvehicle.
-    odsimvehicle:
-        build: .
-        network_mode: host
-        ipc : host
-        depends_on:
-            - odsupercomponent
-        logging:
-            driver: "none"
-        privileged: true
-        restart: on-failure
-        command: "/opt/od4/bin/odsimvehicle --cid=111 --freq=20"
-
-    #Micro-service for camera
-    odsimcamera:
-        build: .
-        network_mode: host
-        ipc: host
-        group_add:
-        - video
-        environment:
-        - DISPLAY=$DISPLAY
-        volumes:
-        - ./DIT-168:/opt/configuration
-        - /tmp/.X11-unix:/tmp/.X11-unix
-        depends_on:
-            - odsupercomponent
-        privileged: true
-        restart: on-failure
-        command: "/opt/opendlv.scaledcars/bin/scaledcars-control-proxy --cid=111 --rm=true --freq=20 --configuration=/opt/configuration/configuration"
 
     #serial
     serialhandler:
@@ -84,40 +54,6 @@ services:
         privileged: true
         command: bash -c "sleep 5; /opt/opendlv.scaledcars/bin/scaledcars-control-communicationlink --verbose=1 --cid=111 --rm=true --freq=20"
 
-    #odcockpit
-    odcockpit:
-        build: .
-        network_mode: host
-        environment:
-        - DISPLAY=$DISPLAY
-        volumes:
-        - ./DIT-168:/opt/configuration
-        - /tmp/.X11-unix:/tmp/.X11-unix
-        - ~/CsvData/Overtaking:/opt/Datacsv
-        ipc: host
-        depends_on:
-            - odsupercomponent
-        restart: on-failure
-        privileged: true
-        command: "/opt/od4/bin/odcockpit --cid=111 --configuration=/opt/configuration/configuration --freq=20"
-
-   #Micro-service for lanedtecter scenario.
-    lanefollower:
-        build: .
-        network_mode: host
-        ipc: host
-        environment:
-        - DISPLAY=$DISPLAY
-        volumes:
-        - ./DIT-168:/opt/configuration
-        depends_on:
-            - odsupercomponent
-            - odsimvehicle
-            - odsimcamera
-            - communicationlink
-        restart: on-failure
-        privileged: true
-        command: bash -c "sleep 5; /opt/opendlv.scaledcars/bin/scaledcars-control-lanefollwer --verbose=1  --cid=111 --freq=20"
         
         #Micro-service for lanedtecter scenario.
     park:
@@ -130,8 +66,6 @@ services:
         - ./DIT-168:/opt/configuration
         depends_on:
             - odsupercomponent
-            - odsimvehicle
-            - odsimcamera
             - communicationlink
         restart: on-failure
         privileged: true

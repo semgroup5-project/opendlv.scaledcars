@@ -66,8 +66,10 @@ namespace scaledcars {
                    
             	if(isParking){
             		parallelPark();
+            		cout << "PARKING : Now I'm parking" << endl;
             	} else {
                	parkingFinder();
+               	cout << "PARKING : Finding values" << endl;
                }
                    
 					Container c(vc);
@@ -79,8 +81,10 @@ namespace scaledcars {
         
         void Park::parkingFinder(){
         		// Parking space starting point
-        		if(communicationLinkMSG.getInfraredSideBack() > 10 && parkingStart == 0){
+        		if((communicationLinkMSG.getInfraredSideBack() < 3 || communicationLinkMSG.getInfraredSideBack() > 10) && parkingStart == 0){
         			parkingStart = communicationLinkMSG.getWheelEncoder();
+        			vc.setSpeed(70);
+        			vc.setSteeringWheelAngle(0);
         			cout << "PARKING : Here starts freedom" << endl;
         		}
         		
@@ -89,13 +93,15 @@ namespace scaledcars {
         			&& parkingStart > 0 && (communicationLinkMSG.getWheelEncoder() - parkingStart) < 100){
         			parkingStart = 0;
         			isParking = false;
+        			vc.setSpeed(70);
+        			vc.setSteeringWheelAngle(0);
         			cout << "PARKING : No freedom" << endl;
         		}
         		
         		// Gap is sufficient
         		if(parkingStart > 0 && (communicationLinkMSG.getWheelEncoder() - parkingStart) >= 100){
         			isParking = true;
-        			sendParkerMSG();
+        			//sendParkerMSG();
         			vc.setBrakeLights(true);
         			cout << "PARKING : Insertion time" << endl;
         		}
