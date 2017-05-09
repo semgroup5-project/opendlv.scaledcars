@@ -55,6 +55,8 @@ void Car::provideSensorsData() {
     }
 
     odometer = wheelEncoder.getDistance() - encoderPos;
+//    Serial.print("THIS IS ODO TO SEND: ");
+//    Serial.println(odometer);
     if (odometer <= 255) {
         wheelEncoder.encodeAndWrite(ID_IN_ENCODER, odometer);
     }else {

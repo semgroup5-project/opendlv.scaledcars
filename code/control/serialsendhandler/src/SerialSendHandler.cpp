@@ -53,6 +53,7 @@ namespace scaledcars {
                     _values[j] = 0;
                 }
                 for (int i = 0; i < pending; i++) {
+                    incoming.value = 0;
                     if (serial_receive(serial_, &incoming)) {
                         cerr << "RECEIVED : id=" << incoming.id << " value=" << incoming.value << endl;
                         filterData(incoming.id, incoming.value);
@@ -63,8 +64,8 @@ namespace scaledcars {
                     isSensorValues = true;
                 }
 
-                const uint32_t ONE_SECOND = 1000 * 1000;
-                odcore::base::Thread::usleepFor(ONE_SECOND);
+//                const uint32_t ONE_SECOND = 1000 * 1000;
+//                odcore::base::Thread::usleepFor(ONE_SECOND);
             }
         }
 
@@ -107,7 +108,9 @@ namespace scaledcars {
 
                 //ODOMETER [ID 6] with value between 0 - 255
             } else if (id == 6 && (value >= 0 && value <= 255)) {
+                cout << "ODOMETER VALUE IS : " << value << endl;
                 realOdometer += value;
+                cout << "ODOMETER REAL IS : " << realOdometer << endl;
 
                 if (realOdometer >= KM_IN_CM) {
                     realOdometer -= KM_IN_CM;
