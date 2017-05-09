@@ -56,19 +56,20 @@ namespace scaledcars {
         
         // This method will do the main data processing job.
         odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Park::body() {
-				Container communicationLinkMSGContainer = getKeyValueDataStore().get(CommunicationLinkMSG::ID());
-            communicationLinkMSG = communicationLinkMSGContainer.getData<CommunicationLinkMSG>();
+				
             
 
             while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
                    odcore::data::dmcp::ModuleStateMessage::RUNNING) {
                    
+               Container communicationLinkMSGContainer = getKeyValueDataStore().get(CommunicationLinkMSG::ID());
+            	communicationLinkMSG = communicationLinkMSGContainer.getData<CommunicationLinkMSG>();
                    
             	if(isParking){
             		parallelPark();
             		cout << "PARKING : Now I'm parking" << endl;
             	} else {
-               	parkingFinder();
+               	parkingFinder(communicationLinkMSG);
                	cout << "PARKING : Finding values" << endl;
                }
                    
@@ -79,29 +80,30 @@ namespace scaledcars {
             return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
         }
         
-        void Park::parkingFinder(){
+        void Park::parkingFinder(CommunicationLinkMSG c){
         		// Parking space starting point
-        		if((communicationLinkMSG.getInfraredSideBack() < 3 || communicationLinkMSG.getInfraredSideBack() > 10) && parkingStart == 0){
-        			parkingStart = communicationLinkMSG.getWheelEncoder();
-        			vc.setSpeed(100);
-        			vc.setSteeringWheelAngle(0);
-        			cout << "PARKING : Here starts freedom" << endl;
+        		if((c.getInfraredSideBack() < 3 || c.getInfraredSideBack() > 10) && parkingStart == 0){
+        			parkingStart = c.getWheelEncoder();
+        			//vc.setSpeed(100);
+        			//vc.setSteeringWheelAngle(0);
+        			cout << "PARKING : Here starts freedom      " << parkingStart << endl;
         		}
         		
         		// Gap is too narrow
-        		if(communicationLinkMSG.getInfraredSideBack() <= 10 && communicationLinkMSG.getInfraredSideFront() <= 10 
-        			&& parkingStart > 0 && (communicationLinkMSG.getWheelEncoder() - parkingStart) < 100){
+        		if(c.getInfraredSideBack() >= 3 && c.getInfraredSideFront() >= 3
+        				&& c.getInfraredSideBack() <= 10 && c.getInfraredSideFront() <= 10 
+        				&& parkingStart > 0 && (c.getWheelEncoder() - parkingStart) < 100){
         			parkingStart = 0;
         			isParking = false;
-        			vc.setSpeed(100);
-        			vc.setSteeringWheelAngle(0);
+        			//vc.setSpeed(100);
+        			//vc.setSteeringWheelAngle(0);
         			cout << "PARKING : No freedom" << endl;
         		}
         		
         		// Gap is sufficient
-        		if(parkingStart > 0 && (communicationLinkMSG.getWheelEncoder() - parkingStart) >= 100){
+        		if(parkingStart > 0 && (c.getWheelEncoder() - parkingStart) >= 100){
         			isParking = true;
-        			//sendParkerMSG();
+        			sendParkerMSG();
         			vc.setBrakeLights(true);
         			cout << "PARKING : Insertion time" << endl;
         		}
@@ -115,14 +117,14 @@ namespace scaledcars {
         				vc.setBrakeLights(false);
         			}
         			break;
-        			
         			case RIGHT_TURN:{
         				vc.setSpeed(70);
+        			
                	vc.setSteeringWheelAngle(1.5);
                	parkingCounter++;
                	cout << "PARKING : Turning right" << endl;
         			
-        				if(parkingCounter == 10){
+        				if(parkingCounter == 100){
         					setParkingState(LEFT_TURN);
         				}
         			}
@@ -134,7 +136,7 @@ namespace scaledcars {
         				parkingCounter++;
         				cout << "PARKING : Turning left" << endl;
         			
-        				if(parkingCounter == 20){
+        				if(parkingCounter == 200){
         					setParkingState(END);
         				}
         			}
@@ -153,6 +155,7 @@ namespace scaledcars {
         
         void Park::sendParkerMSG(){
         		ParkerMSG p;
+        		p.setStopState(0);
         		Container c(p);
         		getConference().send(c);
         }

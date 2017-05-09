@@ -95,7 +95,7 @@ namespace scaledcars {
 
             virtual void tearDown();
             
-            void parkingFinder();
+            void parkingFinder(CommunicationLinkMSG communicationLinkMSG);
             
             void parallelPark();
             
