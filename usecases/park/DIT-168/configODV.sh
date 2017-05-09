@@ -73,8 +73,8 @@ cat  << EOF
 #
 # GLOBAL CONFIGURATION
 #
-global.car = file:///opt/configuration/Car1.objx
-global.scenario = file:///opt/configuration/Parking-boxes-1.scnx
+global.car = file://Car1.objx
+global.scenario = file://Parking-boxes-1.scnx
 global.showGrid = 0
 
 # Location of the origin of the reference frame (example: 57.70485804 N, 11.93831921 E)

@@ -29,7 +29,7 @@ services:
             - ./DIT-168:/opt/configuration
         privileged: true
         restart: on-failure
-        command: "/opt/od4/bin/odsupercomponent --cid=${CID} --configuration=/opt/configuration/configuration --freq=20"
+        command: "/opt/od4/bin/odsupercomponent --cid=111 --configuration=/opt/configuration/configuration --freq=20"
 
     # Micro-service for odsimvehicle.
     odsimvehicle:
@@ -42,28 +42,15 @@ services:
             driver: "none"
         privileged: true
         restart: on-failure
-        command: "/opt/od4/bin/odsimvehicle --cid=${CID} --freq=20"
-        
-        #odsimirus
-    odsimirus:
-        build: .
-        network_mode: host
-        ipc: host
-        volumes:
-        - ./DIT-168:/opt/configuration
-        depends_on: 
-             - odsupercomponent
-        privileged: true
-        restart: on-failure
-        command: "/opt/od4/bin/odsimirus --cid=${CID} --configuration=/opt/configuration/configuration --freq=20"
+        command: "/opt/od4/bin/odsimvehicle --cid=111 --freq=20"
 
     #Micro-service for camera
     odsimcamera:
         build: .
         network_mode: host
         ipc: host
-        #group_add:
-        #- video
+        group_add:
+        - video
         environment:
         - DISPLAY=$DISPLAY
         volumes:
@@ -73,19 +60,19 @@ services:
             - odsupercomponent
         privileged: true
         restart: on-failure
-        command: "/opt/opendlv.scaledcars/bin/scaledcars-control-proxy --cid=${CID} --rm=true --freq=20 --configuration=/opt/configuration/configuration"
+        command: "/opt/opendlv.scaledcars/bin/scaledcars-control-proxy --cid=111 --rm=true --freq=20 --configuration=/opt/configuration/configuration"
 
     #serial
     serialhandler:
         build: .
         network_mode: host
-        #group_add:
-        #- dialout
+        group_add:
+        - dialout
         depends_on:
             - odsupercomponent
         restart: on-failure
         privileged: true
-        command: bash -c "sleep 10; /opt/opendlv.scaledcars/bin/scaledcars-control-serialsendhandler --verbose=1 --cid=${CID} --rm=true --freq=5"
+        command: bash -c "sleep 10; /opt/opendlv.scaledcars/bin/scaledcars-control-serialsendhandler --verbose=1 --cid=111 --rm=true --freq=5"
 
     #communicationlink
     communicationlink:
@@ -95,7 +82,7 @@ services:
             - odsupercomponent
         restart: on-failure
         privileged: true
-        command: bash -c "sleep 5; /opt/opendlv.scaledcars/bin/scaledcars-control-communicationlink --verbose=1 --cid=${CID} --rm=true --freq=20"
+        command: bash -c "sleep 5; /opt/opendlv.scaledcars/bin/scaledcars-control-communicationlink --verbose=1 --cid=111 --rm=true --freq=20"
 
     #odcockpit
     odcockpit:
@@ -112,7 +99,7 @@ services:
             - odsupercomponent
         restart: on-failure
         privileged: true
-        command: "/opt/od4/bin/odcockpit --cid=${CID} --configuration=/opt/configuration/configuration --freq=20"
+        command: "/opt/od4/bin/odcockpit --cid=111 --configuration=/opt/configuration/configuration --freq=20"
 
    #Micro-service for lanedtecter scenario.
     lanefollower:
@@ -130,7 +117,7 @@ services:
             - communicationlink
         restart: on-failure
         privileged: true
-        command: bash -c "sleep 5; /opt/opendlv.scaledcars/bin/scaledcars-control-lanefollwer --verbose=1  --cid=${CID} --freq=20"
+        command: bash -c "sleep 5; /opt/opendlv.scaledcars/bin/scaledcars-control-lanefollwer --verbose=1  --cid=111 --freq=20"
         
         #Micro-service for lanedtecter scenario.
     park:
@@ -148,6 +135,6 @@ services:
             - communicationlink
         restart: on-failure
         privileged: true
-        command: bash -c "sleep 5; /opt/opendlv.scaledcars/bin/scaledcars-control-park --verbose=1  --cid=${CID} --freq=20"
+        command: bash -c "sleep 5; /opt/opendlv.scaledcars/bin/scaledcars-control-park --verbose=1  --cid=111 --freq=20"
 
 

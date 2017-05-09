@@ -18,8 +18,8 @@
 #
 # GLOBAL CONFIGURATION
 #
-global.car = file:///opt/configuration/Car1.objx
-global.scenario = file:///opt/configuration/Parking-boxes-1.scnx
+global.car = file://Car1.objx
+global.scenario = file://Parking-boxes-1.scnx
 global.showGrid = 0
 
 # Location of the origin of the reference frame (example: 57.70485804 N, 11.93831921 E)
@@ -279,7 +279,7 @@ proxy.useRecorder = 0 # 1 = record all captured data directly, 0 otherwise.
 proxy.recorder.output = file://recs/
 proxy.camera.name = WebCam
 proxy.camera.type = OpenCV # OpenCV or UEYE
-proxy.camera.id = 1 # Select here the proper ID for OpenCV
+proxy.camera.id = 0 # Select here the proper ID for OpenCV
 proxy.camera.width = 640 #752-UEYE, 640-OpenCV 
 proxy.camera.height = 480
 proxy.camera.bpp = 3 #3- openCV, 1-UEYE
