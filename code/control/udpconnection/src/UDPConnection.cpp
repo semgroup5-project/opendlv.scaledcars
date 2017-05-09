@@ -24,6 +24,7 @@ namespace scaledcars {
 
         using namespace std;
         using namespace odcore::base;
+        using namespace odcore::base::module;
         using namespace odcore::data;
         using namespace odcore::data::image;
         using namespace automotive;
@@ -32,13 +33,16 @@ namespace scaledcars {
         using namespace odcore;
         using namespace odcore::io;
         using namespace odcore::io::udp;
+        using namespace group5;
+        using namespace odcore::data::dmcp;
 
         void UDPReceiveBytes::nextString(const string &s) {
-            cout << "RECEIVED : " << s.length() << " bytes containing >>>>>>>>>>>>>>>>>>>>>'" << s << "'<<<<<<<<<<<<<<<<<<<<<<<<" << endl;
+            cout << "RECEIVED : " << s.length() << " bytes containing '" << s << "'" << endl;
         }
 
         UDPConnection::UDPConnection(const int &argc, char **argv)
                 : TimeTriggeredConferenceClientModule(argc, argv, "UDPConnection"),
+                  laneFollowerMSG(),
                   udp_receiver(){}
 
 
@@ -80,7 +84,15 @@ namespace scaledcars {
 
                     // Stop receiving bytes and unregister our handler.
                     udp_receiver->stop();
+
                     udp_receiver->setStringListener(NULL);
+
+                    Container laneFollowerMSGContainer = getKeyValueDataStore().get(LaneFollowerMSG::ID());
+                    if (laneFollowerMSGContainer.getDataType() == LaneFollowerMSG::ID()) {
+                        laneFollowerMSG = laneFollowerMSGContainer.getData<LaneFollowerMSG>();
+
+                        cerr << laneFollowerMSG.getImage() << endl;
+                    }
                 }
                 catch(string &exception) {
                     cerr << "Error while creating UDP receiver: " << exception << endl;

@@ -56,6 +56,7 @@ namespace scaledcars {
                 m_eSum(0),
                 m_eOld(0),
                 m_vehicleControl(),
+                laneFollowerMSG(),
                 m_threshold1(50),  //50
                 m_threshold2(200),  // 150
                 m_control_scanline(400),//needs testing with real c
@@ -154,7 +155,6 @@ namespace scaledcars {
 
             Canny(m_image_new, m_image_new, m_threshold1, m_threshold2,
                   3); // see header for algorithm and threshold explanation
-
         }
 
         double LaneFollower::Median(Mat mat) {
@@ -220,8 +220,6 @@ namespace scaledcars {
                     state = "moving";
                 }
             }
-
-
 
             if (y == m_control_scanline) {
 
@@ -337,6 +335,8 @@ namespace scaledcars {
                             CV_RGB(255, 255, 255));
                 }
             }
+
+            static int counter = 0;
 
             // is the detected stopline at a similar distance on both sides
             if (counter < 5 && (left_dist - right_dist) > -10 && (left_dist - right_dist) < 10 && left_dist != 0 &&
@@ -526,7 +526,6 @@ namespace scaledcars {
                     Container c2(m_vehicleControl);
                     // Send container.
                     getConference().send(c2);
-
                 }
             }
             return ModuleExitCodeMessage::OKAY;

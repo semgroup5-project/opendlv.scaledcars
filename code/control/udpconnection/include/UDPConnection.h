@@ -38,8 +38,6 @@
 #include <opendavinci/GeneratedHeaders_OpenDaVINCI.h>
 #include "odvdscaledcarsdatamodel/generated/group5/CommunicationLinkMSG.h"
 #include "odvdscaledcarsdatamodel/generated/group5/LaneFollowerMSG.h"
-#include "odvdscaledcarsdatamodel/generated/group5/OvertakerMSG.h"
-#include "odvdscaledcarsdatamodel/generated/group5/ParkerMSG.h"
 
 #include <iostream>
 #include <memory>
@@ -103,6 +101,8 @@ namespace scaledcars {
             virtual ~UDPConnection();
 
         private:
+            group5::LaneFollowerMSG laneFollowerMSG;
+
             void setUp();
 
             void tearDown();
