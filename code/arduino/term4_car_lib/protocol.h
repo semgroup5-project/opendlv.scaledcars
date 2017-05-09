@@ -88,4 +88,8 @@ void protocol_receive_t2(protocol_state *state, uint8_t b);
 }
 #endif
 
+#ifdef __cplusplus
+}
+#endif
+
 #endif
