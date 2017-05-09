@@ -64,8 +64,8 @@ namespace scaledcars {
                     isSensorValues = true;
                 }
 
-//                const uint32_t ONE_SECOND = 1000 * 1000;
-//                odcore::base::Thread::usleepFor(ONE_SECOND);
+                const uint32_t ONE_SECOND = 1000 * 1000;
+                odcore::base::Thread::usleepFor(ONE_SECOND/2);
             }
         }
 
