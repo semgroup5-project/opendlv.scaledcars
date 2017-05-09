@@ -83,7 +83,7 @@ namespace scaledcars {
         		// Parking space starting point
         		if((communicationLinkMSG.getInfraredSideBack() < 3 || communicationLinkMSG.getInfraredSideBack() > 10) && parkingStart == 0){
         			parkingStart = communicationLinkMSG.getWheelEncoder();
-        			vc.setSpeed(70);
+        			vc.setSpeed(100);
         			vc.setSteeringWheelAngle(0);
         			cout << "PARKING : Here starts freedom" << endl;
         		}
@@ -93,7 +93,7 @@ namespace scaledcars {
         			&& parkingStart > 0 && (communicationLinkMSG.getWheelEncoder() - parkingStart) < 100){
         			parkingStart = 0;
         			isParking = false;
-        			vc.setSpeed(70);
+        			vc.setSpeed(100);
         			vc.setSteeringWheelAngle(0);
         			cout << "PARKING : No freedom" << endl;
         		}
