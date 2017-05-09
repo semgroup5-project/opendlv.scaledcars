@@ -223,8 +223,6 @@ namespace scaledcars {
                 }
             }
 
-
-
             if (y == m_control_scanline) {
 
                 if (inRightLane) {
@@ -339,6 +337,8 @@ namespace scaledcars {
                             CV_RGB(255, 255, 255));
                 }
             }
+
+            static int counter = 0;
 
             // is the detected stopline at a similar distance on both sides
             if (counter < 5 && (left_dist - right_dist) > -10 && (left_dist - right_dist) < 10 && left_dist != 0 &&
@@ -562,7 +562,6 @@ namespace scaledcars {
                     Container c2(m_vehicleControl);
                     // Send container.
                     getConference().send(c2);
-
                 }
             }
             return ModuleExitCodeMessage::OKAY;
