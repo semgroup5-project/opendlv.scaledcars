@@ -200,8 +200,7 @@ namespace scaledcars {
                         parkEnd = vd.getAbsTraveledPath();    // keep updating the "end" of the parking (current odometer reads)
                         backDist = parkEnd - parkStart;       // distance traveled while parking
                         double cosVal = cos(30 * PI / 180.0); // cos value with the proximity angle
-                        double adjDist = cosVal *
-                                         backDist;   // proximity value of the car traveled distance (paralleled to the road)
+                        double adjDist = cosVal * backDist;   // proximity value of the car traveled distance (paralleled to the road)
 
                         if (gap == 1) {
                             // first step (turning right) of the parking start
@@ -259,7 +258,7 @@ namespace scaledcars {
                         cerr << "emergency stop!" << endl;
                     }
                 } else if (!sim) {
-                    cerr<<"real car"<<endl;
+                    cerr << "real car" << endl;
                     irRear = communicationLinkMSG.getInfraredBack();
                     usFront = communicationLinkMSG.getUltraSonicFrontCenter();
                     int a = communicationLinkMSG.getInfraredSideFront();
@@ -267,7 +266,7 @@ namespace scaledcars {
                     bool IRRObstacle = obstacleDetect(irRear, 2);
                     bool USFObstacle = obstacleDetect(usFront, 1);
 
-                    cerr<<"This Is the ID3 Sensor: "<<a<<endl;
+                    cerr << "This Is the ID3 Sensor: " << a << endl;
                     IRFRObstacle = obstacleDetect(a, 2);
 
                     //Car is using degree.
@@ -466,7 +465,7 @@ namespace scaledcars {
                         case 0: {
                             cerr << "case 0! real car" << endl;
                             distance = communicationLinkMSG.getInfraredSideFront();
-                            IRFRObstacle = obstacleDetect(distance,2);
+                            IRFRObstacle = obstacleDetect(distance, 2);
                             double empty = communicationLinkMSG.getWheelEncoder();
                             absPathStart = communicationLinkMSG.getWheelEncoder();
                             cerr << "IRFRObstacle in case 0:" << IRFRObstacle << endl;
