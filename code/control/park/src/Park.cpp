@@ -18,8 +18,6 @@
  */
 #include "Park.h"
 
-#define GAP 100
-
 namespace scaledcars {
     namespace control {
 
@@ -30,10 +28,6 @@ namespace scaledcars {
         using namespace automotive::miniature;
         using namespace group5;
         
-        const int START = 0;
-        const int RIGHT_TURN = 1;
-        const int LEFT_TURN = 2;
-        const int END = 3;
         
         //*****************************//
         //	DIFFERENT PARKING STATES	//
@@ -45,16 +39,29 @@ namespace scaledcars {
                 TimeTriggeredConferenceClientModule(argc, argv, "Park"),
                 communicationLinkMSG(),
                 vc(),
+                IRRObstacle(false),
+                USFObstacle(false),
+                IRFRObstacle(false),
+                IRRRObstacle(false),
+                odometer(0),
+                usFront(0),
+                irFrontRight(0),
+                irRear(0),
+                irRearRight(0),
                 parkingState(0),
                 parkingType(0),
                 parkingCounter(0),
                 parkingStart(0),
+                backDist(0),
+                backStart(0),
+                backEnd(0),
+                adjDist(0),
                 isParking(false) {}
 
         Park::~Park() {}
 
         void Park::setUp() {
-            
+
 
         }
 
@@ -62,63 +69,76 @@ namespace scaledcars {
             // This method will be call automatically _after_ return from body().
         }
 
-        
+
         // This method will do the main data processing job.
         odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Park::body() {
-				
-            
+
 
             while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
                    odcore::data::dmcp::ModuleStateMessage::RUNNING) {
                    
                Container communicationLinkMSGContainer = getKeyValueDataStore().get(CommunicationLinkMSG::ID());
-            	communicationLinkMSG = communicationLinkMSGContainer.getData<CommunicationLinkMSG>();
-	
+                communicationLinkMSG = communicationLinkMSGContainer.getData<CommunicationLinkMSG>();
+                
 					setParkingType(communicationLinkMSG.getParkingType());
-                   
-            	if(isParking){
-            		park();
-            		cout << "PARKING : Now I'm parking" << endl;
-            	} else {
-               	parkingFinder(communicationLinkMSG);
-               	cout << "PARKING : Finding values" << endl;
-               }
-                   
-					Container c(vc);
-					getConference().send(c);
+
+                usFront = communicationLinkMSG.getUltraSonicFrontCenter();
+                irFrontRight = communicationLinkMSG.getInfraredSideFront();
+                irRearRight = communicationLinkMSG.getInfraredSideBack();
+                odometer = communicationLinkMSG.getWheelEncoder();
+
+                IRRObstacle = obstacleDetection(irRear, IR);
+                IRFRObstacle = obstacleDetection(irFrontRight, IR);
+                IRRRObstacle = obstacleDetection(irRearRight, IR);
+                USFObstacle = obstacleDetection(usFront,US);
+
+                if(IRRObstacle && irRear < 15 && irRear > 5){
+                    vc.setBrakeLights(true);
+                    cerr << "TOO CLOSE AT THE BACK, EMERGENCY STOP!!"<<endl;
+                }
+                if(USFObstacle && usFront >0 && usFront < 20){
+                    vc.setBrakeLights(true);
+                    cerr << "TOO CLOSE AT THE BACK, EMERGENCY STOP!!"<<endl;
+                }
+                if (isParking) {
+                    parallelPark();
+                    cout << "PARKING : Now I'm parking" << endl;
+                } else {
+                    parkingFinder();
+                    cout << "PARKING : Finding values" << endl;
+                }
+
+
+                Container c(vc);
+                getConference().send(c);
                 
             }
             return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
         }
         
-        void Park::parkingFinder(CommunicationLinkMSG c){
-        		// Parking space starting point
-        		if((c.getInfraredSideBack() < 3 || c.getInfraredSideBack() > 10) && parkingStart == 0){
-        			parkingStart = c.getWheelEncoder();
-        			//vc.setSpeed(100);
-        			//vc.setSteeringWheelAngle(0);
-        			cout << "PARKING : Here starts freedom      " << parkingStart << endl;
-        		}
-        		
-        		// Gap is too narrow
-        		if(c.getInfraredSideBack() >= 3 && c.getInfraredSideFront() >= 3
-        				&& c.getInfraredSideBack() <= 10 && c.getInfraredSideFront() <= 10 
-        				&& parkingStart > 0 && (c.getWheelEncoder() - parkingStart) < GAP){
-        			parkingStart = 0;
-        			isParking = false;
-        			//vc.setSpeed(100);
-        			//vc.setSteeringWheelAngle(0);
-        			cout << "PARKING : No freedom" << endl;
-        		}
-        		
-        		// Gap is sufficient
-        		if(parkingStart > 0 && (c.getWheelEncoder() - parkingStart) >= GAP){
-        			isParking = true;
-        			sendParkerMSG();
-        			vc.setBrakeLights(true);
-        			cout << "PARKING : Insertion time" << endl;
-        		}
-        		
+        void Park::parkingFinder() {
+            // Parking space starting point
+            if (IRRRObstacle && parkingStart == 0) {
+                parkingStart = odometer;
+                cout << "PARKING : Here starts freedom      " << parkingStart << endl;
+            }
+
+            // Gap is too narrow
+            if (IRRRObstacle && IRFRObstacle && parkingStart > 0 && (odometer - parkingStart) < GAP) {
+                parkingStart = 0;
+                isParking = false;
+                cout << "PARKING : No freedom" << endl;
+            }
+
+            // Gap is sufficient
+            if (parkingStart > 0 && (odometer - parkingStart) >= GAP) {
+                backStart = odometer;
+                isParking = true;
+                sendParkerMSG();
+                vc.setBrakeLights(true);
+                cout << "PARKING : Insertion time" << endl;
+            }
+
         }
         
         void Park::park(){
@@ -211,19 +231,92 @@ namespace scaledcars {
         		}
         }
         
-        void Park::setParkingState(int state){
-        		parkingState = state;
-        }
         
         void Park::setParkingType(int type){
         		parkingType = type;
         }
-        
-        void Park::sendParkerMSG(){
-        		ParkerMSG p;
-        		p.setStateStop(0);
-        		Container c(p);
-        		getConference().send(c);
+                
+
+        void Park::parallelPark() {
+            backEnd = odometer;
+            adjDist = adjDistCalculation(backStart, backEnd);
+            switch (parkingState) {
+                case START: {
+                    vc.setBrakeLights(false);
+                    setParkingState(RIGHT_TURN);
+                }
+                    break;
+                case RIGHT_TURN: {
+                    vc.setBrakeLights(false);
+                    vc.setSpeed(72);
+                    vc.setSteeringWheelAngle(1.5);
+                    parkingCounter++;
+                    cout << "PARKING : Turning right" << endl;
+                    if (adjDist < GAP / 2) {
+                        setParkingState(LEFT_TURN);
+                    }
+                }
+                    break;
+
+                case LEFT_TURN: {
+                    vc.setBrakeLights(false);
+                    vc.setSpeed(72);
+                    vc.setSteeringWheelAngle(-1.5);
+                    parkingCounter++;
+                    cout << "PARKING : Turning left" << endl;
+                    if (adjDist > GAP / 2) {
+                        setParkingState(END);
+                    }
+                }
+                    break;
+                case END: {
+                    vc.setBrakeLights(true);
+                    cout << "PARKING : I'm parked" << endl;
+                }
+            }
+        }
+
+        void Park::setParkingState(int state) {
+            parkingState = state;
+        }
+
+        bool Park::obstacleDetection(int i, int id) {
+            bool ifObstacle;
+            switch (id) {
+                case (US) : {
+                    if (i > 70 || i < 0) {
+                        ifObstacle = false;
+                    } else if (i <= 70 && i > 0) {
+                        ifObstacle = true;
+                    }
+                }
+                    break;
+                case (IR) : {
+                    if (i > 28 || i < 0) {
+                        ifObstacle = true;
+                    } else if (i <= 28 && i > 0) {
+                        ifObstacle = false;
+                    }
+                }
+                    break;
+            }
+            return ifObstacle;
+        }
+
+        double Park::adjDistCalculation(double start, double end) {
+            backDist = end - start;
+
+            double cosVal = cos(backDist / (GAP / 2)); // cos value with the proximity angle
+            adjDist = cosVal * backDist;   // proximity value of the car traveled distance (paralleled to the road)
+
+            return adjDist;
+        }
+
+        void Park::sendParkerMSG() {
+            ParkerMSG p;
+            p.setStateStop(0);
+            Container c(p);
+            getConference().send(c);
         }
     }
 } // automotive::miniature

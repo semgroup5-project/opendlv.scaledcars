@@ -37,7 +37,13 @@
 #include <automotivedata/GeneratedHeaders_AutomotiveData.h>
 #include <opendavinci/GeneratedHeaders_OpenDaVINCI.h>
 
-#define PI 3.14159265859
+#define IR 0
+#define US 1
+#define GAP 10
+#define START 0
+#define RIGHT_TURN 1
+#define LEFT_TURN 2
+#define END 3
 
 namespace scaledcars {
     namespace control {
@@ -89,43 +95,68 @@ namespace scaledcars {
 		  
 		  // Methods
         private:
-            bool sim;
-            
-
             virtual void setUp();
 
             virtual void tearDown();
+
+            void parkingFinder();
+
+            void parallelPark();
+
+            void setParkingState(int state);
             
-            void parkingFinder(CommunicationLinkMSG communicationLinkMSG);
+            void setParkingType(int type);
+
+            double adjDistCalculation(double start, double end);
+
+            bool obstacleDetection(int i, int id);
             
             void park();
             
             void unpark();
-            
-            void setParkingState(int state);
-            
-            void setParkingType(int type);
-            
+
             void sendParkerMSG();
-        
-        // Variables
-        private:
             
             CommunicationLinkMSG communicationLinkMSG;
 
             VehicleControl vc;
-            
+
+            bool IRRObstacle;
+
+            bool USFObstacle;
+
+            bool IRFRObstacle;
+
+            bool IRRRObstacle;
+
+            double odometer;
+
+            double usFront;
+
+            double irFrontRight;
+
+            double irRear;
+
+            double irRearRight;
+
             int parkingState;
             
             int parkingType;
             
             int parkingCounter;
-            
+
             int parkingStart;
-            
+
+            double backDist;
+
+            double backStart;
+
+            double backEnd;
+
+            double adjDist;
+
             bool isParking;
 
-            
 
         };
 
