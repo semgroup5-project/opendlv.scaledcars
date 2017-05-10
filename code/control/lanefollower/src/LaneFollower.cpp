@@ -338,8 +338,6 @@ namespace scaledcars {
                 }
             }
 
-            static int counter = 0;
-
             // is the detected stopline at a similar distance on both sides
             if (counter < 5 && (left_dist - right_dist) > -10 && (left_dist - right_dist) < 10 && left_dist != 0 &&
                 right_dist != 0) {

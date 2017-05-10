@@ -17,18 +17,18 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#ifndef SCALEDCARS_CONTROL_UDPCONNECTION_TESTSUITE_H
-#define SCALEDCARS_CONTROL_UDPCONNECTION_TESTSUITE_H
+#ifndef SCALEDCARS_CONTROL_UDPCONNECTIONRECEIVER_TESTSUITE_H
+#define SCALEDCARS_CONTROL_UDPCONNECTIONRECEIVER_TESTSUITE_H
 
 #include "cxxtest/TestSuite.h"
 
 // Include local header files.
-#include "../include/UDPConnection.h"
+#include "../include/UDPConnectionReceiver.h"
 
 using namespace std;
 using namespace scaledcars::control;
 
-class UDPConnectionTest : public CxxTest::TestSuite {
+class UDPConnectionReceiverTest : public CxxTest::TestSuite {
    public:
     void setUp() {}
 
@@ -39,4 +39,4 @@ class UDPConnectionTest : public CxxTest::TestSuite {
     }
 };
 
-#endif /*SCALEDCARS_CONTROL_UDPCONNECTION_TESTSUITE_H*/
+#endif /*SCALEDCARS_CONTROL_UDPCONNECTIONRECEIVER_TESTSUITE_H*/

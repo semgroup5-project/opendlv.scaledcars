@@ -17,7 +17,7 @@
 
 CMAKE_MINIMUM_REQUIRED (VERSION 2.8)
 
-PROJECT (scaledcars-control-udpconnection)
+PROJECT (scaledcars-control-udpconnectionreceiver)
 
 ###########################################################################
 # Set the search path for .cmake files.
@@ -91,5 +91,5 @@ INSTALL(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin COMPONENT scaledcars-sof
 INSTALL(TARGETS ${PROJECT_NAME}-static DESTINATION lib COMPONENT scaledcars-software)
 
 # Install header files.
-INSTALL(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/" DESTINATION include/scaledcars-control-udpconnection COMPONENT scaledcars-software)
+INSTALL(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/" DESTINATION include/scaledcars-control-udpconnectionreceiver COMPONENT scaledcars-software)
 

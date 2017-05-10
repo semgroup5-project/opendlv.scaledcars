@@ -48,7 +48,10 @@ message group5.ParkerMSG [id = 558 ] {
 }
 
 message group5.UDPMSG [id = 559 ] {
-    uint8 stateFunction [id = 1];
+    uint8 stateFunctionOvertaker [id = 1];
+    uint8 stateFunctionParker [id = 2];
+    uint8 stateStop [id = 3];
+
 }
 
 message group5.SensorsMSG [id = 560 ] {
