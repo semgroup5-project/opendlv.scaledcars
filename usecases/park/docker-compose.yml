@@ -43,6 +43,21 @@ services:
         privileged: true
         restart: on-failure
         command: "/opt/od4/bin/odsimvehicle --cid=${CID} --freq=20"
+        
+        #odsimirus
+    odsimirus:
+        build: .
+        network_mode: host
+        ipc: host
+        volumes:
+        - ./DIT-168:/opt/configuration
+        depends_on: 
+             - odsupercomponent
+        logging:
+            driver: "none"
+        privileged: true
+        restart: on-failure
+        command: "/opt/od4/bin/odsimirus --cid=${CID} --configuration=/opt/configuration/configuration --freq=20"
 
     #Micro-service for camera
     odsimcamera:
@@ -60,7 +75,8 @@ services:
             - odsupercomponent
         privileged: true
         restart: on-failure
-        command: "/opt/opendlv.scaledcars/bin/scaledcars-control-proxy --cid=${CID} --rm=true --freq=20 --configuration=/opt/configuration/configuration"
+        command: "/opt/od4/bin/odsimcamera --cid=${CID} --freq=20 --configuration=/opt/configuration/configuration"
+        #command: "/opt/opendlv.scaledcars/bin/scaledcars-control-proxy --cid=${CID} --rm=true --freq=20 --configuration=/opt/configuration/configuration"
 
     #serial
     serialhandler:

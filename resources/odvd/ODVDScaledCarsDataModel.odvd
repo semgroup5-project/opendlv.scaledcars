@@ -31,6 +31,7 @@ message group5.CommunicationLinkMSG [id = 555 ] {
     double infraredBack [id = 8];
     double wheelEncoder [id = 9];
     uint8 drivingLane [id = 10];
+    uint8 parkingType [id = 11];
 }
 
 message group5.LaneFollowerMSG [id = 556 ] {

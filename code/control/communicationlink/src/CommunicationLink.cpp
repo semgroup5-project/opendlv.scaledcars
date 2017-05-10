@@ -37,6 +37,7 @@ namespace scaledcars {
             if (func2) {
                 communicationLinkMSG.setStateOvertaker(0);
                 communicationLinkMSG.setStateParker(1);
+                communicationLinkMSG.setParkingType(0);
             } else {
                 communicationLinkMSG.setStateOvertaker(1);
                 communicationLinkMSG.setStateParker(0);
@@ -50,7 +51,7 @@ namespace scaledcars {
         odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode CommunicationLink::body() {
             while (getModuleStateAndWaitForRemainingTimeInTimeslice() == ModuleStateMessage::RUNNING) {
                 
-               
+                if(!sim){
                 Container sensorBoardDataContainer = getKeyValueDataStore().get(SensorsMSG::ID());
                 if (sensorBoardDataContainer.getDataType() == SensorsMSG::ID()) {
                     sensorsMSG = sensorBoardDataContainer.getData<SensorsMSG>();
@@ -82,7 +83,9 @@ namespace scaledcars {
                     cout << "ID:  " << ID_IN_INFRARED_BACK << " VALUE: "
                          << sensorsMSG.getValueForKey_MapOfDistances(ID_IN_INFRARED_BACK) << endl;
                 }
-                
+                } else {
+                	setSensors();
+                }
 
                 Container overtakerMSGContainer = getKeyValueDataStore().get(OvertakerMSG::ID());
                 if (overtakerMSGContainer.getDataType() == OvertakerMSG::ID()) {

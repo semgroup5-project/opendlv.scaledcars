@@ -18,6 +18,8 @@
  */
 #include "Park.h"
 
+#define GAP 100
+
 namespace scaledcars {
     namespace control {
 
@@ -32,12 +34,19 @@ namespace scaledcars {
         const int RIGHT_TURN = 1;
         const int LEFT_TURN = 2;
         const int END = 3;
+        
+        //*****************************//
+        //	DIFFERENT PARKING STATES	//
+        //*****************************//
+        const int PARALLEL = 0;
+        const int BOX = 1;
 
         Park::Park(const int32_t &argc, char **argv) :
                 TimeTriggeredConferenceClientModule(argc, argv, "Park"),
                 communicationLinkMSG(),
                 vc(),
                 parkingState(0),
+                parkingType(0),
                 parkingCounter(0),
                 parkingStart(0),
                 isParking(false) {}
@@ -64,9 +73,11 @@ namespace scaledcars {
                    
                Container communicationLinkMSGContainer = getKeyValueDataStore().get(CommunicationLinkMSG::ID());
             	communicationLinkMSG = communicationLinkMSGContainer.getData<CommunicationLinkMSG>();
+	
+					setParkingType(communicationLinkMSG.getParkingType());
                    
             	if(isParking){
-            		parallelPark();
+            		park();
             		cout << "PARKING : Now I'm parking" << endl;
             	} else {
                	parkingFinder(communicationLinkMSG);
@@ -92,7 +103,7 @@ namespace scaledcars {
         		// Gap is too narrow
         		if(c.getInfraredSideBack() >= 3 && c.getInfraredSideFront() >= 3
         				&& c.getInfraredSideBack() <= 10 && c.getInfraredSideFront() <= 10 
-        				&& parkingStart > 0 && (c.getWheelEncoder() - parkingStart) < 100){
+        				&& parkingStart > 0 && (c.getWheelEncoder() - parkingStart) < GAP){
         			parkingStart = 0;
         			isParking = false;
         			//vc.setSpeed(100);
@@ -101,7 +112,7 @@ namespace scaledcars {
         		}
         		
         		// Gap is sufficient
-        		if(parkingStart > 0 && (c.getWheelEncoder() - parkingStart) >= 100){
+        		if(parkingStart > 0 && (c.getWheelEncoder() - parkingStart) >= GAP){
         			isParking = true;
         			sendParkerMSG();
         			vc.setBrakeLights(true);
@@ -110,7 +121,7 @@ namespace scaledcars {
         		
         }
         
-        void Park::parallelPark(){
+        void Park::park(){
         		switch(parkingState){
         			case START: {
         				setParkingState(RIGHT_TURN);
@@ -125,7 +136,11 @@ namespace scaledcars {
                	cout << "PARKING : Turning right" << endl;
         			
         				if(parkingCounter == 100){
-        					setParkingState(LEFT_TURN);
+        					if(parkingType == PARALLEL){
+        						setParkingState(LEFT_TURN);
+        					} else if (parkingType == BOX){
+        						setParkingState(END);
+        					}
         				}
         			}
         			break;
@@ -144,7 +159,54 @@ namespace scaledcars {
         			
         			case END: {
         				vc.setBrakeLights(true);
+        				setParkingState(START);
+        				isParking = false;
         				cout << "PARKING : I'm parked" << endl;
+        			}
+        		}
+        }
+        
+        void Park::unpark(){
+        		switch(parkingState){
+        			case START: {
+        				
+        				if(parkingType == PARALLEL){
+        					setParkingState(LEFT_TURN);
+        				} else if (parkingType == BOX){
+        					setParkingState(RIGHT_TURN);
+        				}
+        				vc.setBrakeLights(false);
+        			}
+        			break;
+        			case LEFT_TURN:{
+        				vc.setSpeed(100);
+        			
+               	vc.setSteeringWheelAngle(-1.5);
+               	parkingCounter++;
+               	cout << "UNPARKING : Turning left" << endl;
+        			
+        				if(parkingCounter == 100){
+        					setParkingState(RIGHT_TURN);
+        				}
+        			}
+        			break;
+        		
+        			case RIGHT_TURN:{
+        				vc.setSpeed(100);
+               	vc.setSteeringWheelAngle(1.5);
+        				parkingCounter++;
+        				cout << "UNPARKING : Turning right" << endl;
+        			
+        				if(parkingCounter == 200){
+        					setParkingState(END);
+        				}
+        			}
+        			break;
+        			
+        			case END: {
+        				sendParkerMSG();
+        				setParkingState(START);
+        				cout << "UNPARKING : I'm unparked" << endl;
         			}
         		}
         }
@@ -153,9 +215,13 @@ namespace scaledcars {
         		parkingState = state;
         }
         
+        void Park::setParkingType(int type){
+        		parkingType = type;
+        }
+        
         void Park::sendParkerMSG(){
         		ParkerMSG p;
-        		p.setStopState(0);
+        		p.setStateStop(0);
         		Container c(p);
         		getConference().send(c);
         }

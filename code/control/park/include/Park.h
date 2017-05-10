@@ -86,7 +86,8 @@ namespace scaledcars {
             virtual ~Park();
 
             odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
-
+		  
+		  // Methods
         private:
             bool sim;
             
@@ -97,17 +98,26 @@ namespace scaledcars {
             
             void parkingFinder(CommunicationLinkMSG communicationLinkMSG);
             
-            void parallelPark();
+            void park();
+            
+            void unpark();
             
             void setParkingState(int state);
             
+            void setParkingType(int type);
+            
             void sendParkerMSG();
+        
+        // Variables
+        private:
             
             CommunicationLinkMSG communicationLinkMSG;
 
             VehicleControl vc;
             
             int parkingState;
+            
+            int parkingType;
             
             int parkingCounter;
             
