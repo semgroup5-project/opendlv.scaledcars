@@ -80,7 +80,7 @@ namespace scaledcars {
                 Container communicationLinkMSGContainer = getKeyValueDataStore().get(CommunicationLinkMSG::ID());
                 communicationLinkMSG = communicationLinkMSGContainer.getData<CommunicationLinkMSG>();
 
-                setParkingType(communicationLinkMSG.getParkingType());
+           //     setParkingType(communicationLinkMSG.getParkingType());
 
                 usFront = communicationLinkMSG.getUltraSonicFrontCenter();
                 irFrontRight = communicationLinkMSG.getInfraredSideFront();
@@ -258,11 +258,11 @@ namespace scaledcars {
                 case RIGHT_TURN: {
                     vc.setBrakeLights(false);
                     vc.setSpeed(69);
-                    vc.setSteeringWheelAngle(1);
+                    vc.setSteeringWheelAngle(1.5);
                     parkingCounter++;
                     cout << "PARKING : Turning right" << endl;
                     cout << "adjDist"<<adjDist<<endl;
-                    if (adjDist <= GAP / 2) {
+                    if (/*adjDist >= GAP / 2 && */parkingCounter >= 40) {
                         setParkingState(LEFT_TURN);
                     }
                 }
@@ -271,11 +271,11 @@ namespace scaledcars {
                 case LEFT_TURN: {
                     vc.setBrakeLights(false);
                     vc.setSpeed(69);
-                    vc.setSteeringWheelAngle(-1);
-                    parkingCounter++;
+                    vc.setSteeringWheelAngle(-1.5);
+                    parkingCounter--;
                     cout << "PARKING : Turning left" << endl;
                     cout << "adjDist"<<adjDist<<endl;
-                    if (adjDist > GAP / 2) {
+                    if (/*adjDist >= GAP && */parkingCounter < 0) {
                         setParkingState(END);
                     }
                 }
@@ -319,7 +319,7 @@ namespace scaledcars {
             backDist = end - start;
 
             double cosVal = cos(backDist / (GAP / 2)); // cos value with the proximity angle
-            adjDist = cosVal * backDist;   // proximity value of the car traveled distance (paralleled to the road)
+            adjDist = abs(cosVal) * backDist;   // proximity value of the car traveled distance (paralleled to the road)
 
             return adjDist;
         }

@@ -276,8 +276,8 @@ namespace scaledcars {
                     irRearRight = communicationLinkMSG.getInfraredSideBack();
                     odometer = communicationLinkMSG.getWheelEncoder();
 
-                    bool IRRObstacle = obstacleDetect(irRear, 2);
-                    bool USFObstacle = obstacleDetect(usFront, 1);
+                    IRRObstacle = obstacleDetect(irRear, 2);
+                    USFObstacle = obstacleDetect(usFront, 1);
 
                     IRRObstacle = obstacleDetect(irRear, IR);
                     USFObstacle = obstacleDetect(usFront, US);

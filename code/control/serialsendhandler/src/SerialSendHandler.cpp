@@ -179,7 +179,7 @@ namespace scaledcars {
                 serial_send(this->serial, d_motor);
                 serial_send(this->serial, d_servo);
 
-                const uint32_t ONE_SECOND = 1000 * 1000;
+                
                 odcore::base::Thread::usleepFor(2 * ONE_SECOND);
 
                 serial_start(this->serial);

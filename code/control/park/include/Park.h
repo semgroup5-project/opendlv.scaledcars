@@ -39,7 +39,7 @@
 
 #define IR 0
 #define US 1
-#define GAP 80
+#define GAP 40
 #define START 0
 #define RIGHT_TURN 1
 #define LEFT_TURN 2

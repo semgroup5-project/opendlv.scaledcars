@@ -38,7 +38,7 @@ namespace scaledcars {
             if (func2) {
                 communicationLinkMSG.setStateOvertaker(0);
                 communicationLinkMSG.setStateParker(1);
-                communicationLinkMSG.setParkingType(0);
+                //communicationLinkMSG.setParkingType(0);
             } else {
                 communicationLinkMSG.setStateOvertaker(1);
                 communicationLinkMSG.setStateParker(0);
