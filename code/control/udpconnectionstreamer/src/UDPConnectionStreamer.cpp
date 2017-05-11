@@ -34,19 +34,11 @@ namespace scaledcars {
         using namespace odcore::data::dmcp;
         using namespace cv;
 
-        string imageName = "";
+        string clientIp = "";
 
         UDPConnectionStreamer::UDPConnectionStreamer(const int &argc, char **argv)
                 : DataTriggeredConferenceClientModule(argc, argv, "UDPConnectionStreamer"),
-                  m_sharedImageMemory(),
-                  m_sharedProcessedImageMemory(),
-                  m_sharedProcessedImage(),
-                  m_hasAttachedToSharedImageMemory(false),
-                  m_image(),
-                  m_image_mat(),
-                  m_image_new(),
-                  m_threshold1(50),  //50
-                  m_threshold2(200) {}  // 150
+                  m_hasAttachedToSharedImageMemory(false){}
 
 
         UDPConnectionStreamer::~UDPConnectionStreamer() {}
@@ -56,16 +48,11 @@ namespace scaledcars {
             // Get configuration data.
             KeyValueConfiguration kv = getKeyValueConfiguration();
 
-//            emergencyStop = kv.getValue<int32_t>("communicationlink.functionlane");
-//
-//            changeFunction =kv.getValue<int32_t>("communicationlink.function2");
+            clientIp = kv.getValue<string>("udpconnectionstreamer.ip");
         }
 
         void UDPConnectionStreamer::tearDown() {
             cout << "Shutting down UDPConnectionStreamer" << endl;
-            if (!m_image.empty()) {
-                m_image.deallocate();
-            }
         }
 
         // This method returns a boolean true if it gets an image from the shared image memory
@@ -89,7 +76,7 @@ namespace scaledcars {
                             retVal = odcore::wrapper::jpg::JPG::compress(buffer, compressedSize, si.getWidth(),
                                                                          si.getHeight(), si.getBytesPerPixel(),
                                                                          static_cast<const unsigned char *>(memory->getSharedMemory()),
-                                                                         50);
+                                                                         70);
                         }
 
                     }
@@ -103,7 +90,7 @@ namespace scaledcars {
 
                         string s(reinterpret_cast<char const *>(buffer), compressedSize);
 
-                        const string SEND_TO = "127.0.0.1";
+                        const string SEND_TO = clientIp;
                         const uint32_t _PORT = 1234;
 
                         // We are using OpenDaVINCI's std::shared_ptr to automatically
@@ -117,13 +104,6 @@ namespace scaledcars {
                         catch (string &exception) {
                             cerr << "Data could not be sent: " << exception << endl;
                         }
-
-                        // Write the CompressedImage container to STDOUT.
-//                        odcore::data::Container container(ci);
-//                        container.setSentTimeStamp(c.getSentTimeStamp());
-//                        container.setReceivedTimeStamp(c.getReceivedTimeStamp());
-//                        container.setSampleTimeStamp(c.getSampleTimeStamp());
-//                        std::cout << container;
                     }
                     if (compressedSize >= MAX_SIZE_UDP_PAYLOAD) {
                         cerr << "Warning! Compressed image too large (" << compressedSize
@@ -146,7 +126,6 @@ namespace scaledcars {
 
             // If we have an image from the previous call, it is then processed
             if (has_next_frame) {
-                cerr << "Image sent!" << std::endl;
             }
         }
     }

@@ -15,7 +15,7 @@
 #include "odvdscaledcarsdatamodel/generated/group5/LaneFollowerMSG.h"
 #include "odvdscaledcarsdatamodel/generated/group5/OvertakerMSG.h"
 #include "odvdscaledcarsdatamodel/generated/group5/ParkerMSG.h"
-
+#include "odvdscaledcarsdatamodel/generated/group5/UdpMSG.h"
 #include "odvdscaledcarsdatamodel/generated/group5/SensorsMSG.h"
 
 #include <iostream>
@@ -81,6 +81,7 @@ namespace scaledcars {
             group5::OvertakerMSG overtakerMSG;
             group5::ParkerMSG parkerMSG;
             group5::SensorsMSG sensorsMSG;
+            group5::UdpMSG UDPMSG;
 
             virtual void setUp();
 

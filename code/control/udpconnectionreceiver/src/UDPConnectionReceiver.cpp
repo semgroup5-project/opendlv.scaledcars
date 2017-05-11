@@ -37,29 +37,45 @@ namespace scaledcars {
         using namespace group5;
         using namespace odcore::data::dmcp;
 
+        int hasConference = 0;
         int notValid = 1;
-        UDPMSG *_udpmsg;
+        UdpMSG _udpmsg;
+        ContainerConference *conference;
 
         void UDPReceiveBytes::nextString(const string &s) {
             cout << "RECEIVED : " << s.length() << " bytes containing '" << s << "'" << endl;
             string received = decodedNetString(s).c_str();
 
             if (!(notValid = received.compare("move"))) {
-                _udpmsg->setStateStop(0);
+                _udpmsg.setStateStop(0);
+                _udpmsg.setUnpark(0);
             } else if (!(notValid = received.compare("stop"))) {
-                _udpmsg->setStateStop(1);
+                _udpmsg.setStateStop(1);
+                _udpmsg.setStateFunctionOvertaker(0);
+                _udpmsg.setStateFunctionParker(0);
             } else if (!(notValid = received.compare("overtake"))) {
-                _udpmsg->setStateFunctionOvertaker(1);
-                _udpmsg->setStateFunctionParker(0);
-            } else if (!(notValid = received.compare("parker"))) {
-                _udpmsg->setStateFunctionOvertaker(0);
-                _udpmsg->setStateFunctionParker(1);
+                _udpmsg.setStateFunctionOvertaker(1);
+                _udpmsg.setStateFunctionParker(0);
+            } else if (!(notValid = received.compare("park"))) {
+                _udpmsg.setStateFunctionOvertaker(0);
+                _udpmsg.setStateFunctionParker(1);
+                _udpmsg.setUnpark(0);
+            } else if (!(notValid = received.compare("unpark"))) {
+                _udpmsg.setStateStop(0);
+                _udpmsg.setUnpark(1);
             }
+
+            if (!notValid && hasConference) {
+                cout << "SENDING CONTAINER" << endl;
+                Container container(_udpmsg);
+                // Send container.
+                conference->send(container);
+            }
+            notValid = 1;
         }
 
         UDPConnectionReceiver::UDPConnectionReceiver(const int &argc, char **argv)
                 : TimeTriggeredConferenceClientModule(argc, argv, "UDPConnectionReceiver"),
-                  UDPMSG(),
                   udp_receiver() {}
 
 
@@ -67,7 +83,6 @@ namespace scaledcars {
 
         void UDPConnectionReceiver::setUp() {
             cout << "Starting UDPConnectionReceiver" << endl;
-            _udpmsg = &UDPMSG;
         }
 
         void UDPConnectionReceiver::tearDown() {
@@ -82,6 +97,11 @@ namespace scaledcars {
 
             while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
                    odcore::data::dmcp::ModuleStateMessage::RUNNING) {
+
+                if (!hasConference) {
+                    conference = &getConference();
+                    hasConference = 1;
+                }
 
                 const string RECEIVER = "0.0.0.0";
                 const uint32_t PORT = 8888;
@@ -99,20 +119,12 @@ namespace scaledcars {
                     udp_receiver->start();
 
                     const uint32_t ONE_SECOND = 1000 * 1000;
-                    odcore::base::Thread::usleepFor(ONE_SECOND);
+                    odcore::base::Thread::usleepFor(10*ONE_SECOND);
 
                     // Stop receiving bytes and unregister our handler.
                     udp_receiver->stop();
 
                     udp_receiver->setStringListener(NULL);
-
-                    if (!notValid) {
-                        cout << "SENDING CONTAINER" << endl;
-                        Container container(UDPMSG);
-                        // Send container.
-                        getConference().send(container);
-                    }
-                    notValid = 1;
                 }
                 catch (string &exception) {
                     cerr << "Error while creating UDP receiver: " << exception << endl;

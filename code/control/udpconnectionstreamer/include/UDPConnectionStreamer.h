@@ -46,8 +46,6 @@
 #include <string>
 #include <opendavinci/odcore/base/Thread.h>
 
-#include "Netstrings.hpp"
-
 #include <opendavinci/odcore/base/KeyValueConfiguration.h>
 
 namespace scaledcars {
@@ -114,18 +112,7 @@ namespace scaledcars {
 
             virtual void nextContainer(odcore::data::Container &c);
 
-            shared_ptr <odcore::wrapper::SharedMemory> m_sharedImageMemory;
-            shared_ptr <odcore::wrapper::SharedMemory> m_sharedProcessedImageMemory;
-            odcore::data::image::SharedImage m_sharedProcessedImage;
-
             bool m_hasAttachedToSharedImageMemory;
-
-            cv::Mat m_image;
-            cv::Mat m_image_mat;
-            cv::Mat m_image_new;
-
-            int32_t m_threshold1;
-            int32_t m_threshold2;
         };
     }
 } // scaledcars::control

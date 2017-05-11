@@ -37,7 +37,7 @@
 #include "automotivedata/generated/automotive/miniature/SensorBoardData.h"
 #include <automotivedata/GeneratedHeaders_AutomotiveData.h>
 #include <opendavinci/GeneratedHeaders_OpenDaVINCI.h>
-#include "odvdscaledcarsdatamodel/generated/group5/UDPMSG.h"
+#include "odvdscaledcarsdatamodel/generated/group5/UdpMSG.h"
 
 #include <iostream>
 #include <memory>
@@ -108,8 +108,6 @@ namespace scaledcars {
             void tearDown();
 
             odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
-
-            group5::UDPMSG UDPMSG;
 
             shared_ptr <UDPReceiver> udp_receiver;
         };

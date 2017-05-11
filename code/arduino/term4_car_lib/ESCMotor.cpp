@@ -28,8 +28,7 @@ void ESCMotor::arm() {
 void ESCMotor::setSpeed(int speed) { //receives a speed in the scale of 0 to 180
     int s = IDLE_SPEED;
     if (speed <= FULL_FORWARD && speed >= FULL_BACKWARD) {
-        s = speed;
-        indicateDirection(s);
+        s = indicateDirection(speed);
     } else {
         s = filterSpeed(speed);
     }
@@ -85,11 +84,11 @@ int ESCMotor::filterSpeed(int speed) {
     } else if (filtered >= deadHi && filtered <= hi) {
         filtered = map(filtered, deadHi, hi, IDLE_SPEED + 1, FULL_FORWARD - 30);
     }
-    indicateDirection(filtered);
+    filtered = indicateDirection(filtered);
     return filtered;
 }
 
-void ESCMotor::indicateDirection(int speed) {
+int ESCMotor::indicateDirection(int speed) {
     if (speed >= FULL_BACKWARD && speed < IDLE_SPEED) {
         _direction = 0;
         red = 255;//set
@@ -103,6 +102,7 @@ void ESCMotor::indicateDirection(int speed) {
         analogWrite(redPin, red);
         analogWrite(greenPin, green);
         analogWrite(bluePin, blue);
+        return speed;
     } else if (speed > IDLE_SPEED && speed <= FULL_FORWARD) {
         _direction = 1;
         red = 255;//set
@@ -116,7 +116,9 @@ void ESCMotor::indicateDirection(int speed) {
         analogWrite(redPin, red);
         analogWrite(greenPin, green);
         analogWrite(bluePin, blue);
+        return speed;
     }
+    return speed;
 }
 
 void ESCMotor::wait(double seconds) {

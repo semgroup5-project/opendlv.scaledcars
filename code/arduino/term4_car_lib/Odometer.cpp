@@ -11,6 +11,7 @@ void updateCounter1(); //ISR for the odometer
 void updateCounter2();
 
 boolean directionPinAttached(unsigned short odometerID);
+
 unsigned short _encoder0PinA, _encoder0PinB;
 volatile unsigned long _previousPulse[2] = {0};
 volatile unsigned long _dt[2] = {0};
@@ -47,6 +48,7 @@ int Odometer::attach(unsigned short odometerPin, unsigned short directionPin, bo
         _directionPin[_odometerID] = directionPin;
         forwardDirState[_odometerID] = forwardPinState;
         _encoder0PinB = directionPin;
+        pinMode(_encoder0PinB, INPUT);
     }
     return result;
 }
@@ -64,6 +66,7 @@ int Odometer::init(unsigned short odometerPin) {
                 attachInterrupt(_odometerInterruptPin, updateCounter2, CHANGE);
             }
         }
+        pinMode(_encoder0PinA, INPUT);
         return 1; //everything went as it should
     }
     return 0; //invalid interrupt pin
@@ -109,10 +112,13 @@ short Odometer::getDirection() {
                                                                                    : -1; //return a positive number if it is going "forward" or negative if "backward"
 }
 
-void updateDtAndCounter(unsigned short odometerID) { //updates dt with the time difference between the last two pulses and increases the pulse counter
+void updateDtAndCounter(
+        unsigned short odometerID) { //updates dt with the time difference between the last two pulses and increases the pulse counter
     unsigned long currentPulse = micros();
-    unsigned long dt = currentPulse - _previousPulse[odometerID]; //calculate the difference in time between the two pulses in microseconds
-    if (dt > MINIMUM_PULSE_GAP) { //if the pulses have not arrived too fast, which is a sign of unstable signal (too much jitter) in microseconds
+    unsigned long dt = currentPulse -
+                       _previousPulse[odometerID]; //calculate the difference in time between the two pulses in microseconds
+    if (dt >
+        MINIMUM_PULSE_GAP) { //if the pulses have not arrived too fast, which is a sign of unstable signal (too much jitter) in microseconds
         _dt[odometerID] = dt; //update the _dt value
         _previousPulse[odometerID] = currentPulse; //update when the last pulse arrived (if it didn't arrive too fast)
 
@@ -121,21 +127,20 @@ void updateDtAndCounter(unsigned short odometerID) { //updates dt with the time 
             // check channel B to see which way encoder is turning
             if (digitalRead(_encoder0PinB) == LOW) {
                 _pulseCounter[odometerID]++; //updates the pulse counter of odometer 0
-            }
-            else {
+            } else {
                 _pulseCounter[odometerID]++; //updates the pulse counter of odometer 0
-                if (directionPinAttached(odometerID)) _negativePulseCounter[odometerID]++; //update the pulse counter that measures how much backwards we are going
+                if (directionPinAttached(odometerID))
+                    _negativePulseCounter[odometerID]++; //update the pulse counter that measures how much backwards we are going
             }
-        }
-        else   // must be a high-to-low edge on channel A
+        } else   // must be a high-to-low edge on channel A
         {
             // check channel B to see which way encoder is turning
             if (digitalRead(_encoder0PinB) == HIGH) {
                 _pulseCounter[odometerID]++; //updates the pulse counter of odometer 0
-            }
-            else {
+            } else {
                 _pulseCounter[odometerID]++; //updates the pulse counter of odometer 0
-                if (directionPinAttached(odometerID)) _negativePulseCounter[odometerID]++; //update the pulse counter that measures how much backwards we are going
+                if (directionPinAttached(odometerID))
+                    _negativePulseCounter[odometerID]++; //update the pulse counter that measures how much backwards we are going
             }
         }
     }

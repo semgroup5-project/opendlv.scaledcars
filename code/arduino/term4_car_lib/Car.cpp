@@ -162,8 +162,21 @@ void Car::establishContact(char toSend) {
         analogWrite(greenPin, green);
         analogWrite(bluePin, blue);
         Serial.println(toSend);   // send a char
+        wait(0.5);
     }
+    red = 0;
+    green = 0;
+    blue = 0;
+#ifdef COMMON_ANODE
+    red = 255 - red;
+    green = 255 - green;
+    blue = 255 - blue;
+#endif
+    analogWrite(redPin, red);
+    analogWrite(greenPin, green);
+    analogWrite(bluePin, blue);
     Serial.read();
+    escMotor.arm();
 }
 
 void Car::waitConnection() {

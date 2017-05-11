@@ -31,11 +31,13 @@ message group5.CommunicationLinkMSG [id = 555 ] {
     double infraredBack [id = 8];
     double wheelEncoder [id = 9];
     uint8 drivingLane [id = 10];
+    uint8 unpark [id = 11];
+    uint16 distanceToRightLane [id = 12];
 }
 
 message group5.LaneFollowerMSG [id = 556 ] {
     uint8 stateLane [id = 1];
-    string image [id = 2];
+    uint16 distanceToRightLane [id = 2];
 }
 
 message group5.OvertakerMSG [id = 557 ] {
@@ -47,10 +49,11 @@ message group5.ParkerMSG [id = 558 ] {
     uint8 stateStop [id = 1];
 }
 
-message group5.UDPMSG [id = 559 ] {
+message group5.UdpMSG [id = 559 ] {
     uint8 stateFunctionOvertaker [id = 1];
     uint8 stateFunctionParker [id = 2];
     uint8 stateStop [id = 3];
+     uint8 unpark [id = 4];
 
 }
 

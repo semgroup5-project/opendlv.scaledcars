@@ -433,5 +433,12 @@ communicationlink.function2 = $FUNCTION2
 #
 global.debug = $MDEBUG      # set to 0 to disable any windows and further output
 global.sim = $SIM    # Set simulation true or false
+
+###############################################################################
+###############################################################################
+#
+# CLIENT IP
+#
+client.ip = 100.82.75.80
 EOF
 

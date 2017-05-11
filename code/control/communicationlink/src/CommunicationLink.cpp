@@ -20,7 +20,8 @@ namespace scaledcars {
                 laneFollowerMSG(),
                 overtakerMSG(),
                 parkerMSG(),
-                sensorsMSG() {}
+                sensorsMSG(),
+                UDPMSG() {}
 
         CommunicationLink::~CommunicationLink() {}
 
@@ -32,6 +33,7 @@ namespace scaledcars {
 
             communicationLinkMSG.setStateLaneFollower(kv.getValue<int32_t>("communicationlink.functionlane"));
             int func2 = kv.getValue<int32_t>("communicationlink.function2");
+
             if (func2) {
                 communicationLinkMSG.setStateOvertaker(0);
                 communicationLinkMSG.setStateParker(1);
@@ -83,9 +85,7 @@ namespace scaledcars {
                 if (overtakerMSGContainer.getDataType() == OvertakerMSG::ID()) {
                     overtakerMSG = overtakerMSGContainer.getData<OvertakerMSG>();
 
-                    communicationLinkMSG.setStateLaneFollower(overtakerMSG.getStateStop());
-                    communicationLinkMSG.setStateOvertaker(1);
-                    communicationLinkMSG.setStateParker(0);
+                    communicationLinkMSG.setStateLaneFollower(!overtakerMSG.getStateStop());
                     communicationLinkMSG.setDrivingLane(overtakerMSG.getStateLane());
                 }
 
@@ -93,10 +93,7 @@ namespace scaledcars {
                 if (parkerMSGContainer.getDataType() == ParkerMSG::ID()) {
                     parkerMSG = parkerMSGContainer.getData<ParkerMSG>();
 
-                    communicationLinkMSG.setStateLaneFollower(parkerMSG.getStateStop());
-                    communicationLinkMSG.setStateOvertaker(0);
-                    communicationLinkMSG.setStateParker(1);
-                    communicationLinkMSG.setDrivingLane(0);
+                    communicationLinkMSG.setStateLaneFollower(!parkerMSG.getStateStop());
                 }
 
                 Container laneFollowerMSGContainer = getKeyValueDataStore().get(LaneFollowerMSG::ID());
@@ -104,6 +101,23 @@ namespace scaledcars {
                     laneFollowerMSG = laneFollowerMSGContainer.getData<LaneFollowerMSG>();
 
                     communicationLinkMSG.setDrivingLane(laneFollowerMSG.getStateLane());
+                    communicationLinkMSG.setDistanceToRightLane(laneFollowerMSG.getDistanceToRightLane());
+                }
+
+                Container UDPMSGContainer = getKeyValueDataStore().get(UdpMSG::ID());
+                if (UDPMSGContainer.getDataType() == UdpMSG::ID()) {
+                    UDPMSG = UDPMSGContainer.getData<UdpMSG>();
+
+                    if (UDPMSG.getStateStop()) {
+                        communicationLinkMSG.setStateLaneFollower(0);
+                        communicationLinkMSG.setStateOvertaker(0);
+                        communicationLinkMSG.setStateParker(0);
+                    } else if (!UDPMSG.getStateStop()) {
+                        communicationLinkMSG.setStateLaneFollower(1);
+                        communicationLinkMSG.setStateOvertaker(UDPMSG.getStateFunctionOvertaker());
+                        communicationLinkMSG.setStateParker(UDPMSG.getStateFunctionParker());
+                        communicationLinkMSG.setUnpark(UDPMSG.getUnpark());
+                    }
                 }
 
                 Container container(communicationLinkMSG);
