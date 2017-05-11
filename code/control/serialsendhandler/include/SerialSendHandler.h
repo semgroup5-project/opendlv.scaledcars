@@ -14,6 +14,8 @@
 #include <opendavinci/odcore/wrapper/SharedMemory.h>
 #include <opendavinci/odcore/wrapper/SharedMemoryFactory.h>
 
+#include <opendavinci/odcore/base/Service.h>
+
 #include <iostream>
 #include <memory>
 #include <stdint.h>
@@ -35,6 +37,18 @@ namespace scaledcars {
         using namespace automotive;
         using namespace automotive::miniature;
         using namespace group5;
+
+        // Concurrency is provided by the class odcore::base::Service.
+        class MyService : public odcore::base::Service {
+
+            // Your class needs to implement the method void beforeStop().
+            virtual void beforeStop();
+
+            // Your class needs to implement the method void run().
+            virtual void run();
+
+            void filterData(int id, int value);
+        };
 
         void __on_read(uint8_t b);
 
@@ -88,24 +102,18 @@ namespace scaledcars {
 
             virtual void tearDown();
 
-            void filterData(int id, int value);
-
             void sendSensorBoardData(std::map<uint32_t, double> sensor);
 
             int motor;
             int servo;
-            SensorsMSG sbd;
-
-            map<uint32_t, double> sensors;
-
-            int realOdometer;
-            long counter;
 
             int arduinoStopAngle;
             int arduinoBrake;
 
             int arduinoAngle;
             int speed;
+
+            MyService s;
         };
     }
 }

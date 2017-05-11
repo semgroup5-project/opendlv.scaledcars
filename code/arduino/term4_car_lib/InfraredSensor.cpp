@@ -22,12 +22,24 @@ unsigned int InfraredSensor::getDistance() {
     return distance;
 }
 
+unsigned int InfraredSensor::getDistance2() {
+    unsigned int distance = voltsToCentimeters2(readAnalogInput());
+    if ((distance < _minDistance) || (distance > _maxDistance)) {
+        return 0;
+    }
+    return distance;
+}
+
 unsigned int InfraredSensor::readAnalogInput() {
     return analogRead(_pin);
 }
 
 unsigned int InfraredSensor::voltsToCentimeters(unsigned int volts) {
     return ((2914 / (volts + 5)) - 1);
+}
+
+unsigned int InfraredSensor::voltsToCentimeters2(unsigned int volts){
+    return (1 / (0.0002391473 * volts - 0.0100251467)); //source: Jeroen Doggen http://plat.is/v3x25
 }
 
 void InfraredSensor::setMinAndMax(unsigned int min, unsigned int max) {

@@ -10,6 +10,8 @@
 #FUNCTION=$7
 
 #or read parameters
+echo "Please provide client IP>" >&2
+read IP
 echo "Please provide camera ID>" >&2
 read CAMID
 echo "Please provide m_debug>" >&2
@@ -73,8 +75,8 @@ cat  << EOF
 #
 # GLOBAL CONFIGURATION
 #
-global.car = file://Car1.objx
-global.scenario = file://Parking-boxes-1.scnx
+global.car = file:///opt/configuration/Car1.objx
+global.scenario = file:///opt/configuration/Parking-boxes-1.scnx
 global.showGrid = 0
 
 # Location of the origin of the reference frame (example: 57.70485804 N, 11.93831921 E)
@@ -433,5 +435,12 @@ communicationlink.function2 = $FUNCTION2
 #
 global.debug = $MDEBUG      # set to 0 to disable any windows and further output
 global.sim = $SIM    # Set simulation true or false
+
+###############################################################################
+###############################################################################
+#
+# CLIENT IP
+#
+udpconnectionstreamer.ip = $IP
 EOF
 

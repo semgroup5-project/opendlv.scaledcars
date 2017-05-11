@@ -1,6 +1,6 @@
 /**
- * SerialSendHandler
- * Copyright (C) 2017 Mattias Landkvist
+ * Example - Example code.
+ * Copyright (C) 2016 Christian Berger
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,9 +17,26 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#include "UDPConnection.h"
+#ifndef SCALEDCARS_CONTROL_UDPCONNECTIONSTREAMER_TESTSUITE_H
+#define SCALEDCARS_CONTROL_UDPCONNECTIONSTREAMER_TESTSUITE_H
 
-int32_t main(int32_t argc, char **argv) {
-    scaledcars::control::UDPConnection udpconnection(argc, argv);
-    return udpconnection.runModule();
-}
+#include "cxxtest/TestSuite.h"
+
+// Include local header files.
+#include "../include/UDPConnectionStreamer.h"
+
+using namespace std;
+using namespace scaledcars::control;
+
+class UDPConnectionStreamerTest : public CxxTest::TestSuite {
+   public:
+    void setUp() {}
+
+    void tearDown() {}
+
+    void testApplication() {
+        TS_ASSERT(true);
+    }
+};
+
+#endif /*SCALEDCARS_CONTROL_UDPCONNECTIONSTREAMER_TESTSUITE_H*/

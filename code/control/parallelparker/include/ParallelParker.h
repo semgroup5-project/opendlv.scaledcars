@@ -37,6 +37,8 @@
 #include <opendavinci/GeneratedHeaders_OpenDaVINCI.h>
 
 #define PI 3.14159265859
+#define US 1
+#define IR 2
 
 namespace scaledcars {
     namespace control {
@@ -88,8 +90,16 @@ namespace scaledcars {
 
         private:
             bool sim;
+            bool IRRObstacle;
+            bool USFObstacle;
+            bool IRFRObstacle;
             int guardGoodV;
             int guardBadV;
+            double odometer;
+            double usFront;
+            double irFrontRight;
+            double irRear;
+            double irRearRight;
 
             virtual void setUp();
 

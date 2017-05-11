@@ -18,6 +18,113 @@ namespace scaledcars {
         int port = 0;
         const string SERIAL_PORTS[] = {"/dev/ttyACM0", "/dev/ttyACM1", "/dev/ttyACM2", "/dev/ttyACM3"};
         int BAUD_RATE = 115200;
+        serial_state *serial_;
+        SensorsMSG sbd;
+        map<uint32_t, double> sensors;
+        int realOdometer = 0;
+        long counter = 0;
+        bool isSensorValues = false;
+        int count_values[] = {0, 0, 0, 0, 0};
+        int _values[] = {0, 0, 0, 0, 0};
+
+        // Your class needs to implement the method void beforeStop().
+        void MyService::beforeStop() {
+            // This block is executed right before
+            // the thread will be stopped.
+            cout << "This method is called right before "
+                 << "isRunning will return false." << endl;
+        }
+
+        // Your class needs to implement the method void run().
+        void MyService::run() {
+            // Here, you can do some initialization of
+            // resources (e.g. data structures and the like).
+            cout << "Starting listener thread. . . ." << endl;
+
+            serviceReady();
+
+            // This is the body of the concurrently executed method.
+            while (isRunning()) {
+                cout << "This message is printed every second." << endl;
+                int pending = g_async_queue_length(serial_->incoming_queue);
+                protocol_data incoming;
+                for (int j = 0; j < 5; ++j) {
+                    count_values[j] = 0;
+                    _values[j] = 0;
+                }
+                for (int i = 0; i < pending; i++) {
+                    incoming.value = 0;
+                    if (serial_receive(serial_, &incoming)) {
+                        cerr << "RECEIVED : id=" << incoming.id << " value=" << incoming.value << endl;
+                        filterData(incoming.id, incoming.value);
+                    }
+                    for (int j = 0; j < 5; ++j) {
+                        sensors[j + 1] = _values[j];
+                    }
+                    isSensorValues = true;
+                }
+
+                const uint32_t ONE_SECOND = 1000 * 1000;
+                odcore::base::Thread::usleepFor(ONE_SECOND/2);
+            }
+        }
+
+        /**
+       * Filters the data according to what sensor it represents and that sensors ranges.
+       * Ultrasonic and IR-sensor values are added to the "values", incrementing the "numbers".
+       * Every odometer value is passed forward for packing and sending.
+       *
+       * @param data to filter
+       */
+        void MyService::filterData(int id, int value) {
+
+            //US-SENSOR [ID 1] [ID 2] with value between 1 - 70
+            if ((id == 1 || id == 2) && value > 0) {
+                if (sensors[id] > -1) {
+                    _values[id-1] += value;
+                } else {
+                    _values[id-1]= value;
+                }
+                count_values[id-1] += 1;
+
+                //IR-SENSOR [ID 3] [ID 4] with value between 3 - 30
+            } else if ((id == 1 || id == 2) && value == 0) {
+                _values[id-1] = -1;
+                cout << "[SensorBoardData to conference] ID: " << id << " VALUE: " << -1 << endl;
+
+                //IR-SENSOR [ID 3] [ID 4] with value between 3 - 40
+            } else if ((id == 3 || id == 4 || id == 5) && value > 2) {
+                if (sensors[id] > -1) {
+                    _values[id-1] += value;
+                } else {
+                    _values[id-1] = value;
+                }
+                count_values[id-1] += 1;
+
+                //ODOMETER [ID 6] with value between 0 - 255
+            } else if ((id == 3 || id == 4 || id == 5) && value == 0) {
+                _values[id-1] = -1;
+                cout << "[SensorBoardData to conference] ID: " << id << " VALUE: " << -1 << endl;
+
+                //ODOMETER [ID 6] with value between 0 - 255
+            } else if (id == 6 && (value >= 0 && value <= 255)) {
+                cout << "ODOMETER VALUE IS : " << value << endl;
+                realOdometer += value;
+                cout << "ODOMETER REAL IS : " << realOdometer << endl;
+
+                if (realOdometer >= KM_IN_CM) {
+                    realOdometer -= KM_IN_CM;
+                    counter++;
+                    cout << "LOOPED +1 KM! " << endl;
+                }
+
+                cout << "[VehicleData to conference] VALUE: " << realOdometer << endl;
+                sbd.setTravelledDistance(realOdometer);
+                sbd.setTravelledKm(counter);
+            } else {
+                cerr << "[Filter no sensor] ID: " << id << " VALUE: " << value << endl;
+            }
+        }
 
         void __on_read(uint8_t b) {
             cout << ">> read " << (int) b << endl;
@@ -32,14 +139,11 @@ namespace scaledcars {
                 serial(),
                 motor(90),
                 servo(90),
-                sbd(),
-                sensors(),
-                realOdometer(0),
-                counter(0),
                 arduinoStopAngle(90),
                 arduinoBrake(190),
                 arduinoAngle(90),
-                speed(190) {}
+                speed(190),
+                s() {}
 
         SerialSendHandler::~SerialSendHandler() {}
 
@@ -57,15 +161,13 @@ namespace scaledcars {
 
                 const char *_port = SERIAL_PORTS[port].c_str();
                 serial_open(this->serial, _port, BAUD_RATE);
+
                 cerr << "serial open" << endl;
                 serial_handshake(this->serial, '\n');
                 cerr << "serial handshake" << endl;
 
                 const uint32_t ONE_SECOND = 1000 * 1000;
                 odcore::base::Thread::usleepFor(5 * ONE_SECOND);
-
-                serial_start(this->serial);
-                cerr << "serial start" << endl;
 
                 protocol_data d_motor;
                 d_motor.id = ID_OUT_MOTOR;
@@ -77,6 +179,14 @@ namespace scaledcars {
                 serial_send(this->serial, d_motor);
                 serial_send(this->serial, d_servo);
 
+                const uint32_t ONE_SECOND = 1000 * 1000;
+                odcore::base::Thread::usleepFor(2 * ONE_SECOND);
+
+                serial_start(this->serial);
+                cerr << "serial start" << endl;
+
+                serial_ = this->serial;
+                s.start();
             } catch (const char *msg) {
                 cerr << "Serial error : " << msg << endl;
                 port++;
@@ -89,6 +199,8 @@ namespace scaledcars {
 
         void SerialSendHandler::tearDown() {
             cerr << "Shutting down serial handler" << endl;
+
+            s.stop();
 
             protocol_data d_motor;
             d_motor.id = ID_OUT_MOTOR;
@@ -143,83 +255,35 @@ namespace scaledcars {
                 }
 
 
-                    protocol_data d_motor;
-                    d_motor.id = ID_OUT_MOTOR;
-                    d_motor.value = this->motor / 3;
+                protocol_data d_motor;
+                d_motor.id = ID_OUT_MOTOR;
+                d_motor.value = this->motor / 3;
 
-                    serial_send(this->serial, d_motor);
+                serial_send(this->serial, d_motor);
 
-                    protocol_data d_servo;
-                    d_servo.id = ID_OUT_SERVO;
-                    d_servo.value = this->servo / 3;
+                protocol_data d_servo;
+                d_servo.id = ID_OUT_SERVO;
+                d_servo.value = this->servo / 3;
 
-                    serial_send(this->serial, d_servo);
-
-
-                int pending = g_async_queue_length(this->serial->incoming_queue);
-                bool isSensorValues = false;
-                protocol_data incoming;
-                for (int i = 0; i < pending; i++) {
-                    if (serial_receive(this->serial, &incoming)) {
-                        cerr << "RECEIVED : id=" << incoming.id << " value=" << incoming.value << endl;
-                        filterData(incoming.id, incoming.value);
-                        isSensorValues = true;
-                    }
-                }
+                serial_send(this->serial, d_servo);
 
                 if (isSensorValues) {
+                    for (int i = 1; i < 6; ++i) {
+                       if (sensors[i] > 0) {
+                            cerr << "Normalizing ID:" << i << " value total:" << sensors[i] << " divided by:" << count_values[i-1] << endl;
+                            sensors[i] /= count_values[i-1];
+                           cout << "[SensorBoardData to conference] ID: " << i << " VALUE: " << sensors[i] << " RECEIVED: " << count_values[i-1] << " TIMES" << endl;
+
+                       }
+                    }
                     sendSensorBoardData(sensors);
                 }
+
+//                const uint32_t ONE_SECOND = 1000 * 1000;
+//                odcore::base::Thread::usleepFor(2 * ONE_SECOND);
             }
 
             return ModuleExitCodeMessage::OKAY;
-        }
-
-        /**
-        * Filters the data according to what sensor it represents and that sensors ranges.
-        * Ultrasonic and IR-sensor values are added to the "values", incrementing the "numbers".
-        * Every odometer value is passed forward for packing and sending.
-        *
-        * @param data to filter
-        */
-        void SerialSendHandler::filterData(int id, int value) {
-
-            //US-SENSOR [ID 1] [ID 2] with value between 1 - 70
-            if ((id == 1 || id == 2) && value >= 1 && value <= 70) {
-                sensors[id] = value;
-                cout << "[SensorBoardData to conference] ID: " << id << " VALUE: " << value << endl;
-
-                //IR-SENSOR [ID 3] [ID 4] with value between 3 - 40
-            } else if ((id == 1 || id == 2) && ((value >= 0 && value <= 1) || (value > 70))) {
-                sensors[id] = -1;
-                cout << "[SensorBoardData to conference] ID: " << id << " VALUE: " << -1 << endl;
-
-                //IR-SENSOR [ID 3] [ID 4] with value between 3 - 40
-            } else if ((id == 3 || id == 4 || id == 5) && value >= 3 && value <= 30) {
-                sensors[id] = value;
-                cout << "[SensorBoardData to conference] ID: " << id << " VALUE: " << value << endl;
-
-                //ODOMETER [ID 6] with value between 0 - 255
-            } else if ((id == 3 || id == 4 || id == 5) && (value < 3 || value > 30)) {
-                sensors[id] = -1;
-                cout << "[SensorBoardData to conference] ID: " << id << " VALUE: " << -1 << endl;
-
-                //ODOMETER [ID 6] with value between 0 - 255
-            } else if (id == 6 && value >= 0 && value <= 255) {
-                realOdometer += value;
-
-                if (realOdometer >= KM_IN_CM) {
-                    realOdometer -= KM_IN_CM;
-                    counter++;
-                    cout << "LOOPED +1 KM! " << endl;
-                }
-
-                cout << "[VehicleData to conference] VALUE: " << realOdometer << endl;
-                sbd.setTravelledDistance(realOdometer);
-                sbd.setTravelledKm(counter);
-            } else {
-                cerr << "[Filter no sensor] ID: " << id << " VALUE: " << value << endl;
-            }
         }
 
         /**
@@ -233,6 +297,7 @@ namespace scaledcars {
             sbd.setMapOfDistances(sensor);
             Container c(sbd);
             getConference().send(c);
+            isSensorValues = false;
         }
     }
 }

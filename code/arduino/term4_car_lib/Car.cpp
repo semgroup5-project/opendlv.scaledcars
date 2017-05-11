@@ -44,16 +44,24 @@ void Car::run() {
 }
 
 void Car::provideSensorsData() {
-    infraredBack.encodeAndWrite(ID_IN_INFRARED_BACK, infraredBack.getDistance());
-    infraredSideFront.encodeAndWrite(ID_IN_INFRARED_SIDE_FRONT, infraredSideFront.getDistance());
-    infraredSideBack.encodeAndWrite(ID_IN_INFRARED_SIDE_BACK, infraredSideBack.getDistance());
+    int count = 0;
+    while (count++ < 5) {
+        infraredBack.encodeAndWrite(ID_IN_INFRARED_BACK, infraredBack.getDistance());
+        infraredSideFront.encodeAndWrite(ID_IN_INFRARED_SIDE_FRONT, infraredSideFront.getDistance2());
+        infraredSideBack.encodeAndWrite(ID_IN_INFRARED_SIDE_BACK, infraredSideBack.getDistance());
+
+        ultrasonicFront.encodeAndWrite(ID_IN_ULTRASONIC_CENTER, ultrasonicFront.getDistance());
+        ultrasonicRight.encodeAndWrite(ID_IN_ULTRASONIC_SIDE_FRONT, ultrasonicRight.getDistance());
+    }
 
     odometer = wheelEncoder.getDistance() - encoderPos;
+//    Serial.print("THIS IS ODO TO SEND: ");
+//    Serial.println(odometer);
     if (odometer <= 255) {
         wheelEncoder.encodeAndWrite(ID_IN_ENCODER, odometer);
+    }else {
+        wheelEncoder.encodeAndWrite(ID_IN_ENCODER, 255);
     }
-    ultrasonicFront.encodeAndWrite(ID_IN_ULTRASONIC_CENTER, ultrasonicFront.getDistance());
-    ultrasonicRight.encodeAndWrite(ID_IN_ULTRASONIC_SIDE_FRONT, ultrasonicRight.getDistance());
 }
 
 void Car::rcControl() {
@@ -154,8 +162,21 @@ void Car::establishContact(char toSend) {
         analogWrite(greenPin, green);
         analogWrite(bluePin, blue);
         Serial.println(toSend);   // send a char
+        wait(0.5);
     }
+    red = 0;
+    green = 0;
+    blue = 0;
+#ifdef COMMON_ANODE
+    red = 255 - red;
+    green = 255 - green;
+    blue = 255 - blue;
+#endif
+    analogWrite(redPin, red);
+    analogWrite(greenPin, green);
+    analogWrite(bluePin, blue);
     Serial.read();
+    escMotor.arm();
 }
 
 void Car::waitConnection() {

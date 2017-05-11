@@ -17,10 +17,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#ifndef UDPCONNECTION_H
-#define UDPCONNECTION_H
+#ifndef UDPCONNECTIONSTREAMER_H
+#define UDPCONNECTIONSTREAMER_H
 
-#include <opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h>
+#include <opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h>
 #include <opendavinci/odcore/data/Container.h>
 #include <opendavinci/odcore/data/TimeStamp.h>
 #include <opendavinci/odcore/base/Lock.h>
@@ -31,25 +31,20 @@
 #include <opendavinci/odcore/wrapper/SharedMemory.h>
 #include <opendavinci/odcore/wrapper/SharedMemoryFactory.h>
 
-#include <opendavinci/odcore/io/StringListener.h>
-#include <opendavinci/odcore/io/udp/UDPReceiver.h>
 #include <opendavinci/odcore/io/udp/UDPSender.h>
 #include <opendavinci/odcore/io/udp/UDPFactory.h>
 
-#include "automotivedata/generated/automotive/VehicleData.h"
-#include "automotivedata/generated/automotive/miniature/SensorBoardData.h"
-#include <automotivedata/GeneratedHeaders_AutomotiveData.h>
 #include <opendavinci/GeneratedHeaders_OpenDaVINCI.h>
-#include "odvdscaledcarsdatamodel/generated/group5/CommunicationLinkMSG.h"
-#include "odvdscaledcarsdatamodel/generated/group5/LaneFollowerMSG.h"
+
+#include <opendavinci/odcore/wrapper/jpg/JPG.h>
+#include "opendavinci/odcore/data/image/CompressedImage.h"
+#include "opendavinci/generated/odcore/data/image/SharedImage.h"
 
 #include <iostream>
 #include <memory>
 #include <stdint.h>
 #include <string>
 #include <opendavinci/odcore/base/Thread.h>
-
-#include "Netstrings.hpp"
 
 #include <opendavinci/odcore/base/KeyValueConfiguration.h>
 
@@ -64,12 +59,7 @@ namespace scaledcars {
         using namespace odcore::data;
         using namespace odcore::wrapper;
 
-        class UDPReceiveBytes : public odcore::io::StringListener {
-
-            virtual void nextString(const std::string &s);
-        };
-
-        class UDPConnection : public odcore::base::module::TimeTriggeredConferenceClientModule {
+        class UDPConnectionStreamer : public odcore::base::module::DataTriggeredConferenceClientModule {
 
         private:
             /**
@@ -81,7 +71,7 @@ namespace scaledcars {
              *
              * @param obj Reference to an object of this class.
              */
-            UDPConnection(const UDPConnection &/*obj*/);
+            UDPConnectionStreamer(const UDPConnectionStreamer &/*obj*/);
 
             /**
              * "Forbidden" assignment operator.
@@ -93,7 +83,7 @@ namespace scaledcars {
              * @param obj Reference to an object of this class.
              * @return Reference to this instance.
              */
-            UDPConnection &operator=(const UDPConnection &/*obj*/);
+            UDPConnectionStreamer &operator=(const UDPConnectionStreamer &/*obj*/);
 
         public:
             /**
@@ -102,9 +92,9 @@ namespace scaledcars {
              * @param argc Number of command line arguments.
              * @param argv Command line arguments.
              */
-            UDPConnection(const int &argc, char **argv);
+            UDPConnectionStreamer(const int &argc, char **argv);
 
-            virtual ~UDPConnection();
+            virtual ~UDPConnectionStreamer();
 
         protected:
             /**
@@ -120,30 +110,11 @@ namespace scaledcars {
 
             void tearDown();
 
-            double Median(cv::Mat mat);
-
-            void processImage();
-
-            odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
-
-            group5::LaneFollowerMSG laneFollowerMSG;
-
-            shared_ptr <UDPReceiver> udp_receiver;
-
-            shared_ptr <odcore::wrapper::SharedMemory> m_sharedImageMemory;
-            shared_ptr <odcore::wrapper::SharedMemory> m_sharedProcessedImageMemory;
-            odcore::data::image::SharedImage m_sharedProcessedImage;
+            virtual void nextContainer(odcore::data::Container &c);
 
             bool m_hasAttachedToSharedImageMemory;
-
-            cv::Mat m_image;
-            cv::Mat m_image_mat;
-            cv::Mat m_image_new;
-
-            int32_t m_threshold1;
-            int32_t m_threshold2;
         };
     }
 } // scaledcars::control
 
-#endif /*UDPCONNECTION_H*/
+#endif /*UDPCONNECTIONSTREAMER_H*/
