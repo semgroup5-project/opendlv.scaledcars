@@ -10,6 +10,8 @@
 #FUNCTION=$7
 
 #or read parameters
+echo "Please provide client IP>" >&2
+read IP
 echo "Please provide camera ID>" >&2
 read CAMID
 echo "Please provide m_debug>" >&2
@@ -439,6 +441,6 @@ global.sim = $SIM    # Set simulation true or false
 #
 # CLIENT IP
 #
-client.ip = 100.82.75.80
+udpconnectionstreamer.ip = $IP
 EOF
 
