@@ -1,5 +1,7 @@
 
 # docker-compose.yml - Micro-services to record one documentation camera.
+
+# docker-compose.yml - Micro-services to record one documentation camera.
 # Copyright (C) 2016 Hang Yin, Christian Berger
 #
 # This program is free software; you can redistribute it and/or
@@ -43,21 +45,6 @@ services:
         privileged: true
         restart: on-failure
         command: "/opt/od4/bin/odsimvehicle --cid=${CID} --freq=20"
-        
-        #odsimirus
-    odsimirus:
-        build: .
-        network_mode: host
-        ipc: host
-        volumes:
-        - ./DIT-168:/opt/configuration
-        depends_on: 
-             - odsupercomponent
-        logging:
-            driver: "none"
-        privileged: true
-        restart: on-failure
-        command: "/opt/od4/bin/odsimirus --cid=${CID} --configuration=/opt/configuration/configuration --freq=20"
 
     #Micro-service for camera
     odsimcamera:
@@ -75,8 +62,7 @@ services:
             - odsupercomponent
         privileged: true
         restart: on-failure
-        command: "/opt/od4/bin/odsimcamera --cid=${CID} --freq=20 --configuration=/opt/configuration/configuration"
-        #command: "/opt/opendlv.scaledcars/bin/scaledcars-control-proxy --cid=${CID} --rm=true --freq=20 --configuration=/opt/configuration/configuration"
+        command: "/opt/opendlv.scaledcars/bin/scaledcars-control-proxy --cid=${CID} --rm=true --freq=20 --configuration=/opt/configuration/configuration"
 
     #serial
     serialhandler:
@@ -118,22 +104,22 @@ services:
         command: "/opt/od4/bin/odcockpit --cid=${CID} --configuration=/opt/configuration/configuration --freq=20"
 
    #Micro-service for lanedtecter scenario.
-    lanefollower:
-        build: .
-        network_mode: host
-        ipc: host
-        environment:
-        - DISPLAY=$DISPLAY
-        volumes:
-        - ./DIT-168:/opt/configuration
-        depends_on:
-            - odsupercomponent
-            - odsimvehicle
-            - odsimcamera
-            - communicationlink
-        restart: on-failure
-        privileged: true
-        command: bash -c "sleep 5; /opt/opendlv.scaledcars/bin/scaledcars-control-lanefollwer --verbose=1  --cid=${CID} --freq=20"
+   # lanefollower:
+    #    build: .
+     #   network_mode: host
+      #  ipc: host
+       # environment:
+        #- DISPLAY=$DISPLAY
+#        volumes:
+ #       - ./DIT-168:/opt/configuration
+  #      depends_on:
+   #         - odsupercomponent
+    #        - odsimvehicle
+     #       - odsimcamera
+      #      - communicationlink
+       # restart: on-failure
+        #privileged: true
+#        command: bash -c "sleep 5; /opt/opendlv.scaledcars/bin/scaledcars-control-lanefollwer --verbose=1  --cid=${CID} --freq=20"
         
         #Micro-service for lanedtecter scenario.
     park:
@@ -145,7 +131,9 @@ services:
         volumes:
         - ./DIT-168:/opt/configuration
         depends_on:
+            #- lanefollower
             - odsupercomponent
+            - odsimvehicle
             - communicationlink
         restart: on-failure
         privileged: true

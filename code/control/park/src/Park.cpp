@@ -27,10 +27,10 @@ namespace scaledcars {
         using namespace automotive;
         using namespace automotive::miniature;
         using namespace group5;
-        
-        
+
+
         //*****************************//
-        //	DIFFERENT PARKING STATES	//
+        //	DIFFERENT PARKING STATES   //
         //*****************************//
         const int PARALLEL = 0;
         const int BOX = 1;
@@ -76,11 +76,11 @@ namespace scaledcars {
 
             while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
                    odcore::data::dmcp::ModuleStateMessage::RUNNING) {
-                   
-               Container communicationLinkMSGContainer = getKeyValueDataStore().get(CommunicationLinkMSG::ID());
+
+                Container communicationLinkMSGContainer = getKeyValueDataStore().get(CommunicationLinkMSG::ID());
                 communicationLinkMSG = communicationLinkMSGContainer.getData<CommunicationLinkMSG>();
-                
-					setParkingType(communicationLinkMSG.getParkingType());
+
+                setParkingType(communicationLinkMSG.getParkingType());
 
                 usFront = communicationLinkMSG.getUltraSonicFrontCenter();
                 irFrontRight = communicationLinkMSG.getInfraredSideFront();
@@ -90,15 +90,15 @@ namespace scaledcars {
                 IRRObstacle = obstacleDetection(irRear, IR);
                 IRFRObstacle = obstacleDetection(irFrontRight, IR);
                 IRRRObstacle = obstacleDetection(irRearRight, IR);
-                USFObstacle = obstacleDetection(usFront,US);
-
-                if(IRRObstacle && irRear < 15 && irRear > 5){
+                USFObstacle = obstacleDetection(usFront, US);
+                cerr<<"HOLA!!"<<endl;
+                if (IRRObstacle && irRear < 15 && irRear > 5) {
                     vc.setBrakeLights(true);
-                    cerr << "TOO CLOSE AT THE BACK, EMERGENCY STOP!!"<<endl;
+                    cerr << "TOO CLOSE AT THE BACK, EMERGENCY STOP!!" << endl;
                 }
-                if(USFObstacle && usFront >0 && usFront < 20){
+                if (USFObstacle && usFront > 0 && usFront < 20) {
                     vc.setBrakeLights(true);
-                    cerr << "TOO CLOSE AT THE BACK, EMERGENCY STOP!!"<<endl;
+                    cerr << "TOO CLOSE AT THE BACK, EMERGENCY STOP!!" << endl;
                 }
                 if (isParking) {
                     parallelPark();
@@ -108,24 +108,33 @@ namespace scaledcars {
                     cout << "PARKING : Finding values" << endl;
                 }
 
-
                 Container c(vc);
                 getConference().send(c);
-                
+
             }
             return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
         }
-        
+
         void Park::parkingFinder() {
             // Parking space starting point
-            if (IRRRObstacle && parkingStart == 0) {
+            vc.setBrakeLights(false);
+            vc.setSpeed(99);
+
+            if (!IRRRObstacle && !IRFRObstacle && parkingStart == 0) {
                 parkingStart = odometer;
+
+                vc.setSteeringWheelAngle(0);
                 cout << "PARKING : Here starts freedom      " << parkingStart << endl;
             }
+            cout << "IRRR: " << IRRRObstacle<< endl;
+            cout << "IRFR: " << IRFRObstacle << endl;
+            cout << "OD-Park: " << odometer - parkingStart << endl;
+            cout << "parkingstart: " << parkingStart<<endl;
 
             // Gap is too narrow
             if (IRRRObstacle && IRFRObstacle && parkingStart > 0 && (odometer - parkingStart) < GAP) {
                 parkingStart = 0;
+                vc.setSteeringWheelAngle(0);
                 isParking = false;
                 cout << "PARKING : No freedom" << endl;
             }
@@ -134,108 +143,108 @@ namespace scaledcars {
             if (parkingStart > 0 && (odometer - parkingStart) >= GAP) {
                 backStart = odometer;
                 isParking = true;
-                sendParkerMSG();
+                //sendParkerMSG();
                 vc.setBrakeLights(true);
                 cout << "PARKING : Insertion time" << endl;
             }
 
         }
-        
-        void Park::park(){
-        		switch(parkingState){
-        			case START: {
-        				setParkingState(RIGHT_TURN);
-        				vc.setBrakeLights(false);
-        			}
-        			break;
-        			case RIGHT_TURN:{
-        				vc.setSpeed(70);
-        			
-               	vc.setSteeringWheelAngle(1.5);
-               	parkingCounter++;
-               	cout << "PARKING : Turning right" << endl;
-        			
-        				if(parkingCounter == 100){
-        					if(parkingType == PARALLEL){
-        						setParkingState(LEFT_TURN);
-        					} else if (parkingType == BOX){
-        						setParkingState(END);
-        					}
-        				}
-        			}
-        			break;
-        		
-        			case LEFT_TURN:{
-        				vc.setSpeed(70);
-               	vc.setSteeringWheelAngle(-1.5);
-        				parkingCounter++;
-        				cout << "PARKING : Turning left" << endl;
-        			
-        				if(parkingCounter == 200){
-        					setParkingState(END);
-        				}
-        			}
-        			break;
-        			
-        			case END: {
-        				vc.setBrakeLights(true);
-        				setParkingState(START);
-        				isParking = false;
-        				cout << "PARKING : I'm parked" << endl;
-        			}
-        		}
+
+        void Park::park() {
+            switch (parkingState) {
+                case START: {
+                    setParkingState(RIGHT_TURN);
+                    vc.setBrakeLights(false);
+
+                }
+                    break;
+                case RIGHT_TURN: {
+                    vc.setSpeed(70);
+                    vc.setSteeringWheelAngle(1.5);
+                    parkingCounter++;
+                    cout << "PARKING : Turning right" << endl;
+
+                    if (parkingCounter == 100) {
+                        if (parkingType == PARALLEL) {
+                            setParkingState(LEFT_TURN);
+                        } else if (parkingType == BOX) {
+                            setParkingState(END);
+                        }
+                    }
+                }
+                    break;
+
+                case LEFT_TURN: {
+                    vc.setSpeed(70);
+                    vc.setSteeringWheelAngle(-1.5);
+                    parkingCounter++;
+                    cout << "PARKING : Turning left" << endl;
+
+                    if (parkingCounter == 200) {
+                        setParkingState(END);
+                    }
+                }
+                    break;
+
+                case END: {
+                    vc.setBrakeLights(true);
+                    setParkingState(START);
+                    isParking = false;
+                    cout << "PARKING : I'm parked" << endl;
+                }
+            }
         }
-        
-        void Park::unpark(){
-        		switch(parkingState){
-        			case START: {
-        				
-        				if(parkingType == PARALLEL){
-        					setParkingState(LEFT_TURN);
-        				} else if (parkingType == BOX){
-        					setParkingState(RIGHT_TURN);
-        				}
-        				vc.setBrakeLights(false);
-        			}
-        			break;
-        			case LEFT_TURN:{
-        				vc.setSpeed(100);
-        			
-               	vc.setSteeringWheelAngle(-1.5);
-               	parkingCounter++;
-               	cout << "UNPARKING : Turning left" << endl;
-        			
-        				if(parkingCounter == 100){
-        					setParkingState(RIGHT_TURN);
-        				}
-        			}
-        			break;
-        		
-        			case RIGHT_TURN:{
-        				vc.setSpeed(100);
-               	vc.setSteeringWheelAngle(1.5);
-        				parkingCounter++;
-        				cout << "UNPARKING : Turning right" << endl;
-        			
-        				if(parkingCounter == 200){
-        					setParkingState(END);
-        				}
-        			}
-        			break;
-        			
-        			case END: {
-        				sendParkerMSG();
-        				setParkingState(START);
-        				cout << "UNPARKING : I'm unparked" << endl;
-        			}
-        		}
+
+        void Park::unpark() {
+            switch (parkingState) {
+                case START: {
+
+                    if (parkingType == PARALLEL) {
+                        setParkingState(LEFT_TURN);
+                    } else if (parkingType == BOX) {
+                        setParkingState(RIGHT_TURN);
+                    }
+                    vc.setBrakeLights(false);
+                }
+                    break;
+                case LEFT_TURN: {
+                    vc.setSpeed(99);
+
+                    vc.setSteeringWheelAngle(-1.5);
+                    parkingCounter++;
+                    cout << "UNPARKING : Turning left" << endl;
+
+                    if (parkingCounter == 100) {
+                        setParkingState(RIGHT_TURN);
+                    }
+                }
+                    break;
+
+                case RIGHT_TURN: {
+                    vc.setSpeed(99);
+                    vc.setSteeringWheelAngle(1.5);
+                    parkingCounter++;
+                    cout << "UNPARKING : Turning right" << endl;
+
+                    if (parkingCounter == 200) {
+                        setParkingState(END);
+                    }
+                }
+                    break;
+
+                case END: {
+                    sendParkerMSG();
+                    setParkingState(START);
+                    cout << "UNPARKING : I'm unparked" << endl;
+                }
+            }
         }
-        
-        
-        void Park::setParkingType(int type){
-        		parkingType = type;
+
+
+        void Park::setParkingType(int type) {
+            parkingType = type;
         }
-                
+
 
         void Park::parallelPark() {
             backEnd = odometer;
@@ -248,11 +257,12 @@ namespace scaledcars {
                     break;
                 case RIGHT_TURN: {
                     vc.setBrakeLights(false);
-                    vc.setSpeed(72);
-                    vc.setSteeringWheelAngle(1.5);
+                    vc.setSpeed(69);
+                    vc.setSteeringWheelAngle(1);
                     parkingCounter++;
                     cout << "PARKING : Turning right" << endl;
-                    if (adjDist < GAP / 2) {
+                    cout << "adjDist"<<adjDist<<endl;
+                    if (adjDist <= GAP / 2) {
                         setParkingState(LEFT_TURN);
                     }
                 }
@@ -260,10 +270,11 @@ namespace scaledcars {
 
                 case LEFT_TURN: {
                     vc.setBrakeLights(false);
-                    vc.setSpeed(72);
-                    vc.setSteeringWheelAngle(-1.5);
+                    vc.setSpeed(69);
+                    vc.setSteeringWheelAngle(-1);
                     parkingCounter++;
                     cout << "PARKING : Turning left" << endl;
+                    cout << "adjDist"<<adjDist<<endl;
                     if (adjDist > GAP / 2) {
                         setParkingState(END);
                     }
@@ -293,9 +304,10 @@ namespace scaledcars {
                     break;
                 case (IR) : {
                     if (i > 28 || i < 0) {
-                        ifObstacle = true;
-                    } else if (i <= 28 && i > 0) {
+                        cout<<"YO!"<<endl;
                         ifObstacle = false;
+                    } else if (i <= 28 && i > 0) {
+                        ifObstacle = true;
                     }
                 }
                     break;
