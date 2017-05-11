@@ -25,7 +25,6 @@
 
 namespace scaledcars {
     namespace control {
-
         using namespace std;
         using namespace cv;
         using namespace odcore::base;
@@ -61,7 +60,7 @@ namespace scaledcars {
                 m_threshold2(200),  // 150
                 m_control_scanline(250),//needs testing with real c
                 m_stop_scanline(170),//needs testing with real car
-                m_distance(140),  //needs testing with real car as well
+                m_distance(130),  //needs testing with real car as well
                 p_gain(0),       // the gain values can be adjusted here outside of simulation scenario (see @setUp() )
                 i_gain(0),
                 d_gain(0),
@@ -71,8 +70,7 @@ namespace scaledcars {
 
         // This method will be call automatically _before_ running body().
         void LaneFollower::setUp() {
-
-            // Get configuration data.
+            // Get configuration data for this class.
             KeyValueConfiguration kv = getKeyValueConfiguration();
             m_debug = kv.getValue<int32_t>("global.debug") == 1;
             Sim = kv.getValue<int32_t>("global.sim") == 1;
@@ -136,7 +134,6 @@ namespace scaledcars {
             }
             return retVal;
         }
-
         // Process Image
         void LaneFollower::processImage() {
             // New image
@@ -189,7 +186,7 @@ namespace scaledcars {
             Point left, right, left2, right2;  // P(x, y) = P (column, row)
 
             left.y = y;
-            left2.y = y - 100;
+            left2.y = 50;
             left.x = -1;
             left2.x = -1;
 
@@ -203,7 +200,7 @@ namespace scaledcars {
             }
 
             right.y = y;
-            right2.y = y - 100;
+            right2.y = 50;
             right.x = -1;
             right2.x = -1;
             // Search from middle to the right
@@ -227,7 +224,7 @@ namespace scaledcars {
 
                 // Search from middle to the right
                 for (int x = m_image_new.cols / 2;
-                     x < m_image_new.cols ; x++) {
+                     x < m_image_new.cols - 30; x++) {
                     pixelRight = m_image_new.at<uchar>(Point(x, y));
                     if (pixelRight >= 150) {   //tentative value, might need adjustment: lower it closer to 100
                         right2.x = x;
@@ -242,6 +239,9 @@ namespace scaledcars {
                     state = "moving";
                 }
             }
+
+            if (right.x > 0) right.x += 20;
+            if (left.x > 0) left.x += 20;
 
             if (y == m_control_scanline) {
 
@@ -273,7 +273,7 @@ namespace scaledcars {
 
             int left_dist = 0;
 
-            stop_left.x = (m_image_new.cols / 2) - 40;   // stop line checker needs to be moved more towards the left side
+            stop_left.x = (m_image_new.cols / 2) - 70;   // stop line checker needs to be moved more towards the left side
             stop_left.y = m_control_scanline;
 
             // Find first grey pixel in the front of the car left side
@@ -288,7 +288,7 @@ namespace scaledcars {
 
             int right_dist = 0;
 
-            stop_right.x = (m_image_new.cols / 2) + 40;  // stop line checker needs to be moved more towards the left side
+            stop_right.x = (m_image_new.cols / 2) ;  // stop line checker needs to be moved more towards the left side
             stop_right.y = m_control_scanline;
 
             // Find first grey pixel in front of the car right side
@@ -332,14 +332,6 @@ namespace scaledcars {
                 putText(m_image_new, "Stop counter :" + std::to_string(stopCounter) , Point(m_image_new.cols - 150, 100), FONT_HERSHEY_PLAIN, 1,
                         CV_RGB(255, 255, 255));
 
-//                putText(m_image_new, state , Point(m_image_new.cols - 80, 20), FONT_HERSHEY_PLAIN, 1,
-//                        CV_RGB(255, 255, 255));
-//
-//                std::string speed = std::to_string(m_vehicleControl.getSpeed());
-//                putText(m_image_new, speed , Point(m_image_new.cols - 80, 40), FONT_HERSHEY_PLAIN, 1,
-//                        CV_RGB(255, 255, 255));
-//
-
                 putText(m_image_new, "Distance " + std::to_string(m_distance) , Point(m_image_new.cols - 150, 120), FONT_HERSHEY_PLAIN, 1,
                         CV_RGB(255, 255, 255));
 
@@ -360,10 +352,8 @@ namespace scaledcars {
                 }
             }
 
-            //static int counter = 0;
-
             // is the detected stopline at a similar distance on both sides
-            if (counter < 5 && (left_dist - right_dist) > -10 && (left_dist - right_dist) < 10 && left_dist != 0 &&
+            if (counter < 5 && (left_dist - right_dist) > -15 && (left_dist - right_dist) < 15 && left_dist != 0 &&
                 right_dist != 0) {
                 counter++;
             }else{
@@ -389,26 +379,11 @@ namespace scaledcars {
                 m_eSum += e;
             }
 
-
-//            if (fabs(e) < 1e-1) {
-//                m_eSum = m_eSum * 0.01;
-//            }
-//            if (fabs(e) < 1e-2) {
-//                m_eSum = m_eSum * 0.0001;
-//            }
-//            if (fabs(e) < 1e-3) {
-//                m_eSum = 0;
-//            } else {
-//                m_eSum += e;
-//            }
-
-            // The following values have been determined by Twiddle algorithm.
+            // PID control algorithm uses the following values, with the meaning:
             //Kp = p_gain -> Proportional -> how big of a turn when the car try to "fix" the error
-            //const double Kp = 0.4482626884328734;
             //Ki = i_gain-> Integral -> Current -> might be the middle position of the car
-            //const double Ki = 3.103197570937628;
             //Kd = d_gain-> derivative -> how frequent the reaction the car will be -> the smaller the better.
-            //const double Kd = 0.030450210485408566;
+
 
             const double p = p_gain * e;
             const double i = i_gain * timeStep * m_eSum;
@@ -423,18 +398,18 @@ namespace scaledcars {
                 desiredSteering = y;
             }
             // set an upper and lower limit for the desired steering
-            if (desiredSteering > 0.911) {
-                desiredSteering = 0.911;
+            if (desiredSteering > 1.5) {
+                desiredSteering = 1.5;
             }
-            if (desiredSteering < -0.911) {
-                desiredSteering = -0.911;
+            if (desiredSteering < -1.5) {
+                desiredSteering = -1.5;
             }
 
-            // Show resulting features.
+            // Show resulting image from image processing
             if (m_debug) {
                 if (m_image.data != NULL) {
                     imshow("Debug Image",
-                           m_image_new);  //m_image = image without canny || m_image_new = fully processed image
+                           m_image_new);
                     waitKey(10);
                 }
             }
@@ -458,18 +433,15 @@ namespace scaledcars {
 //            }
         }
 
-        // This method will do the main data processing job.
-        // Therefore, it tries to open the real camera first. If that fails, the virtual camera images from camgen are used.
+        // Body method does the main data processing job.
         ModuleExitCodeMessage::ModuleExitCode LaneFollower::body() {    // this method still needs
             // Overall state machine handler.
             while (getModuleStateAndWaitForRemainingTimeInTimeslice() == ModuleStateMessage::RUNNING) {
-
                 Container communicationLinkContainer = getKeyValueDataStore().get(CommunicationLinkMSG::ID());
                 if (communicationLinkContainer.getDataType() == CommunicationLinkMSG::ID()) {
                     const CommunicationLinkMSG communicationLinkMSG = communicationLinkContainer.getData<CommunicationLinkMSG>();
                     _state = communicationLinkMSG.getStateLaneFollower();
                 }
-
                 cerr << "STATE IS : " << _state << endl;
                 if (_state == 1) {
                     bool has_next_frame = false;
@@ -480,7 +452,6 @@ namespace scaledcars {
                     if (image_container.getDataType() == SharedImage::ID()) {
                         has_next_frame = readSharedImage(image_container);
                     }
-
                     // If we have an image from the previous call, it is then processed
                     if (has_next_frame) {
                         processImage();
@@ -523,21 +494,23 @@ namespace scaledcars {
                         if (stopCounter > 30.9999) {
                             state = "resume";
                             prevState = "stopLine";
-                            if (Sim) {
-                                m_vehicleControl.setSpeed(1);
-                            } else {
-                                m_vehicleControl.setSpeed(100);
-                            }
+
 
                         }
                     }
                     if (state == "resume"){
-                        if (stopCounter < 25.0) {
+                        if (stopCounter < 50.0) {
                             stopCounter += 0.5;
+                            if (Sim) {
+                                m_vehicleControl.setSpeed(1);
+                            } else {
+                                m_vehicleControl.setSpeed(99);
+                                m_vehicleControl.setSteeringWheelAngle(0);
+                            }
                         } else {
-                            stopCounter = 0;
-                            state = "moving";
-                            cerr << "Moving!" << endl;
+                                stopCounter = 0;
+                                state = "moving";
+                                cerr << "Moving!" << endl;
                         }
                     }
                     if (state == "danger") {
