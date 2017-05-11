@@ -1,36 +1,16 @@
 #!/bin/bash
 
 #define parameters which are passed in.
-#CAMID=$1
-#MDEBUG=$2
-#SIM=$3
-#P=$4
-#I=$5
-#D=$6
-#FUNCTION=$7
+ANS=$1
+IP=$2
+P=$3
+I=$4
+D=$5
+FUNCTION1=$6
+FUNCTION2=$7
 
-#or read parameters
-echo "Please provide camera ID>" >&2
-read CAMID
-echo "Please provide m_debug>" >&2
-read MDEBUG
-echo "Please provide SIM>" >&2
-read SIM
-echo "Please provide if function lanefollower will be running [0 | 1]>" >&2
-read FUNCTION1
-echo "Please provide wich other function will the decision maker run [0 for overtaker | 1 for parker]>" >&2
-read FUNCTION2
-
-echo "Do you wish to modify the PID [y,n]?>" >&2
-read ANSWER
-case $ANSWER in
+case $ANS in
     y|Y) 
-        echo "Please provide P (of PID)>" >&2
-        read P
-        echo "Please provide I (of PID)>" >&2
-        read I
-        echo "Please provide D (of PID)>" >&2
-        read D
         if [ -f oldpid.txt ];
         then
             echo "Replacing old PID values..." >&2
@@ -334,7 +314,7 @@ proxy.useRecorder = 0 # 1 = record all captured data directly, 0 otherwise.
 proxy.recorder.output = file://recs/
 proxy.camera.name = WebCam
 proxy.camera.type = OpenCV # OpenCV or UEYE
-proxy.camera.id = $CAMID # Select here the proper ID for OpenCV
+proxy.camera.id = 0 # Select here the proper ID for OpenCV
 proxy.camera.width = 640 #752-UEYE, 640-OpenCV 
 proxy.camera.height = 480
 proxy.camera.bpp = 3 #3- openCV, 1-UEYE
@@ -431,7 +411,14 @@ communicationlink.function2 = $FUNCTION2
 #
 # GLOBAL CONFIGURATION
 #
-global.debug = $MDEBUG      # set to 0 to disable any windows and further output
-global.sim = $SIM    # Set simulation true or false
+global.debug = 0      # set to 0 to disable any windows and further output
+global.sim = 0    # Set simulation true or false
+
+###############################################################################
+###############################################################################
+#
+# CLIENT IP
+#
+udpconnectionstreamer.ip = $IP
 EOF
 
