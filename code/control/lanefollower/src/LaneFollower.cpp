@@ -41,7 +41,7 @@ namespace scaledcars {
         bool stop = false;
         double stopCounter = 0, counter = 0;
         String state = "moving", prevState = "moving";
-        bool inRightLane = true;   //the overtaker alters this value to signal a lane change
+        bool inRightLane = true;   //Flip this value to indicate lane change
 
         LaneFollower::LaneFollower(const int32_t &argc, char **argv) :
                 TimeTriggeredConferenceClientModule(argc, argv, "lanefollower"),
@@ -59,9 +59,9 @@ namespace scaledcars {
                 laneFollowerMSG(),
                 m_threshold1(50),  //50
                 m_threshold2(200),  // 150
-                m_control_scanline(400),//needs testing with real c
-                m_stop_scanline(250),//needs testing with real car
-                m_distance(245),  //needs testing with real car as well
+                m_control_scanline(250),//needs testing with real c
+                m_stop_scanline(170),//needs testing with real car
+                m_distance(140),  //needs testing with real car as well
                 p_gain(0),       // the gain values can be adjusted here outside of simulation scenario (see @setUp() )
                 i_gain(0),
                 d_gain(0),
@@ -186,10 +186,12 @@ namespace scaledcars {
             int32_t y = m_control_scanline;
 
             uchar pixelLeft, pixelRight;
-            Point left, right;  // P(x, y) = P (column, row)
+            Point left, right, left2, right2;  // P(x, y) = P (column, row)
 
             left.y = y;
+            left2.y = y - 100;
             left.x = -1;
+            left2.x = -1;
 
             // Search from middle to the left
             for (int x = m_image_new.cols / 2; x > 0; x--) {//from the middle to the left
@@ -201,10 +203,12 @@ namespace scaledcars {
             }
 
             right.y = y;
+            right2.y = y - 100;
             right.x = -1;
+            right2.x = -1;
             // Search from middle to the right
             for (int x = m_image_new.cols / 2;
-                 x < m_image_new.cols ; x++) {  //cols - 50 to stop it from finding the wall
+                 x < m_image_new.cols ; x++) {
                 pixelRight = m_image_new.at<uchar>(Point(x, y));
                 if (pixelRight >= 150) {   //tentative value, might need adjustment: lower it closer to 100
                     right.x = x;
@@ -213,6 +217,24 @@ namespace scaledcars {
             }
 
             if (right.x == -1 && left.x == -1) {  //setting state if the car does not see any line
+                for (int x = m_image_new.cols / 2; x > 0; x--) {//from the middle to the left
+                    pixelLeft = m_image_new.at<uchar>(Point(x, y));
+                    if (pixelLeft >= 150) {   //tentative value, might need adjustment: lower it closer to 100
+                        left2.x = x;
+                        break;
+                    }
+                }
+
+                // Search from middle to the right
+                for (int x = m_image_new.cols / 2;
+                     x < m_image_new.cols ; x++) {
+                    pixelRight = m_image_new.at<uchar>(Point(x, y));
+                    if (pixelRight >= 150) {   //tentative value, might need adjustment: lower it closer to 100
+                        right2.x = x;
+                        break;
+                    }
+                }
+                if (right2.x == -1 && left2.x == -1)
                 state = "danger";
             }
             else{
@@ -225,8 +247,10 @@ namespace scaledcars {
 
                 if (inRightLane) {
                     if (right.x > 0) {
+                       // m_distance = 210;
                         e = ((right.x - m_image_new.cols / 2.0) - m_distance) / m_distance;
                     } else if (left.x > 0) {
+                       // m_distance = 190;
                         e = (m_distance - (m_image_new.cols / 2.0 - left.x)) / m_distance;
                     }
                 } else {  //Adapt to following the left lane
@@ -336,7 +360,7 @@ namespace scaledcars {
                 }
             }
 
-            static int counter = 0;
+            //static int counter = 0;
 
             // is the detected stopline at a similar distance on both sides
             if (counter < 5 && (left_dist - right_dist) > -10 && (left_dist - right_dist) < 10 && left_dist != 0 &&
@@ -359,17 +383,24 @@ namespace scaledcars {
             m_previousTime = currentTime;
 
             //a more soft way to handle instead of resetting to 0 a way to mitigate toggling in corners
-            if (fabs(e) < 1e-1) {
-                m_eSum = m_eSum * 0.01;
-            }
-            if (fabs(e) < 1e-2) {
-                m_eSum = m_eSum * 0.0001;
-            }
-            if (fabs(e) < 1e-3) {
+            if(fabs(e) < 1e-2) {
                 m_eSum = 0;
             } else {
                 m_eSum += e;
             }
+
+
+//            if (fabs(e) < 1e-1) {
+//                m_eSum = m_eSum * 0.01;
+//            }
+//            if (fabs(e) < 1e-2) {
+//                m_eSum = m_eSum * 0.0001;
+//            }
+//            if (fabs(e) < 1e-3) {
+//                m_eSum = 0;
+//            } else {
+//                m_eSum += e;
+//            }
 
             // The following values have been determined by Twiddle algorithm.
             //Kp = p_gain -> Proportional -> how big of a turn when the car try to "fix" the error
@@ -390,15 +421,15 @@ namespace scaledcars {
 
             if (fabs(e) > 1e-2) {
                 desiredSteering = y;
-
-                // set an upper and lower limit for the desired steering
-                if (desiredSteering > 1.5) {
-                    desiredSteering = 1.5;
-                }
-                if (desiredSteering < -1.5) {
-                    desiredSteering = -1.5;
-                }
             }
+            // set an upper and lower limit for the desired steering
+            if (desiredSteering > 0.911) {
+                desiredSteering = 0.911;
+            }
+            if (desiredSteering < -0.911) {
+                desiredSteering = -0.911;
+            }
+
             // Show resulting features.
             if (m_debug) {
                 if (m_image.data != NULL) {
@@ -463,18 +494,18 @@ namespace scaledcars {
                             m_vehicleControl.setSpeed(1);
                         } else {
                             if (stop) {
-                                if (stopCounter < 2.0) {
+                                if (stopCounter < 1.0) {
                                     stopCounter += 0.5;
                                 }else{
                                     if (prevState == "stopLine"){
-                                        m_vehicleControl.setSpeed(100);
+                                        m_vehicleControl.setSpeed(99);
                                     }else{
                                         state = "stop";
                                         stopCounter = 0;
                                     }
                                 }
                             } else {
-                                m_vehicleControl.setSpeed(100);
+                                m_vehicleControl.setSpeed(99);
                                 prevState = "moving";
                             }
                         }
@@ -489,7 +520,7 @@ namespace scaledcars {
 
                         stopCounter += 0.5;
 
-                        if (stopCounter > 20.9999) {
+                        if (stopCounter > 30.9999) {
                             state = "resume";
                             prevState = "stopLine";
                             if (Sim) {
@@ -501,7 +532,7 @@ namespace scaledcars {
                         }
                     }
                     if (state == "resume"){
-                        if (stopCounter < 50) {
+                        if (stopCounter < 25.0) {
                             stopCounter += 0.5;
                         } else {
                             stopCounter = 0;
