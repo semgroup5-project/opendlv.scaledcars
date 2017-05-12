@@ -34,11 +34,17 @@ namespace scaledcars {
         //*****************************//
         const int PARALLEL = 0;
         const int BOX = 1;
+        double counterS = 0;
+        double counterO = 0;
+        int counter = 0;
+        double timer = 0;
+        double turnCount = 0;
 
         Park::Park(const int32_t &argc, char **argv) :
                 TimeTriggeredConferenceClientModule(argc, argv, "Park"),
                 communicationLinkMSG(),
                 vc(),
+                parkingSpace(0),
                 IRRObstacle(false),
                 USFObstacle(false),
                 IRFRObstacle(false),
@@ -80,7 +86,7 @@ namespace scaledcars {
                 Container communicationLinkMSGContainer = getKeyValueDataStore().get(CommunicationLinkMSG::ID());
                 communicationLinkMSG = communicationLinkMSGContainer.getData<CommunicationLinkMSG>();
 
-           //     setParkingType(communicationLinkMSG.getParkingType());
+                //     setParkingType(communicationLinkMSG.getParkingType());
                 irRear = communicationLinkMSG.getInfraredBack();
                 usFront = communicationLinkMSG.getUltraSonicFrontCenter();
                 irFrontRight = communicationLinkMSG.getInfraredSideFront();
@@ -91,19 +97,19 @@ namespace scaledcars {
                 IRFRObstacle = obstacleDetection(irFrontRight, IR);
                 IRRRObstacle = obstacleDetection(irRearRight, IR);
                 USFObstacle = obstacleDetection(usFront, US);
-                cerr<<"HOLA!!"<<endl;
-                if (IRRObstacle && irRear < 10 && irRear > 5) {
+                cerr << "HOLA!!" << endl;
+                if (IRRObstacle && irRear < 5 && irRear > 0) {
                     vc.setBrakeLights(true);
                     cerr << "TOO CLOSE AT THE BACK, EMERGENCY STOP!!" << endl;
                 }
-                if (USFObstacle && usFront > 0 && usFront < 25) {
-                    vc.setBrakeLights(true);
-                    cerr << "TOO CLOSE AT THE FRONT, EMERGENCY STOP!!" << endl;
-                }
+//                if (USFObstacle && usFront > 0 && usFront < 10) {
+//                    vc.setBrakeLights(true);
+//                    cerr << "TOO CLOSE AT THE FRONT, EMERGENCY STOP!!" << endl;
+//                }
                 if (isParking) {
                     parallelPark();
                     cout << "PARKING : Now I'm parking" << endl;
-                } else {
+                } else if (!isParking) {
                     parkingFinder();
                     cout << "PARKING : Finding values" << endl;
                 }
@@ -117,40 +123,72 @@ namespace scaledcars {
 
         void Park::parkingFinder() {
             // Parking space starting point
+            vc.setSteeringWheelAngle(.2);
+
             vc.setBrakeLights(false);
-            vc.setSpeed(99);
+            vc.setSpeed(96);
+            cout << "IRRRObstacle : " << IRRRObstacle << endl;
 
-            if (!IRRRObstacle && !IRFRObstacle && parkingStart == 0) {
-                parkingStart = odometer;
+            if (!IRRRObstacle) {
+                counterS++;
+                if (counterS > 3) {
+                    counterO = 0;
+                    parkingSpace = odometer - parkingStart;
+                    cout << "ParkingSpace : " << parkingSpace << endl;
 
-                vc.setSteeringWheelAngle(0);
-                cout << "PARKING : Here starts freedom      " << parkingStart << endl;
+                }
+            } else if (IRRRObstacle) {
+                counterO++;
+                if (counterO > 3) {
+                    parkingStart = odometer;
+                    parkingSpace = 0;
+                    counterS = 0;
+                }
             }
-            cout << "IRRR: " << IRRRObstacle<< endl;
-            cout << "IRFR: " << IRFRObstacle << endl;
-            cout << "OD-Park: " << odometer - parkingStart << endl;
-            cout << "parkingstart: " << parkingStart<<endl;
-
-            // Gap is too narrow
-            if (IRRRObstacle && IRFRObstacle && parkingStart > 0 && (odometer - parkingStart) < GAP) {
-                parkingStart = 0;
-                vc.setSteeringWheelAngle(0);
-                isParking = false;
-                cout << "PARKING : No freedom" << endl;
-            }
-
-            // Gap is sufficient
-            if (parkingStart > 0 && (odometer - parkingStart) >= GAP) {
+            if (parkingSpace >= GAP) {
                 backStart = odometer;
-                isParking = true;
-                //sendParkerMSG();
-                vc.setBrakeLights(true);
-                cout << "PARKING : Insertion time" << endl;
+                timer += 0.5;
+                if (timer >= 8) {
+                    vc.setBrakeLights(true);
+                    isParking = true;
+                }
             }
+
+
+//            if ((IRRRObstacle == false) /*&& !IRFRObstacle */&& parkingStart == 0) {
+//                parkingStart = odometer;
+//
+//                vc.setSteeringWheelAngle(.2);
+//                cout << "PARKING : Here starts freedom      " << parkingStart << endl;
+//            }
+//            cout << "IRRR: " << IRRRObstacle << endl;
+//            cout << "IRFR: " << IRFRObstacle << endl;
+//            cout << "OD-Park: " << odometer - parkingStart << endl;
+//            cout << " odometer: " << odometer << endl;
+//            cout << "parkingStart: " << parkingStart << endl;
+//
+//            // Gap is too narrow
+//            if (IRRRObstacle && (odometer - parkingStart) < GAP && parkingStart > 0) {
+//                parkingStart = 0;
+//                vc.setSteeringWheelAngle(0);
+//                isParking = false;
+//                cout << "PARKING : No freedom" << endl;
+//            }
+//
+//            // Gap is sufficient
+//            if (((odometer - parkingStart) >= GAP) && (parkingStart > 0)) {
+//                backStart = odometer;
+//                isParking = true;
+//                //sendParkerMSG();
+//
+//                vc.setBrakeLights(true);
+//                vc.setSpeed(190);
+//                cout << "PARKING : Insertion time" << endl;
+//            }
 
         }
 
-        void Park::park() {
+        /*void Park::park() {
             switch (parkingState) {
                 case START: {
                     setParkingState(RIGHT_TURN);
@@ -194,8 +232,8 @@ namespace scaledcars {
                 }
             }
         }
-
-        void Park::unpark() {
+*/
+        /*void Park::unpark() {
             switch (parkingState) {
                 case START: {
 
@@ -208,7 +246,7 @@ namespace scaledcars {
                 }
                     break;
                 case LEFT_TURN: {
-                    vc.setSpeed(99);
+                    vc.setSpeed(96);
 
                     vc.setSteeringWheelAngle(-1.5);
                     parkingCounter++;
@@ -221,7 +259,7 @@ namespace scaledcars {
                     break;
 
                 case RIGHT_TURN: {
-                    vc.setSpeed(99);
+                    vc.setSpeed(96);
                     vc.setSteeringWheelAngle(1.5);
                     parkingCounter++;
                     cout << "UNPARKING : Turning right" << endl;
@@ -239,7 +277,7 @@ namespace scaledcars {
                 }
             }
         }
-
+*/
 
         void Park::setParkingType(int type) {
             parkingType = type;
@@ -251,18 +289,18 @@ namespace scaledcars {
             adjDist = adjDistCalculation(backStart, backEnd);
             switch (parkingState) {
                 case START: {
-                    vc.setBrakeLights(false);
+                    vc.setBrakeLights(true);
                     setParkingState(RIGHT_TURN);
                 }
                     break;
                 case RIGHT_TURN: {
                     vc.setBrakeLights(false);
-                    vc.setSpeed(69);
+                    vc.setSpeed(60);
                     vc.setSteeringWheelAngle(1.5);
                     parkingCounter++;
                     cout << "PARKING : Turning right" << endl;
-                    cout << "adjDist"<<adjDist<<endl;
-                    if (/*adjDist >= GAP / 2 && */parkingCounter >= 40) {
+                    cout << "adjDist" << adjDist << endl;
+                    if (adjDist >= GAP/1.2  /*&& parkingCounter >= 40*/) {
                         setParkingState(LEFT_TURN);
                     }
                 }
@@ -270,16 +308,28 @@ namespace scaledcars {
 
                 case LEFT_TURN: {
                     vc.setBrakeLights(false);
-                    vc.setSpeed(69);
+                    vc.setSpeed(60);
                     vc.setSteeringWheelAngle(-1.5);
                     parkingCounter--;
                     cout << "PARKING : Turning left" << endl;
-                    cout << "adjDist"<<adjDist<<endl;
-                    if (/*adjDist >= GAP && */parkingCounter < 0) {
-                        setParkingState(END);
+                    cout << "adjDist" << adjDist << endl;
+                    if (adjDist >= (GAP*2.5)/*&& parkingCounter < 0 */ || (irRear < 10 && irRear > 0)) {
+                        setParkingState(INGAP_RIGHT_TURN);
                     }
                 }
                     break;
+                case INGAP_RIGHT_TURN: {
+                    vc.setBrakeLights(false);
+                    vc.setSpeed(99);
+                    vc.setSteeringWheelAngle(1);
+                    cout << "PARKING : In Gap Turning right" << endl;
+                    cout<<"turnCount"<<turnCount<<endl;
+                    turnCount+=0.5;
+
+                    if (turnCount > 10) {
+                        setParkingState(END);
+                    }
+                }
                 case END: {
                     vc.setBrakeLights(true);
                     cout << "PARKING : I'm parked" << endl;
@@ -298,14 +348,14 @@ namespace scaledcars {
                     if (i > 70 || i < 0) {
                         ifObstacle = false;
                     } else if (i <= 70 && i > 0) {
-                        cout<<"YOYO!"<<endl;
+                        cout << "YOYO! US Object" << endl;
                         ifObstacle = true;
                     }
                 }
                     break;
                 case (IR) : {
                     if (i > 28 || i < 0) {
-                        cout<<"YO!"<<endl;
+                        cout << "YO! IR Object" << endl;
                         ifObstacle = false;
                     } else if (i <= 28 && i > 0) {
                         ifObstacle = true;

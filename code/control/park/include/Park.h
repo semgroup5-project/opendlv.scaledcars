@@ -39,11 +39,12 @@
 
 #define IR 0
 #define US 1
-#define GAP 40
+#define GAP 10
 #define START 0
 #define RIGHT_TURN 1
 #define LEFT_TURN 2
-#define END 3
+#define INGAP_RIGHT_TURN 3
+#define END 4
 
 namespace scaledcars {
     namespace control {
@@ -120,6 +121,8 @@ namespace scaledcars {
             CommunicationLinkMSG communicationLinkMSG;
 
             VehicleControl vc;
+
+            double parkingSpace;
 
             bool IRRObstacle;
 
