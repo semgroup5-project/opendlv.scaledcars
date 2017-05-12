@@ -1,17 +1,16 @@
 #!/bin/bash
 
 #define parameters which are passed in.
-#CAMID=$1
-#MDEBUG=$2
-#SIM=$3
-#P=$4
-#I=$5
-#D=$6
-#FUNCTION=$7
+ANS=$1
+ANS2=$2
+IP=$3
+P=$4
+I=$5
+D=$6
+FUNCTION=$7
+FUNCTION2=$8
 
-echo "Do you wish to modify the configuration file [y,n]?" >&2
-read ANSWER
-case $ANSWER in
+case $ANS in
     y|Y) 
         if [ -f configuration ];
         then
@@ -20,10 +19,10 @@ case $ANSWER in
         else
             echo "File configuration does not exist!" >&2
         fi
-        ./configODV.sh > configuration;;
+        ./configODV.sh $ANS2 $IP $P $I $D $FUNCTION $FUNCTION2 > configuration;;
     *) 
         echo "Using the old configuration file!" >&2;;
 esac
 
-#$CAMID $MDEBUG $SIM $P $I $D $FUNCTION 
+#$ANS2 $IP $P $I $D $FUNCTION $FUNCTION2
 

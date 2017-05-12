@@ -60,39 +60,55 @@ services:
             - odsupercomponent
         privileged: true
         restart: on-failure
-        command: "/opt/opendlv.scaledcars/bin/scaledcars-control-proxy --cid=${CID} --rm=true --freq=20 --configuration=/opt/configuration/configuration"
+        command: "/opt/opendlv.scaledcars/bin/scaledcars-control-proxy --cid=${CID} --rm=true --freq=20"
 
     #serial
-    serialhandler:
-        build: .
-        network_mode: host
-        group_add:
-        - dialout
-        depends_on:
-            - odsupercomponent
-        restart: on-failure
-        privileged: true
-        command: bash -c "sleep 10; /opt/opendlv.scaledcars/bin/scaledcars-control-serialsendhandler --verbose=1 --cid=${CID} --rm=true --freq=1"
+    #serialhandler:
+     #   build: .
+      #  network_mode: host
+       # ipc : host
+        #group_add:
+        #- dialout
+        #depends_on:
+         #   - odsupercomponent
+        #restart: on-failure
+        #privileged: true
+        #command: bash -c "sleep 10; /opt/opendlv.scaledcars/bin/scaledcars-control-serialsendhandler --verbose=1 --cid=${CID} --rm=true --freq=10"
 
     #communicationlink
     communicationlink:
         build: .
         network_mode: host
+        ipc : host
         depends_on:
             - odsupercomponent
         restart: on-failure
         privileged: true
         command: bash -c "sleep 5; /opt/opendlv.scaledcars/bin/scaledcars-control-communicationlink --verbose=1 --cid=${CID} --rm=true --freq=20"
 
-    #udpconnection
-    udpconnection:
+    #udpconnectionreceiver
+    udpconnectionreceiver:
         build: .
         network_mode: host
+        ipc : host
         depends_on:
             - odsupercomponent
         restart: on-failure
         privileged: true
-        command: bash -c "sleep 5; /opt/opendlv.scaledcars/bin/scaledcars-control-udpconnection --verbose=1 --cid=${CID} --rm=true --freq=20"
+        command: bash -c "sleep 5; /opt/opendlv.scaledcars/bin/scaledcars-control-udpconnectionreceiver --verbose=1 --cid=${CID} --rm=true --freq=20"
+
+#udpconnectionstreamer
+    udpconnectionstreamer:
+        build: .
+        network_mode: host
+        ipc : host
+        depends_on:
+            - odsupercomponent
+        volumes:
+        - ./DIT-168:/opt/configuration
+        restart: on-failure
+        privileged: true
+        command: bash -c "sleep 5; /opt/opendlv.scaledcars/bin/scaledcars-control-udpconnectionstreamer --verbose=1 --cid=${CID} --rm=true --freq=20"
 
     #odcockpit
     odcockpit:
@@ -109,9 +125,9 @@ services:
             - odsupercomponent
         restart: on-failure
         privileged: true
-        command: "/opt/od4/bin/odcockpit --cid=${CID} --configuration=/opt/configuration/configuration --freq=20"
+        command: "/opt/od4/bin/odcockpit --cid=${CID} --freq=20 --configuration=/opt/configuration/configuration"
 
-   #Micro-service for lanedtecter scenario.
+   #Micro-service for lanefollower.
     lanefollower:
         build: .
         network_mode: host
@@ -121,12 +137,26 @@ services:
         volumes:
         - ./DIT-168:/opt/configuration
         depends_on:
-            - odsupercomponent
-            - odsimvehicle
-            - odsimcamera
-            - communicationlink
+           - odsupercomponent
+           - odsimvehicle
+           - odsimcamera
+           - communicationlink
         restart: on-failure
         privileged: true
-        command: bash -c "sleep 5; /opt/opendlv.scaledcars/bin/scaledcars-control-lanefollwer --verbose=1  --cid=${CID} --freq=20"
+        command: bash -c "sleep 5; /opt/opendlv.scaledcars/bin/scaledcars-control-lanefollwer --verbose=1  --cid=${CID} --freq=20 --configuration=/opt/configuration/configuration"
+
+    #Micro-service for lanedtecter scenario.
+    #parallelparker:
+     #   build: .
+      #  network_mode: host
+       # ipc : host
+        #volumes:
+        #- ./DIT-168:/opt/configuration
+        #depends_on:
+         #   - odsupercomponent
+          #  - odsimvehicle
+           # - communicationlink
+        #privileged: true
+        #command: bash -c "sleep 5; /opt/opendlv.scaledcars/bin/scaledcars-control-parallelparker --verbose=1  --cid=${CID} --freq=20 --configuration=/opt/configuration/configuration"
 
 

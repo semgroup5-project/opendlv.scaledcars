@@ -9,14 +9,14 @@
 #include <opendavinci/odcore/wrapper/SharedMemory.h>
 #include <opendavinci/odcore/wrapper/SharedMemoryFactory.h>
 
-#include "automotivedata/generated/automotive/VehicleData.h"
-#include "automotivedata/generated/automotive/miniature/SensorBoardData.h"
 #include <automotivedata/GeneratedHeaders_AutomotiveData.h>
 #include <opendavinci/GeneratedHeaders_OpenDaVINCI.h>
 #include "odvdscaledcarsdatamodel/generated/group5/CommunicationLinkMSG.h"
 #include "odvdscaledcarsdatamodel/generated/group5/LaneFollowerMSG.h"
 #include "odvdscaledcarsdatamodel/generated/group5/OvertakerMSG.h"
 #include "odvdscaledcarsdatamodel/generated/group5/ParkerMSG.h"
+#include "odvdscaledcarsdatamodel/generated/group5/UdpMSG.h"
+#include "odvdscaledcarsdatamodel/generated/group5/SensorsMSG.h"
 
 #include <iostream>
 #include <memory>
@@ -28,15 +28,14 @@
 
 #include "defines.h"
 
-using namespace std;
-
-using namespace odcore;
-using namespace odcore::base::module;
-using namespace odcore::data;
-using namespace odcore::wrapper;
-
 namespace scaledcars {
     namespace control {
+
+        using namespace std;
+        using namespace odcore;
+        using namespace odcore::base::module;
+        using namespace odcore::data;
+        using namespace odcore::wrapper;
 
         class CommunicationLink :
                 public odcore::base::module::TimeTriggeredConferenceClientModule {
@@ -81,8 +80,8 @@ namespace scaledcars {
             group5::LaneFollowerMSG laneFollowerMSG;
             group5::OvertakerMSG overtakerMSG;
             group5::ParkerMSG parkerMSG;
-            automotive::VehicleData vd;
-            automotive::miniature::SensorBoardData sbd;
+            group5::SensorsMSG sensorsMSG;
+            group5::UdpMSG UDPMSG;
 
             virtual void setUp();
 

@@ -2,27 +2,53 @@
 #define SERIALSENDHANDLER_H
 
 #include <automotivedata/GeneratedHeaders_AutomotiveData.h>
+#include "odvdscaledcarsdatamodel/generated/group5/SensorsMSG.h"
 
 #include <opendavinci/GeneratedHeaders_OpenDaVINCI.h>
 #include <opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h>
 #include <opendavinci/odcore/data/Container.h>
 #include <opendavinci/odcore/data/TimeStamp.h>
+#include <opendavinci/odcore/base/Thread.h>
 #include <opendavinci/odcore/wrapper/SerialPort.h>
 #include <opendavinci/odcore/wrapper/SerialPortFactory.h>
 #include <opendavinci/odcore/wrapper/SharedMemory.h>
 #include <opendavinci/odcore/wrapper/SharedMemoryFactory.h>
 
+#include <opendavinci/odcore/base/Service.h>
+
+#include <iostream>
+#include <memory>
+#include <stdint.h>
+#include <string>
+
 #include "serial.h"
 
-using namespace std;
-
-using namespace odcore;
-using namespace odcore::base::module;
-using namespace odcore::data;
-using namespace odcore::wrapper;
+#define PI 3.1415926535897
+#define KM_IN_CM  100000
 
 namespace scaledcars {
     namespace control {
+
+        using namespace std;
+        using namespace odcore;
+        using namespace odcore::base::module;
+        using namespace odcore::data;
+        using namespace odcore::wrapper;
+        using namespace automotive;
+        using namespace automotive::miniature;
+        using namespace group5;
+
+        // Concurrency is provided by the class odcore::base::Service.
+        class MyService : public odcore::base::Service {
+
+            // Your class needs to implement the method void beforeStop().
+            virtual void beforeStop();
+
+            // Your class needs to implement the method void run().
+            virtual void run();
+
+            void filterData(int id, int value);
+        };
 
         void __on_read(uint8_t b);
 
@@ -76,14 +102,18 @@ namespace scaledcars {
 
             virtual void tearDown();
 
-            void filterData(protocol_data data, double *values, int *numbers);
-
             void sendSensorBoardData(std::map<uint32_t, double> sensor);
-
-            void sendVehicleData();
 
             int motor;
             int servo;
+
+            int arduinoStopAngle;
+            int arduinoBrake;
+
+            int arduinoAngle;
+            int speed;
+
+            MyService s;
         };
     }
 }

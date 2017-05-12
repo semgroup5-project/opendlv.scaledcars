@@ -17,27 +17,28 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#ifndef UDPCONNECTION_H
-#define UDPCONNECTION_H
+#ifndef UDPCONNECTIONSTREAMER_H
+#define UDPCONNECTIONSTREAMER_H
 
-#include <opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h>
+#include <opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h>
 #include <opendavinci/odcore/data/Container.h>
 #include <opendavinci/odcore/data/TimeStamp.h>
+#include <opendavinci/odcore/base/Lock.h>
+
+#include <opencv2/opencv.hpp>
+#include <opencv2/highgui/highgui.hpp>
 
 #include <opendavinci/odcore/wrapper/SharedMemory.h>
 #include <opendavinci/odcore/wrapper/SharedMemoryFactory.h>
 
-#include <opendavinci/odcore/io/StringListener.h>
-#include <opendavinci/odcore/io/udp/UDPReceiver.h>
 #include <opendavinci/odcore/io/udp/UDPSender.h>
 #include <opendavinci/odcore/io/udp/UDPFactory.h>
 
-#include "automotivedata/generated/automotive/VehicleData.h"
-#include "automotivedata/generated/automotive/miniature/SensorBoardData.h"
-#include <automotivedata/GeneratedHeaders_AutomotiveData.h>
 #include <opendavinci/GeneratedHeaders_OpenDaVINCI.h>
-#include "odvdscaledcarsdatamodel/generated/group5/CommunicationLinkMSG.h"
-#include "odvdscaledcarsdatamodel/generated/group5/LaneFollowerMSG.h"
+
+#include <opendavinci/odcore/wrapper/jpg/JPG.h>
+#include "opendavinci/odcore/data/image/CompressedImage.h"
+#include "opendavinci/generated/odcore/data/image/SharedImage.h"
 
 #include <iostream>
 #include <memory>
@@ -58,12 +59,7 @@ namespace scaledcars {
         using namespace odcore::data;
         using namespace odcore::wrapper;
 
-        class UDPReceiveBytes : public odcore::io::StringListener {
-
-            virtual void nextString(const std::string &s);
-        };
-
-        class UDPConnection : public odcore::base::module::TimeTriggeredConferenceClientModule {
+        class UDPConnectionStreamer : public odcore::base::module::DataTriggeredConferenceClientModule {
 
         private:
             /**
@@ -75,7 +71,7 @@ namespace scaledcars {
              *
              * @param obj Reference to an object of this class.
              */
-            UDPConnection(const UDPConnection &/*obj*/);
+            UDPConnectionStreamer(const UDPConnectionStreamer &/*obj*/);
 
             /**
              * "Forbidden" assignment operator.
@@ -87,7 +83,7 @@ namespace scaledcars {
              * @param obj Reference to an object of this class.
              * @return Reference to this instance.
              */
-            UDPConnection &operator=(const UDPConnection &/*obj*/);
+            UDPConnectionStreamer &operator=(const UDPConnectionStreamer &/*obj*/);
 
         public:
             /**
@@ -96,23 +92,29 @@ namespace scaledcars {
              * @param argc Number of command line arguments.
              * @param argv Command line arguments.
              */
-            UDPConnection(const int &argc, char **argv);
+            UDPConnectionStreamer(const int &argc, char **argv);
 
-            virtual ~UDPConnection();
+            virtual ~UDPConnectionStreamer();
+
+        protected:
+            /**
+             * This method is called to process an incoming container.
+             *
+             * @param c Container to process.
+             * @return true if c was successfully processed.
+             */
+            bool readSharedImage(odcore::data::Container &c);
 
         private:
-            group5::LaneFollowerMSG laneFollowerMSG;
-
             void setUp();
 
             void tearDown();
 
-            odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
+            virtual void nextContainer(odcore::data::Container &c);
 
-            shared_ptr <UDPReceiver> udp_receiver;
-
+            bool m_hasAttachedToSharedImageMemory;
         };
     }
 } // scaledcars::control
 
-#endif /*UDPCONNECTION_H*/
+#endif /*UDPCONNECTIONSTREAMER_H*/

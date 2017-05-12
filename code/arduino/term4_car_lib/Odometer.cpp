@@ -12,6 +12,7 @@ void updateCounter2();
 
 boolean directionPinAttached(unsigned short odometerID);
 
+unsigned short _encoder0PinA, _encoder0PinB;
 volatile unsigned long _previousPulse[2] = {0};
 volatile unsigned long _dt[2] = {0};
 volatile unsigned long _pulseCounter[2] = {0};
@@ -46,22 +47,26 @@ int Odometer::attach(unsigned short odometerPin, unsigned short directionPin, bo
     if (result == 1) { //therefore no problem was encountered during the initialization
         _directionPin[_odometerID] = directionPin;
         forwardDirState[_odometerID] = forwardPinState;
+        _encoder0PinB = directionPin;
+        pinMode(_encoder0PinB, INPUT);
     }
     return result;
 }
 
 int Odometer::init(unsigned short odometerPin) {
+    _encoder0PinA = odometerPin;
     _odometerInterruptPin = digitalPinToInterrupt(odometerPin);
     if (_odometerInterruptPin != NOT_AN_INTERRUPT) {
         if (_odometerID > 1) {
             return -1; //too many encoders attached
         } else { // there is an acceptable number of odometers
             if (_odometerID == 0) {
-                attachInterrupt(_odometerInterruptPin, updateCounter1, RISING);
+                attachInterrupt(_odometerInterruptPin, updateCounter1, CHANGE);
             } else if (_odometerID == 1) {
-                attachInterrupt(_odometerInterruptPin, updateCounter2, RISING);
+                attachInterrupt(_odometerInterruptPin, updateCounter2, CHANGE);
             }
         }
+        pinMode(_encoder0PinA, INPUT);
         return 1; //everything went as it should
     }
     return 0; //invalid interrupt pin
@@ -107,16 +112,35 @@ short Odometer::getDirection() {
                                                                                    : -1; //return a positive number if it is going "forward" or negative if "backward"
 }
 
-void updateDtAndCounter(unsigned short odometerID) { //updates dt with the time difference between the last two pulses and increases the pulse counter
+void updateDtAndCounter(
+        unsigned short odometerID) { //updates dt with the time difference between the last two pulses and increases the pulse counter
     unsigned long currentPulse = micros();
-    unsigned long dt = currentPulse - _previousPulse[odometerID]; //calculate the difference in time between the two pulses in microseconds
-    if (dt > MINIMUM_PULSE_GAP) { //if the pulses have not arrived too fast, which is a sign of unstable signal (too much jitter) in microseconds
+    unsigned long dt = currentPulse -
+                       _previousPulse[odometerID]; //calculate the difference in time between the two pulses in microseconds
+    if (dt >
+        MINIMUM_PULSE_GAP) { //if the pulses have not arrived too fast, which is a sign of unstable signal (too much jitter) in microseconds
         _dt[odometerID] = dt; //update the _dt value
         _previousPulse[odometerID] = currentPulse; //update when the last pulse arrived (if it didn't arrive too fast)
-        _pulseCounter[odometerID]++; //updates the pulse counter of odometer 0
-        if (directionPinAttached(odometerID)) { //if the direction pin is attached
-            if (digitalRead(_directionPin[odometerID]) != forwardDirState[odometerID]) { //if we are going back
-                _negativePulseCounter[odometerID]++; //update the pulse counter that measures how much backwards we are going
+
+        // look for a low-to-high on channel A
+        if (digitalRead(_encoder0PinA) == HIGH) {
+            // check channel B to see which way encoder is turning
+            if (digitalRead(_encoder0PinB) == LOW) {
+                _pulseCounter[odometerID]++; //updates the pulse counter of odometer 0
+            } else {
+                _pulseCounter[odometerID]++; //updates the pulse counter of odometer 0
+                if (directionPinAttached(odometerID))
+                    _negativePulseCounter[odometerID]++; //update the pulse counter that measures how much backwards we are going
+            }
+        } else   // must be a high-to-low edge on channel A
+        {
+            // check channel B to see which way encoder is turning
+            if (digitalRead(_encoder0PinB) == HIGH) {
+                _pulseCounter[odometerID]++; //updates the pulse counter of odometer 0
+            } else {
+                _pulseCounter[odometerID]++; //updates the pulse counter of odometer 0
+                if (directionPinAttached(odometerID))
+                    _negativePulseCounter[odometerID]++; //update the pulse counter that measures how much backwards we are going
             }
         }
     }
@@ -138,4 +162,11 @@ void Odometer::encodeAndWrite(int id, int value) {
     protocol_frame outframe1 = protocol_encode_t2(outdata1);
     Serial.write(outframe1.a);
     Serial.write(outframe1.b);
+
+//    protocol_data data = protocol_decode_t2(outframe1);
+//
+//    Serial.print("THIS IS ODO ID after decoding: ");
+//    Serial.println(data.id);
+//    Serial.print("THIS IS ODO VALUE after decoding: ");
+//    Serial.println(data.value);
 }
