@@ -81,7 +81,7 @@ namespace scaledcars {
                 communicationLinkMSG = communicationLinkMSGContainer.getData<CommunicationLinkMSG>();
 
            //     setParkingType(communicationLinkMSG.getParkingType());
-
+                irRear = communicationLinkMSG.getInfraredBack();
                 usFront = communicationLinkMSG.getUltraSonicFrontCenter();
                 irFrontRight = communicationLinkMSG.getInfraredSideFront();
                 irRearRight = communicationLinkMSG.getInfraredSideBack();
@@ -92,13 +92,13 @@ namespace scaledcars {
                 IRRRObstacle = obstacleDetection(irRearRight, IR);
                 USFObstacle = obstacleDetection(usFront, US);
                 cerr<<"HOLA!!"<<endl;
-                if (IRRObstacle && irRear < 15 && irRear > 5) {
+                if (IRRObstacle && irRear < 10 && irRear > 5) {
                     vc.setBrakeLights(true);
                     cerr << "TOO CLOSE AT THE BACK, EMERGENCY STOP!!" << endl;
                 }
-                if (USFObstacle && usFront > 0 && usFront < 20) {
+                if (USFObstacle && usFront > 0 && usFront < 25) {
                     vc.setBrakeLights(true);
-                    cerr << "TOO CLOSE AT THE BACK, EMERGENCY STOP!!" << endl;
+                    cerr << "TOO CLOSE AT THE FRONT, EMERGENCY STOP!!" << endl;
                 }
                 if (isParking) {
                     parallelPark();
@@ -298,6 +298,7 @@ namespace scaledcars {
                     if (i > 70 || i < 0) {
                         ifObstacle = false;
                     } else if (i <= 70 && i > 0) {
+                        cout<<"YOYO!"<<endl;
                         ifObstacle = true;
                     }
                 }
