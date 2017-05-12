@@ -59,7 +59,7 @@ namespace scaledcars {
                 m_threshold1(50),  //50
                 m_threshold2(200),  // 150
                 m_control_scanline(250),//needs testing with real c
-                m_stop_scanline(170),//needs testing with real car
+                m_stop_scanline(160),//needs testing with real car
                 m_distance(130),  //needs testing with real car as well
                 p_gain(0),       // the gain values can be adjusted here outside of simulation scenario (see @setUp() )
                 i_gain(0),
@@ -212,27 +212,26 @@ namespace scaledcars {
                     break;
                 }
             }
-
-            if (right.x == -1 && left.x == -1) {  //setting state if the car does not see any line
-                for (int x = m_image_new.cols / 2; x > 0; x--) {//from the middle to the left
-                    pixelLeft = m_image_new.at<uchar>(Point(x, y));
-                    if (pixelLeft >= 150) {   //tentative value, might need adjustment: lower it closer to 100
-                        left2.x = x;
-                        break;
-                    }
+            for (int x = m_image_new.cols / 2; x > 0; x--) {//from the middle to the left
+                pixelLeft = m_image_new.at<uchar>(Point(x, y));
+                if (pixelLeft >= 150) {   //tentative value, might need adjustment: lower it closer to 100
+                    left2.x = x;
+                    break;
                 }
+            }
 
-                // Search from middle to the right
-                for (int x = m_image_new.cols / 2;
-                     x < m_image_new.cols - 30; x++) {
-                    pixelRight = m_image_new.at<uchar>(Point(x, y));
-                    if (pixelRight >= 150) {   //tentative value, might need adjustment: lower it closer to 100
-                        right2.x = x;
-                        break;
-                    }
+            // Search from middle to the right
+            for (int x = m_image_new.cols / 2;
+                 x < m_image_new.cols - 30; x++) {
+                pixelRight = m_image_new.at<uchar>(Point(x, y));
+                if (pixelRight >= 150) {   //tentative value, might need adjustment: lower it closer to 100
+                    right2.x = x;
+                    break;
                 }
-                if (right2.x == -1 && left2.x == -1)
-                state = "danger";
+            }
+            if (right.x == -1 && left.x == -1 && right2.x == -1 && left2.x == -1) {  //setting state if the car does not see any line
+
+                    state = "danger";
             }
             else{
                 if(state != "stop" && state != "resume"){
@@ -240,8 +239,8 @@ namespace scaledcars {
                 }
             }
 
-            if (right.x > 0) right.x += 20;
-            if (left.x > 0) left.x += 20;
+            if (right.x > 0) right.x += 10;
+            if (left.x > 0) left.x += 10;
 
             if (y == m_control_scanline) {
 
@@ -273,7 +272,7 @@ namespace scaledcars {
 
             int left_dist = 0;
 
-            stop_left.x = (m_image_new.cols / 2) - 70;   // stop line checker needs to be moved more towards the left side
+            stop_left.x = (m_image_new.cols / 2) - 30;   // stop line checker needs to be moved more towards the left side
             stop_left.y = m_control_scanline;
 
             // Find first grey pixel in the front of the car left side
@@ -288,7 +287,7 @@ namespace scaledcars {
 
             int right_dist = 0;
 
-            stop_right.x = (m_image_new.cols / 2) ;  // stop line checker needs to be moved more towards the left side
+            stop_right.x = (m_image_new.cols / 2) + 10;  // stop line checker needs to be moved more towards the left side
             stop_right.y = m_control_scanline;
 
             // Find first grey pixel in front of the car right side
@@ -353,13 +352,17 @@ namespace scaledcars {
             }
 
             // is the detected stopline at a similar distance on both sides
-            if (counter < 5 && (left_dist - right_dist) > -15 && (left_dist - right_dist) < 15 && left_dist != 0 &&
+            if (counter < 4 && (left_dist - right_dist) > -15 && (left_dist - right_dist) < 15 && left_dist != 0 &&
                 right_dist != 0) {
-                counter++;
+                if(left_dist > 55 || right_dist > 55){
+
+                }else {
+                    counter++;
+                }
             }else{
                 counter = 0;
             }
-            if (counter > 4) {
+            if (counter > 3) {
                 stop = true;
             } else {
                 stop = false;
@@ -499,7 +502,7 @@ namespace scaledcars {
                         }
                     }
                     if (state == "resume"){
-                        if (stopCounter < 50.0) {
+                        if (stopCounter < 55.0) {
                             stopCounter += 0.5;
                             if (Sim) {
                                 m_vehicleControl.setSpeed(1);
