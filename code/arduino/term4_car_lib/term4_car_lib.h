@@ -7,6 +7,7 @@
 #include <Wire.h>
 #include <Servo.h>
 #include "protocol.h"
+#include "Netstrings.h"
 
 #define BAUD 115200
 #define US_C 0x73 //front ultrasonic pin
@@ -184,6 +185,9 @@ private:
     long interval;
     protocol_data dataMotor;
     protocol_data dataServo;
+    long timer;
+    long oldMillis;
+    int noData;
 };
 
 #endif

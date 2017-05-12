@@ -45,6 +45,8 @@ protocol_frame protocol_encode_t1(protocol_data data)
 protocol_frame protocol_encode_t2(protocol_data data)
 {
     protocol_frame frame;
+    frame.a = 0x00;
+    frame.b = 0x00;
 
     frame.a = (
             (0 << 0) |

@@ -3,6 +3,8 @@
 Car::Car() {}
 
 void Car::setUp() {
+    timer = 5000;
+    noData = 0;
     pinMode(RELAY_PIN, OUTPUT);
 
     digitalWrite(RELAY_PIN, HIGH);
@@ -24,6 +26,7 @@ void Car::setUp() {
     infraredBack.attach(BACK_PIN);
     wheelEncoder.attach(ENCODER_PIN_A, ENCODER_PIN_B, true);
     wheelEncoder.begin();
+    encoderPos = wheelEncoder.getDistance();
 
     Serial.begin(BAUD); //start the serial
     waitConnection();
@@ -34,7 +37,6 @@ void Car::setUp() {
 }
 
 void Car::run() {
-    encoderPos = wheelEncoder.getDistance();
     if (!isRCControllerOn()) {
         automatedDrive();
     } else {
@@ -52,15 +54,17 @@ void Car::provideSensorsData() {
 
         ultrasonicFront.encodeAndWrite(ID_IN_ULTRASONIC_CENTER, ultrasonicFront.getDistance());
         ultrasonicRight.encodeAndWrite(ID_IN_ULTRASONIC_SIDE_FRONT, ultrasonicRight.getDistance());
-    }
 
-    odometer = wheelEncoder.getDistance() - encoderPos;
+        odometer = wheelEncoder.getDistance() - encoderPos;
 //    Serial.print("THIS IS ODO TO SEND: ");
 //    Serial.println(odometer);
-    if (odometer <= 255) {
-        wheelEncoder.encodeAndWrite(ID_IN_ENCODER, odometer);
-    }else {
-        wheelEncoder.encodeAndWrite(ID_IN_ENCODER, 255);
+        if (odometer <= 255) {
+            wheelEncoder.encodeAndWrite(ID_IN_ENCODER, odometer);
+            encoderPos = wheelEncoder.getDistance();
+        } else {
+            wheelEncoder.encodeAndWrite(ID_IN_ENCODER, 255);
+            encoderPos = wheelEncoder.getDistance();
+        }
     }
 }
 
@@ -89,6 +93,7 @@ void Car::rcControl() {
 }
 
 void Car::automatedDrive() {
+    oldMillis = millis();
     if (isFunctionChanged()) {
         escMotor.brake();
     }
@@ -96,40 +101,51 @@ void Car::automatedDrive() {
     func_is_changed = 0;
 
     int value = 90, serial_size = 0, count = 0;
-    while ((serial_size = Serial.available()) <= 0 && !isRCControllerOn());
+    while ((serial_size = Serial.available()) <= 0 && !isRCControllerOn()) {
+        if ((millis() - oldMillis) > timer) {
+            noData = 1;
+            break;
+        }
+    }
     dataMotor.id = 0;
     dataMotor.value = 0;
     dataServo.id = 0;
     dataServo.value = 0;
-    while (count++ < serial_size) {
-        protocol_frame frame;
-        frame.a = Serial.read();
-        protocol_data data = protocol_decode_t1(frame);
+    if (!noData) {
+        while (count++ < serial_size) {
+            protocol_frame frame;
+            frame.a = Serial.read();
+            protocol_data data = protocol_decode_t1(frame);
 
-        if (data.id == ID_OUT_SERVO) {
-            dataServo = data;
-        } else if (data.id == ID_OUT_MOTOR) {
-            dataMotor = data;
-        }
-    }
-
-    if (dataServo.id == ID_OUT_SERVO) {
-        value = dataServo.value * 3;
-        if (value >= 0 && value <= 180) {
-            steeringMotor.setAngle(value, 0);
-        }
-    }
-
-    if (dataMotor.id == ID_OUT_MOTOR) {
-        value = dataMotor.value * 3;
-        if (value > 185) {
-            escMotor.brake();//applying values greater than 180 will be our indicative to brake
-        } else {
-            if (value >= 0 && value <= 180) {
-                escMotor.setSpeed(value);
+            if (data.id == ID_OUT_SERVO) {
+                dataServo = data;
+            } else if (data.id == ID_OUT_MOTOR) {
+                dataMotor = data;
             }
         }
+
+        if (dataServo.id == ID_OUT_SERVO) {
+            value = dataServo.value * 3;
+            if (value >= 0 && value <= 180) {
+                steeringMotor.setAngle(value, 0);
+            }
+        }
+
+        if (dataMotor.id == ID_OUT_MOTOR) {
+            value = dataMotor.value * 3;
+            if (value > 185) {
+                escMotor.brake();//applying values greater than 180 will be our indicative to brake
+            } else {
+                if (value >= 0 && value <= 180) {
+                    escMotor.setSpeed(value);
+                }
+            }
+        }
+    } else {
+        escMotor.brake();
+        steeringMotor.setAngle(90, 0);
     }
+    noData = 0;
 }
 
 int Car::readChannel1() {
@@ -176,6 +192,7 @@ void Car::establishContact(char toSend) {
     analogWrite(greenPin, green);
     analogWrite(bluePin, blue);
     Serial.read();
+    wait(10);
     escMotor.arm();
 }
 
