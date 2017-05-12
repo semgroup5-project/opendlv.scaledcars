@@ -182,11 +182,11 @@ namespace scaledcars {
 
             int32_t y = m_control_scanline;
 
-            uchar pixelLeft, pixelRight;
+            uchar pixelLeft, pixelRight, pixelLeft2, pixelRight2;
             Point left, right, left2, right2;  // P(x, y) = P (column, row)
 
             left.y = y;
-            left2.y = 50;
+            left2.y = 80;
             left.x = -1;
             left2.x = -1;
 
@@ -200,7 +200,7 @@ namespace scaledcars {
             }
 
             right.y = y;
-            right2.y = 50;
+            right2.y = 80;
             right.x = -1;
             right2.x = -1;
             // Search from middle to the right
@@ -213,24 +213,22 @@ namespace scaledcars {
                 }
             }
             for (int x = m_image_new.cols / 2; x > 0; x--) {//from the middle to the left
-                pixelLeft = m_image_new.at<uchar>(Point(x, y));
-                if (pixelLeft >= 150) {   //tentative value, might need adjustment: lower it closer to 100
+                pixelLeft2 = m_image_new.at<uchar>(Point(x, y));
+                if (pixelLeft2 >= 150) {   //tentative value, might need adjustment: lower it closer to 100
                     left2.x = x;
                     break;
                 }
             }
-
             // Search from middle to the right
             for (int x = m_image_new.cols / 2;
                  x < m_image_new.cols - 30; x++) {
-                pixelRight = m_image_new.at<uchar>(Point(x, y));
-                if (pixelRight >= 150) {   //tentative value, might need adjustment: lower it closer to 100
+                pixelRight2 = m_image_new.at<uchar>(Point(x, y));
+                if (pixelRight2 >= 150) {   //tentative value, might need adjustment: lower it closer to 100
                     right2.x = x;
                     break;
                 }
             }
             if (right.x == -1 && left.x == -1 && right2.x == -1 && left2.x == -1) {  //setting state if the car does not see any line
-
                     state = "danger";
             }
             else{
@@ -244,35 +242,28 @@ namespace scaledcars {
 
             if (y == m_control_scanline) {
 
-                if (inRightLane) {
+                if (inRightLane) { //Adapt to following the right lane
                     if (right.x > 0) {
-                       // m_distance = 210;
                         e = ((right.x - m_image_new.cols / 2.0) - m_distance) / m_distance;
                     } else if (left.x > 0) {
-                       // m_distance = 190;
                         e = (m_distance - (m_image_new.cols / 2.0 - left.x)) / m_distance;
                     }
                 } else {  //Adapt to following the left lane
                     if (left.x > 0) {
-//                        m_eSum = 0;
-//                        m_eOld = 0;
                         e = (m_distance - (m_image_new.cols / 2.0 - left.x)) / m_distance;
                     } else if (right.x > 0) {
-//                        m_eSum = 0;
-//                        m_eOld = 0;
                         e = ((right.x - m_image_new.cols / 2.0) - m_distance) / m_distance;
                     }
                 }
             }
 
             // stopline logic
-
             uchar front_left, front_right;
             Point stop_left, stop_right;
 
             int left_dist = 0;
 
-            stop_left.x = (m_image_new.cols / 2) - 30;   // stop line checker needs to be moved more towards the left side
+            stop_left.x = (m_image_new.cols / 2) - 10;   // stop line checker needs to be moved more towards the left side
             stop_left.y = m_control_scanline;
 
             // Find first grey pixel in the front of the car left side
@@ -287,7 +278,7 @@ namespace scaledcars {
 
             int right_dist = 0;
 
-            stop_right.x = (m_image_new.cols / 2) + 10;  // stop line checker needs to be moved more towards the left side
+            stop_right.x = (m_image_new.cols / 2) + 30;  // stop line checker needs to be moved more towards the left side
             stop_right.y = m_control_scanline;
 
             // Find first grey pixel in front of the car right side
@@ -317,9 +308,9 @@ namespace scaledcars {
                 putText(m_image_new, "Speed is " + speed , Point(m_image_new.cols - 150, 20), FONT_HERSHEY_PLAIN, 1,
                         CV_RGB(255, 255, 255));
 
-                std::string steer = std::to_string(90+ (m_vehicleControl.getSteeringWheelAngle() * (180/3.14)));
-                putText(m_image_new, "Steering: " + steer , Point(m_image_new.cols - 150, 40), FONT_HERSHEY_PLAIN, 1,
-                        CV_RGB(255, 255, 255));
+//                std::string steer = std::to_string(90+ (m_vehicleControl.getSteeringWheelAngle() * (180/3.14)));
+//                putText(m_image_new, "Steering: " + steer , Point(m_image_new.cols - 150, 40), FONT_HERSHEY_PLAIN, 1,
+//                        CV_RGB(255, 255, 255));
 
                 putText(m_image_new, "State: " + state , Point(m_image_new.cols - 150, 60), FONT_HERSHEY_PLAIN, 1,
                         CV_RGB(255, 255, 255));
@@ -330,9 +321,9 @@ namespace scaledcars {
 
                 putText(m_image_new, "Stop counter :" + std::to_string(stopCounter) , Point(m_image_new.cols - 150, 100), FONT_HERSHEY_PLAIN, 1,
                         CV_RGB(255, 255, 255));
-
-                putText(m_image_new, "Distance " + std::to_string(m_distance) , Point(m_image_new.cols - 150, 120), FONT_HERSHEY_PLAIN, 1,
-                        CV_RGB(255, 255, 255));
+//
+//                putText(m_image_new, "Distance " + std::to_string(m_distance) , Point(m_image_new.cols - 150, 120), FONT_HERSHEY_PLAIN, 1,
+//                        CV_RGB(255, 255, 255));
 
                 if (left.x > 0) {
                     line(m_image_new, Point(m_image.cols / 2, y), left, Scalar(255, 0, 0), 1, 8);
@@ -352,7 +343,7 @@ namespace scaledcars {
             }
 
             // is the detected stopline at a similar distance on both sides
-            if (counter < 4 && (left_dist - right_dist) > -15 && (left_dist - right_dist) < 15 && left_dist != 0 &&
+            if (counter < 3 && (left_dist - right_dist) > -15 && (left_dist - right_dist) < 15 && left_dist != 0 &&
                 right_dist != 0) {
                 if(left_dist > 55 || right_dist > 55){
 
@@ -362,7 +353,7 @@ namespace scaledcars {
             }else{
                 counter = 0;
             }
-            if (counter > 3) {
+            if (counter > 2) {
                 stop = true;
             } else {
                 stop = false;
@@ -468,22 +459,29 @@ namespace scaledcars {
                             m_vehicleControl.setSpeed(1);
                         } else {
                             if (stop) {
-                                if (stopCounter < 1.0) {
-                                    stopCounter += 0.5;
-                                }else{
-                                    if (prevState == "stopLine"){
-                                        m_vehicleControl.setSpeed(99);
-                                    }else{
-                                        state = "stop";
-                                        stopCounter = 0;
-                                    }
-                                }
-                            } else {
+                                state = "stop";
+                                stopCounter = 0;
+                            }else {
                                 m_vehicleControl.setSpeed(99);
                                 prevState = "moving";
+                                state = "moving";
                             }
+                            //else{
+                                   // if (prevState == "stopLine"){
+                                     //   stopCounter = 0;
+                                     //   m_vehicleControl.setSpeed(99);
+                                    //}else{
+
+                                    //}
+                               // }
+                            }
+//                        else {
+//                                m_vehicleControl.setSpeed(99);
+//                                prevState = "moving";
+//                            }
+//
                         }
-                    }
+                   // }
                     if (state == "stop") {
                         m_vehicleControl.setSteeringWheelAngle(0);
                         if (Sim) {

@@ -226,7 +226,7 @@ odsimvehicle.LinearBicycleModel.KdynamicBrake=60.0
 # CONFIGURATION FOR LANEFOLLOWER
 #
 lanefollower.p = 1.4     #OG val = 1.3
-lanefollower.d = 0.50  #OG val = 0.10
+lanefollower.d = 0.40  #OG val = 0.10
 lanefollower.i= 0.01     #OG val = 0.01
 
 ###############################################################################
