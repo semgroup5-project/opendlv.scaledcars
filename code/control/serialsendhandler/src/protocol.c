@@ -83,7 +83,9 @@ protocol_data protocol_decode_t2(protocol_frame frame)
             ((frame.a >> 4) & 0xf) |
             (((frame.b >> 1) & 0xf) << 4)
     );
-
+    if (data.id == 6 && data.value > 10) {
+        data.value = 0;
+    }
     return data;
 }
 

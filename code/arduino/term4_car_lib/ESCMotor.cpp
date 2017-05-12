@@ -53,11 +53,10 @@ void ESCMotor::brake() {
 
     if (_direction && _speed != IDLE_SPEED) {
         write(IDLE_SPEED + 15);
-        write(IDLE_SPEED);
     } else if (_speed != IDLE_SPEED && !_direction) {
         write(IDLE_SPEED - 55);
-        write(IDLE_SPEED);
     }
+    write(IDLE_SPEED);
     _speed = IDLE_SPEED;
 }
 

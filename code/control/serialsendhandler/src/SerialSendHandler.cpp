@@ -26,6 +26,7 @@ namespace scaledcars {
         bool isSensorValues = false;
         int count_values[] = {0, 0, 0, 0, 0};
         int _values[] = {0, 0, 0, 0, 0};
+        const uint32_t ONE_SECOND = 1000 * 1000;
 
         // Your class needs to implement the method void beforeStop().
         void MyService::beforeStop() {
@@ -53,7 +54,6 @@ namespace scaledcars {
                     _values[j] = 0;
                 }
                 for (int i = 0; i < pending; i++) {
-                    incoming.value = 0;
                     if (serial_receive(serial_, &incoming)) {
                         cerr << "RECEIVED : id=" << incoming.id << " value=" << incoming.value << endl;
                         filterData(incoming.id, incoming.value);
@@ -64,7 +64,6 @@ namespace scaledcars {
                     isSensorValues = true;
                 }
 
-                const uint32_t ONE_SECOND = 1000 * 1000;
                 odcore::base::Thread::usleepFor(ONE_SECOND/2);
             }
         }
@@ -107,7 +106,7 @@ namespace scaledcars {
                 cout << "[SensorBoardData to conference] ID: " << id << " VALUE: " << -1 << endl;
 
                 //ODOMETER [ID 6] with value between 0 - 255
-            } else if (id == 6 && (value >= 0 && value <= 255)) {
+            } else if (id == 6) {
                 cout << "ODOMETER VALUE IS : " << value << endl;
                 realOdometer += value;
                 cout << "ODOMETER REAL IS : " << realOdometer << endl;
@@ -166,7 +165,6 @@ namespace scaledcars {
                 serial_handshake(this->serial, '\n');
                 cerr << "serial handshake" << endl;
 
-                const uint32_t ONE_SECOND = 1000 * 1000;
                 odcore::base::Thread::usleepFor(5 * ONE_SECOND);
 
                 protocol_data d_motor;
@@ -179,7 +177,6 @@ namespace scaledcars {
                 serial_send(this->serial, d_motor);
                 serial_send(this->serial, d_servo);
 
-                const uint32_t ONE_SECOND = 1000 * 1000;
                 odcore::base::Thread::usleepFor(2 * ONE_SECOND);
 
                 serial_start(this->serial);
@@ -212,7 +209,6 @@ namespace scaledcars {
             serial_send(this->serial, d_motor);
             serial_send(this->serial, d_servo);
 
-            const uint32_t ONE_SECOND = 1000 * 1000;
             odcore::base::Thread::usleepFor(15 * ONE_SECOND);
 
             serial_stop(this->serial);

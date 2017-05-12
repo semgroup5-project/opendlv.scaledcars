@@ -162,4 +162,11 @@ void Odometer::encodeAndWrite(int id, int value) {
     protocol_frame outframe1 = protocol_encode_t2(outdata1);
     Serial.write(outframe1.a);
     Serial.write(outframe1.b);
+
+//    protocol_data data = protocol_decode_t2(outframe1);
+//
+//    Serial.print("THIS IS ODO ID after decoding: ");
+//    Serial.println(data.id);
+//    Serial.print("THIS IS ODO VALUE after decoding: ");
+//    Serial.println(data.value);
 }
