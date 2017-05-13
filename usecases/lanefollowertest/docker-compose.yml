@@ -63,17 +63,17 @@ services:
         command: "/opt/opendlv.scaledcars/bin/scaledcars-control-proxy --cid=${CID} --rm=true --freq=20"
 
     #serial
-    #serialhandler:
-     #   build: .
-      #  network_mode: host
-       # ipc : host
-        #group_add:
-        #- dialout
-        #depends_on:
-         #   - odsupercomponent
-        #restart: on-failure
-        #privileged: true
-        #command: bash -c "sleep 10; /opt/opendlv.scaledcars/bin/scaledcars-control-serialsendhandler --verbose=1 --cid=${CID} --rm=true --freq=10"
+    serialhandler:
+        build: .
+        network_mode: host
+        ipc : host
+        group_add:
+        - dialout
+        depends_on:
+            - odsupercomponent
+        restart: on-failure
+        privileged: true
+        command: bash -c "sleep 10; /opt/opendlv.scaledcars/bin/scaledcars-control-serialsendhandler --verbose=1 --cid=${CID} --rm=true --freq=10"
 
     #communicationlink
     communicationlink:
