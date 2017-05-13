@@ -384,4 +384,4 @@ global.sim = 0    # Set simulation true or false
 #
 # CLIENT IP
 #
-udpconnectionstreamer.ip = 100.106.119.8
+udpconnectionstreamer.ip = 192.168.0.5

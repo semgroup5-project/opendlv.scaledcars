@@ -111,7 +111,7 @@ namespace scaledcars {
             m_image_mat = Mat(m_image.rows, m_image.cols, CV_8UC1);
             // Copy the original image to the new image as greyscale
 
-            cvtColor(m_image, m_image_mat, COLOR_BGR2GRAY);
+            cvtColor(m_image, m_image_mat, COLOR_BGR2GRAY);   //COLOR_BGR2RGB   for full colors, set the color and stop this method here, change the compressor to m_image_mat and change the width + height back to si.getHeight() si.getWidth()
 
             GaussianBlur(m_image_mat, m_image_new, Size(5, 5), 0, 0);
             // calc median of pixel color
@@ -123,12 +123,12 @@ namespace scaledcars {
 
             Canny(m_image_new, m_image_new, m_threshold1, m_threshold2,
                   3); // see header for algorithm and threshold explanation
-
-                if (m_image.data != NULL) {
-                    imshow("Debug Image",
-                           m_image_new);  //m_image = image without canny || m_image_new = fully processed image
-                    waitKey(10);
-                }
+//
+//                if (m_image.data != NULL) {
+////                    imshow("Debug Image",
+////                           m_image_new);  //m_image = image without canny || m_image_new = fully processed image
+////                    waitKey(10);
+//                }
 
             stream();
         }
@@ -163,10 +163,10 @@ namespace scaledcars {
                 int compressedSize = si.getWidth() * si.getHeight() * si.getBytesPerPixel();
                 void *buffer = ::malloc(compressedSize);
                 if (buffer != NULL) {
-                    retVal = odcore::wrapper::jpg::JPG::compress(buffer, compressedSize, si.getWidth(),
-                                                                 si.getHeight(), si.getBytesPerPixel(),
+                    retVal = odcore::wrapper::jpg::JPG::compress(buffer, compressedSize, m_image_new.cols,
+                                                                 m_image_new.rows,1,
                                                                  m_image_new.data,
-                                                                 70);
+                                                                 100);
                 }
                 // Check if the size of the compressed image fits in a UDP packet.
                 const int32_t MAX_SIZE_UDP_PAYLOAD = 65000;
