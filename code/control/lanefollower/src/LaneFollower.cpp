@@ -477,6 +477,7 @@ namespace scaledcars {
                                 state = "stop";
                                 stopCounter = 0;
                             }else {
+                                m_vehicleControl.setBrakeLights(false);
                                 m_vehicleControl.setSpeed(96);
                                 prevState = "moving";
                                 state = "moving";
@@ -502,7 +503,7 @@ namespace scaledcars {
                         if (Sim) {
                             m_vehicleControl.setSpeed(0);
                         } else {
-                            m_vehicleControl.setSpeed(190);
+                            m_vehicleControl.setBrakeLights(true);
                         }
 
                         stopCounter += 0.5;
@@ -517,20 +518,21 @@ namespace scaledcars {
                                 m_vehicleControl.setSpeed(1);
                             } else {
                                 state = "moving";
+                                m_vehicleControl.setBrakeLights(false);
                                 m_vehicleControl.setSpeed(96);
                             }
                     }
                     if (state == "danger") {
                         if (prevState ==
                             "stopLine") {  // The idea here is, after a stop line, go forward and dont steer at all, it is expected to not find any reference line markings
+                            m_vehicleControl.setBrakeLights(false);
                             m_vehicleControl.setSpeed(96);
                             m_vehicleControl.setSteeringWheelAngle(0);
                         }
                         if (prevState ==
                             "moving") {
                             prevState = "danger";
-                            m_vehicleControl.setSpeed(190);
-                            m_vehicleControl.setSteeringWheelAngle(0);
+                            m_vehicleControl.setBrakeLights(true);
                         }
                     }
                     // Create container for finally sending the set values for the control algorithm.
