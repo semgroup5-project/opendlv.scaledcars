@@ -97,7 +97,7 @@ namespace scaledcars {
                 IRFRObstacle = obstacleDetection(irFrontRight, IR);
                 IRRRObstacle = obstacleDetection(irRearRight, IR);
                 USFObstacle = obstacleDetection(usFront, US);
-                cerr << "HOLA!!" << endl;
+
                 if (IRRObstacle && irRear < 5 && irRear > 0) {
                     vc.setBrakeLights(true);
                     cerr << "TOO CLOSE AT THE BACK, EMERGENCY STOP!!" << endl;
