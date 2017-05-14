@@ -127,7 +127,7 @@ namespace scaledcars {
        //going forwards till finds a gap
         void Park::parkingFinder() {
             // Parking space starting point
-            vc.setSteeringWheelAngle(.2);
+
 
             vc.setBrakeLights(false);
             vc.setSpeed(96);
@@ -335,14 +335,14 @@ namespace scaledcars {
                     setParkingState(RIGHT_TURN);
                 }
                     break;
-                case INTHEMIDD: {
+                /*case INTHEMIDD: {
                     vc.setBrakeLights(false);
-                    vc.setSteeringWheelAngle(1.5);
-                    vc.setSpeed(60);
+                    vc.setSteeringWheelAngle(1.4);
+                    vc.setSpeed(96);
                     cout << "In the middle" << endl;
                     setParkingState(RIGHT_TURN);
                 }
-                break;
+                break;*/
                 case RIGHT_TURN: {
                     vc.setBrakeLights(false);
                     vc.setSteeringWheelAngle(1.5);
@@ -382,7 +382,7 @@ namespace scaledcars {
                     cout << "PARKING : Turning left" << endl;
                     cout << "adjDist" << adjDist << endl;
                     //if (adjDist >= (GAP / 1.5)/*&& parkingCounter < 0 */ ) {
-                    if (backEnd - parkingSpace >= (adjDist * 1.3)) {
+                    if (backEnd - parkingSpace >= (adjDist * 1.0)) {
 
                         setParkingState(INGAP_RIGHT_TURN);
 
