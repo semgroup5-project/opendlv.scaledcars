@@ -106,20 +106,20 @@ namespace scaledcars {
         //const int32_t INFRARED_BACK = 1;
         //const int32_t WHEEL_ENCODER = 5;
 
-        const double OVERTAKING_DISTANCE = 40.0;
+        const double OVERTAKING_DISTANCE = 30.0;
         const double HEADING_PARALLEL = 1;
 
         const double TURN_SPEED_SIM = 0.7;
-        const double TURN_ANGLE_SIM_LEFT = -5;
-        const double TURN_ANGLE_SIM_RIGHT = 5;
+        const double TURN_ANGLE_SIM_LEFT = -25;
+        const double TURN_ANGLE_SIM_RIGHT = 25;
         const double STRAIGHT_ANGLE_SIM = 0;
 
-        const double TURN_SPEED_CAR = 100;
+        const double TURN_SPEED_CAR = 96;
         const double TURN_ANGLE_CAR_LEFT = TURN_ANGLE_SIM_LEFT;
         const double TURN_ANGLE_CAR_RIGHT = TURN_ANGLE_SIM_RIGHT;
         const double STRAIGHT_ANGLE_CAR = STRAIGHT_ANGLE_SIM;
 
-        const int IR_FR_BLIND_COUNT = 3;
+        const int IR_FR_BLIND_COUNT = 2;
 
         long cycles = 0;
         const bool USE_CYCLES = true;
@@ -183,6 +183,9 @@ namespace scaledcars {
         // Distance variables to ensure we are overtaking only stationary or slowly driving obstacles.
         double distanceToObstacle = 0;
         double distanceToObstacleOld = 0;
+
+        const int OBJECT_PLAUSIBLE_COUNT = 6;
+        int objectPlausibleCount = 0;
 
         bool overtake = true;
         LaneFollower::~LaneFollower() {}
@@ -550,9 +553,6 @@ namespace scaledcars {
             if (stageMeasuring == FIND_OBJECT_INIT) {
                 cerr << "FIND_OBJECT_INIT" << endl;
 
-                // Reset counters
-                IR_FR_blindCount = 0;
-
                 // Read initial distance to obstacle
                 if (Sim) {
                     distanceToObstacleOld = sbd.getValueForKey_MapOfDistances(ULTRASONIC_FRONT_CENTER);
@@ -576,6 +576,8 @@ namespace scaledcars {
                                                  (fabs(distanceToObstacleOld - distanceToObstacle) < 1e-2))) {
                     // Check if overtaking shall be started.
                     stageMeasuring = FIND_OBJECT_PLAUSIBLE;
+
+                    objectPlausibleCount = 0;
                 }
 
                 distanceToObstacleOld = distanceToObstacle;
@@ -592,26 +594,34 @@ namespace scaledcars {
                 }
 
                 if (distance > 0 && distance < OVERTAKING_DISTANCE) {
-                    overtake = true;
+                    objectPlausibleCount++;
 
-                    stageMoving = OUT_TO_LEFT;
-                    if (USE_CYCLES) {
-                        distanceOUTtoL_0 = cycles;
-                    } else {
-                        if (Sim) {
-                            distanceOUTtoL_0 = vd.getAbsTraveledPath();
+                    if (objectPlausibleCount >= OBJECT_PLAUSIBLE_COUNT) {
+
+                        overtake = true;
+
+                        stageMoving = OUT_TO_LEFT;
+                        if (USE_CYCLES) {
+                            distanceOUTtoL_0 = cycles;
                         } else {
-                            distanceOUTtoL_0 = clm.getWheelEncoder();
+                            if (Sim) {
+                                distanceOUTtoL_0 = vd.getAbsTraveledPath();
+                            } else {
+                                distanceOUTtoL_0 = clm.getWheelEncoder();
+                            }
                         }
-                    }
 
-                    stageMeasuring = DISABLE;
+                        stageMeasuring = DISABLE;
+                    }
                 } else {
                     stageMeasuring = FIND_OBJECT;
                 }
 
             } else if (stageMeasuring == HAVE_BOTH_IR) {
                 cerr << "HAVE_BOTH_IR" << endl;
+
+                // Reset counters
+                IR_FR_blindCount = 0;
 
                 double infraredFrontRightDistance;
                 double infraredRearRightDistance;
@@ -624,8 +634,12 @@ namespace scaledcars {
                     infraredRearRightDistance = clm.getInfraredSideBack();
                 }
 
-                if ((infraredFrontRightDistance > 1) &&
-                    (infraredRearRightDistance > 1)) {
+                //if ((infraredFrontRightDistance > 1) &&
+                //    (infraredRearRightDistance > 1)) {
+
+                infraredRearRightDistance = infraredRearRightDistance;
+
+                if (infraredFrontRightDistance > 1) {
 
                     if (USE_CYCLES) {
                         distanceOUTtoL_1 = cycles;
@@ -697,8 +711,6 @@ namespace scaledcars {
                 cerr << "distanceCondition=" << distanceCondition << endl;
 
                 cerr << "blindCountCondition=" << distanceCondition << endl;
-
-                blindCountCondition = false;
 
                 if ((sensorCondition && distanceCondition) || blindCountCondition) {
                     stageMoving = CONTINUE_STRAIGHT;
@@ -924,7 +936,7 @@ namespace scaledcars {
                 }
 
                 m_vehicleControl.setBrakeLights(false);
-                m_vehicleControl.setSpeed(100);
+                m_vehicleControl.setSpeed(96);
 
                 movingMachine(true);
                 measuring_state_machine();
@@ -1038,7 +1050,7 @@ namespace scaledcars {
                     {
                         if (prevState == "stopLine")
                         {  // The idea here is, after a stop line, go forward and dont steer at all, it is expected to not find any reference line markings
-                            m_vehicleControl.setSpeed(100);
+                            m_vehicleControl.setSpeed(96);
                             m_vehicleControl.setSteeringWheelAngle(0);
                             m_vehicleControl.setBrakeLights(false);
                         }

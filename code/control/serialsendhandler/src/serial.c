@@ -9,6 +9,8 @@
 #include "protocol.h"
 #include "arduino.h"
 
+using namespace std;
+
 serial_state *serial_new()
 {
     serial_state *state = (serial_state *) malloc(sizeof(serial_state));
@@ -117,7 +119,11 @@ void *serial_outgoing_thread_routine(void *_state)
             continue;
         }
 
+
+
         g_mutex_lock(&state->write_mutex);
+
+        cerr << "ACTIONWRITE: id=" << data->id << " value=" << data->value << endl;
 
         if (state->outgoing_frame_t == FRAME_T1) {
             protocol_frame frame = protocol_encode_t1(*data);

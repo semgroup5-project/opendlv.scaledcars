@@ -20,11 +20,13 @@ namespace scaledcars {
         int BAUD_RATE = 115200;
 
         void __on_read(uint8_t b) {
-            cout << ">> read " << (int) b << endl;
+            //cout << ">> read " << (int) b << endl;
+            b = b;
         }
 
         void __on_write(uint8_t b) {
-            cout << "<< write " << (int) b << endl;
+            //cout << "<< write " << (int) b << endl;
+            b = b;
         }
 
         SerialSendHandler::SerialSendHandler(const int32_t &argc, char **argv) :
@@ -131,7 +133,6 @@ namespace scaledcars {
                     }
                 }
 
-
                 protocol_data d_motor;
                 d_motor.id = ID_OUT_MOTOR;
                 d_motor.value = this->motor / 3;
@@ -150,7 +151,7 @@ namespace scaledcars {
                 protocol_data incoming;
                 for (int i = 0; i < pending; i++) {
                     if (serial_receive(this->serial, &incoming)) {
-                        cerr << "RECEIVED : id=" << incoming.id << " value=" << incoming.value << endl;
+                        //cerr << "RECEIVED : id=" << incoming.id << " value=" << incoming.value << endl;
                         filterData(incoming.id, incoming.value);
                         isSensorValues = true;
                     }
@@ -176,22 +177,22 @@ namespace scaledcars {
             //US-SENSOR [ID 1] [ID 2] with value between 1 - 70
             if ((id == 1 || id == 2) && value >= 1 && value <= 70) {
                 sensors[id] = value;
-                cout << "[SensorBoardData to conference] ID: " << id << " VALUE: " << value << endl;
+                //cout << "[SensorBoardData to conference] ID: " << id << " VALUE: " << value << endl;
 
                 //IR-SENSOR [ID 3] [ID 4] with value between 3 - 30
             } else if ((id == 1 || id == 2) && ((value >= 0 && value <= 1) || (value > 70))) {
                 sensors[id] = -1;
-                cout << "[SensorBoardData to conference] ID: " << id << " VALUE: " << value << endl;
+                //cout << "[SensorBoardData to conference] ID: " << id << " VALUE: " << value << endl;
 
                 //IR-SENSOR [ID 3] [ID 4] with value between 3 - 30
             } else if ((id == 3 || id == 4 || id == 5) && value >= 3 && value <= 30) {
                 sensors[id] = value;
-                cout << "[SensorBoardData to conference] ID: " << id << " VALUE: " << value << endl;
+                //cout << "[SensorBoardData to conference] ID: " << id << " VALUE: " << value << endl;
 
                 //ODOMETER [ID 6] with value between 0 - 255
             } else if ((id == 3 || id == 4 || id == 5) && (value < 3 || value > 30)) {
                 sensors[id] = -1;
-                cout << "[SensorBoardData to conference] ID: " << id << " VALUE: " << value << endl;
+                //cout << "[SensorBoardData to conference] ID: " << id << " VALUE: " << value << endl;
 
                 //ODOMETER [ID 6] with value between 0 - 255
             } else if (id == 6 && value >= 0 && value <= 255) {
@@ -202,11 +203,11 @@ namespace scaledcars {
                     counter++;
                 }
 
-                cout << "[VehicleData to conference] VALUE: " << realOdometer << endl;
+                //cout << "[VehicleData to conference] VALUE: " << realOdometer << endl;
                 sbd.setTravelledDistance(realOdometer);
                 sbd.setTravelledKm(counter);
             } else {
-                cerr << "[Filter no sensor] ID: " << id << " VALUE: " << value << endl;
+                //cerr << "[Filter no sensor] ID: " << id << " VALUE: " << value << endl;
             }
         }
 
