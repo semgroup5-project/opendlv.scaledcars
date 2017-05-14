@@ -126,11 +126,13 @@ namespace scaledcars {
         }
 
         void __on_read(uint8_t b) {
-            cout << ">> read " << (int) b << endl;
+            //cout << ">> read " << (int) b << endl;
+            b = b;
         }
 
         void __on_write(uint8_t b) {
-            cout << "<< write " << (int) b << endl;
+            //cout << "<< write " << (int) b << endl;
+            b = b;
         }
 
         SerialSendHandler::SerialSendHandler(const int32_t &argc, char **argv) :
@@ -266,9 +268,9 @@ namespace scaledcars {
                 if (isSensorValues) {
                     for (int i = 1; i < 6; ++i) {
                        if (sensors[i] > 0) {
-                            cerr << "Normalizing ID:" << i << " value total:" << sensors[i] << " divided by:" << count_values[i-1] << endl;
+                            //cerr << "Normalizing ID:" << i << " value total:" << sensors[i] << " divided by:" << count_values[i-1] << endl;
                             sensors[i] /= count_values[i-1];
-                           cout << "[SensorBoardData to conference] ID: " << i << " VALUE: " << sensors[i] << " RECEIVED: " << count_values[i-1] << " TIMES" << endl;
+                           //cout << "[SensorBoardData to conference] ID: " << i << " VALUE: " << sensors[i] << " RECEIVED: " << count_values[i-1] << " TIMES" << endl;
 
                        }
                     }
