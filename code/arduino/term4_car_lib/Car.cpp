@@ -56,8 +56,6 @@ void Car::provideSensorsData() {
         ultrasonicRight.encodeAndWrite(ID_IN_ULTRASONIC_SIDE_FRONT, ultrasonicRight.getDistance());
 
         odometer = wheelEncoder.getDistance() - encoderPos;
-//    Serial.print("THIS IS ODO TO SEND: ");
-//    Serial.println(odometer);
         if (odometer <= 255) {
             wheelEncoder.encodeAndWrite(ID_IN_ENCODER, odometer);
             encoderPos = wheelEncoder.getDistance();
@@ -192,7 +190,7 @@ void Car::establishContact(char toSend) {
     analogWrite(greenPin, green);
     analogWrite(bluePin, blue);
     Serial.read();
-    wait(10);
+    wait(5);
     escMotor.arm();
 }
 
