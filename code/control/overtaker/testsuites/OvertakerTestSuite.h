@@ -27,7 +27,7 @@
 
 using namespace std;
 using namespace odcore::data;
-using namespace automotive::miniature;
+using namespace scaledcars::control;
 
 /**
  * This class derives from SensorBoard to allow access to protected methods.

@@ -52,8 +52,14 @@ void Car::provideSensorsData() {
         infraredSideFront.encodeAndWrite(ID_IN_INFRARED_SIDE_FRONT, infraredSideFront.getDistance2());
         infraredSideBack.encodeAndWrite(ID_IN_INFRARED_SIDE_BACK, infraredSideBack.getDistance());
 
-        ultrasonicFront.encodeAndWrite(ID_IN_ULTRASONIC_CENTER, ultrasonicFront.getDistance());
-        ultrasonicRight.encodeAndWrite(ID_IN_ULTRASONIC_SIDE_FRONT, ultrasonicRight.getDistance());
+        readSerial();
+        int ur_val = ultrasonicFront.getDistance();
+        if (ur_val > 60) {
+            ultrasonicFront.encodeAndWrite(ID_IN_ULTRASONIC_CENTER, 0);
+        } else {
+            ultrasonicFront.encodeAndWrite(ID_IN_ULTRASONIC_CENTER, ur_val);
+        }
+//        ultrasonicRight.encodeAndWrite(ID_IN_ULTRASONIC_SIDE_FRONT, ultrasonicRight.getDistance());
 
         odometer = wheelEncoder.getDistance() - encoderPos;
         if (odometer <= 255) {
@@ -63,6 +69,8 @@ void Car::provideSensorsData() {
             wheelEncoder.encodeAndWrite(ID_IN_ENCODER, 255);
             encoderPos = wheelEncoder.getDistance();
         }
+
+        readSerial();
     }
 }
 
@@ -98,6 +106,12 @@ void Car::automatedDrive() {
 
     func_is_changed = 0;
 
+    readSerial();
+}
+
+void Car::readSerial() {
+    oldMillis = millis();
+
     int value = 90, serial_size = 0, count = 0;
     while ((serial_size = Serial.available()) <= 0 && !isRCControllerOn()) {
         if ((millis() - oldMillis) > timer) {
@@ -121,6 +135,7 @@ void Car::automatedDrive() {
                 dataMotor = data;
             }
         }
+
 
         if (dataServo.id == ID_OUT_SERVO) {
             value = dataServo.value * 3;

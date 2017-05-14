@@ -20,11 +20,13 @@
 #include <memory>
 #include <stdint.h>
 #include <string>
+#include <vector>
+#include <cctype>
+#include <algorithm>
 
 #include "serial.h"
 
-#define PI 3.1415926535897
-#define KM_IN_CM  100000
+#include "defines.h"
 
 namespace scaledcars {
     namespace control {
@@ -81,7 +83,8 @@ namespace scaledcars {
              */
             SerialSendHandler &operator=(const SerialSendHandler &/*obj*/);
 
-            serial_state *serial;
+            serial_state *serial_incoming;
+            serial_state *serial_outgoing;
 
         public:
             /**
