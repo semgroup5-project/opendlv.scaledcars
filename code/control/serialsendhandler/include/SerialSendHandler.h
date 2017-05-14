@@ -83,7 +83,8 @@ namespace scaledcars {
              */
             SerialSendHandler &operator=(const SerialSendHandler &/*obj*/);
 
-            serial_state *serial;
+            serial_state *serial_incoming;
+            serial_state *serial_outgoing;
 
         public:
             /**
