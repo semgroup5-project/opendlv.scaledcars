@@ -62,7 +62,7 @@ namespace scaledcars {
                 m_threshold2(200),
                 m_control_scanline(250),// Lane markings are searched for at this pixel line
                 m_stop_scanline(160),// Stop line lane marking searched for at this pixel line
-                m_distance(130),  // Distance from the lane marking at which the car attempts to drive
+                m_distance(140),  // Distance from the lane marking at which the car attempts to drive
                 p_gain(0),       // The gain values for the PID control algorithm
                 i_gain(0),
                 d_gain(0),
@@ -273,7 +273,7 @@ namespace scaledcars {
 
             int left_dist = 0;
             // Set the column/ row at which to search
-            stop_left.x = (m_image_new.cols / 2) - 10;
+            stop_left.x = (m_image_new.cols / 2) - 30;
             stop_left.y = m_control_scanline;
 
             // Find first grey pixel in the front of the car left side
@@ -288,7 +288,7 @@ namespace scaledcars {
 
             int right_dist = 0;
             // Set the column/ row at which to search
-            stop_right.x = (m_image_new.cols / 2) + 30;
+            stop_right.x = (m_image_new.cols / 2) + 20;
             stop_right.y = m_control_scanline;
 
             // Find first grey pixel in front of the car right side
@@ -368,7 +368,7 @@ namespace scaledcars {
             }
 
             // Checks whether the detected stopline is at a similar distance on both sides
-            if (counter < 3 && (left_dist - right_dist) > -15 && (left_dist - right_dist) < 15 && left_dist != 0 &&
+            if (counter < 3 && (left_dist - right_dist) > -10 && (left_dist - right_dist) < 10 && left_dist != 0 &&
                 right_dist != 0) {
                 if(left_dist > 40 || right_dist > 40){
 
@@ -505,9 +505,16 @@ namespace scaledcars {
                         }
                     }
                     if (state == "resume"){
+
                             if (Sim) {
                                 m_vehicleControl.setSpeed(1);
                             } else {
+                                if (stopCounter > 25.9999) {
+                                    stopCounter += 0.5;
+                                    m_vehicleControl.setSpeed(96);
+                                    m_vehicleControl.setSteeringWheelAngle(0);
+
+                                }
                                 state = "moving";
                                 m_vehicleControl.setBrakeLights(false);
                                 m_vehicleControl.setSpeed(96);
