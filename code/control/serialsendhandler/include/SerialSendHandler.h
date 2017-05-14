@@ -26,8 +26,7 @@
 
 #include "serial.h"
 
-#define PI 3.1415926535897
-#define KM_IN_CM  100000
+#include "defines.h"
 
 namespace scaledcars {
     namespace control {
