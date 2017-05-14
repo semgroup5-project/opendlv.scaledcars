@@ -125,9 +125,9 @@ namespace scaledcars {
                   3); // see header for algorithm and threshold explanation
 //
 //                if (m_image.data != NULL) {
-////                    imshow("Debug Image",
-////                           m_image_new);  //m_image = image without canny || m_image_new = fully processed image
-////                    waitKey(10);
+//                    imshow("Debug Image",
+//                           m_image_new);  //m_image = image without canny || m_image_new = fully processed image
+//                    waitKey(10);
 //                }
 
             stream();

@@ -1,3 +1,58 @@
+#!/bin/bash
+
+#define parameters which are passed in.
+#CAMID=$1
+#MDEBUG=$2
+#SIM=$3
+#P=$4
+#I=$5
+#D=$6
+#FUNCTION=$7
+
+#or read parameters
+echo "Please provide camera ID>" >&2
+read CAMID
+echo "Please provide m_debug>" >&2
+read MDEBUG
+echo "Please provide SIM>" >&2
+read SIM
+echo "Please provide if function lanefollower will be running [0 | 1]>" >&2
+read FUNCTION1
+echo "Please provide wich other function will the decision maker run [0 for overtaker | 1 for parker]>" >&2
+read FUNCTION2
+
+echo "Do you wish to modify the PID [y,n]?>" >&2
+read ANSWER
+case $ANSWER in
+    y|Y) 
+        echo "Please provide P (of PID)>" >&2
+        read P
+        echo "Please provide I (of PID)>" >&2
+        read I
+        echo "Please provide D (of PID)>" >&2
+        read D
+        if [ -f oldpid.txt ];
+        then
+            echo "Replacing old PID values..." >&2
+            rm oldpid.txt
+        else
+            echo "File oldpid.txt does not exist! Creating a one..." >&2
+        fi
+        echo lanefollowerp=$P >> oldpid.txt
+        echo lanefollowerd=$D >> oldpid.txt
+        echo lanefolloweri=$I >> oldpid.txt
+        ;;
+    *) 
+        echo "Using old PID values!" >&2
+        source oldpid.txt
+        P=$lanefollowerp
+        I=$lanefolloweri
+        D=$lanefollowerd;;
+esac
+
+echo "Creating new file configuration..." >&2
+#define the template.
+cat  << EOF
 # This is the "one-and-only" configuration for OpenDaVINCI.
 # Its format is like:
 #
@@ -225,9 +280,9 @@ odsimvehicle.LinearBicycleModel.KdynamicBrake=60.0
 #
 # CONFIGURATION FOR LANEFOLLOWER
 #
-lanefollower.p = 1.4     #OG val = 1.3
-lanefollower.d = 0.60  #OG val = 0.10
-lanefollower.i= 0.01     #OG val = 0.01
+lanefollower.p = $P     #OG val = 1.3
+lanefollower.d = $D    #OG val = 0.10
+lanefollower.i= $I     #OG val = 0.01
 
 ###############################################################################
 ###############################################################################
@@ -279,7 +334,7 @@ proxy.useRecorder = 0 # 1 = record all captured data directly, 0 otherwise.
 proxy.recorder.output = file://recs/
 proxy.camera.name = WebCam
 proxy.camera.type = OpenCV # OpenCV or UEYE
-proxy.camera.id = 1 # Select here the proper ID for OpenCV
+proxy.camera.id = $CAMID # Select here the proper ID for OpenCV
 proxy.camera.width = 640 #752-UEYE, 640-OpenCV 
 proxy.camera.height = 480
 proxy.camera.bpp = 3 #3- openCV, 1-UEYE
@@ -368,14 +423,15 @@ lanedetector.threshBaseParameter=48
 #
 # CONFIGURATION FOR CommunicationLink
 #
-communicationlink.functionlane = 1
-communicationlink.function2 = 0
+communicationlink.functionlane = $FUNCTION1
+communicationlink.function2 = $FUNCTION2
 
 ###############################################################################
 ###############################################################################
 #
 # GLOBAL CONFIGURATION
 #
-global.debug = 1      # set to 0 to disable any windows and further output
-global.sim = 0    # Set simulation true or false
+global.debug = $MDEBUG      # set to 0 to disable any windows and further output
+global.sim = $SIM    # Set simulation true or false
+EOF
 

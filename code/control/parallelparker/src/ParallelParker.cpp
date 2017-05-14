@@ -269,13 +269,15 @@ namespace scaledcars {
                         cerr << "emergency stop!" << endl;
                     }
                 } else if (!sim) {
-
+                    cerr<<"real car"<<endl;
                     irRear = communicationLinkMSG.getInfraredBack();
                     usFront = communicationLinkMSG.getUltraSonicFrontCenter();
                     irFrontRight = communicationLinkMSG.getInfraredSideFront();
                     irRearRight = communicationLinkMSG.getInfraredSideBack();
                     odometer = communicationLinkMSG.getWheelEncoder();
 
+                    IRRObstacle = obstacleDetect(irRear, 2);
+                    USFObstacle = obstacleDetect(usFront, 1);
 
                     IRRObstacle = obstacleDetect(irRear, IR);
                     USFObstacle = obstacleDetect(usFront, US);
