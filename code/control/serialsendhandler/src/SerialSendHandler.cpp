@@ -119,7 +119,7 @@ namespace scaledcars {
                     isSensorValues = true;
                 }
 
-                odcore::base::Thread::usleepFor(ONE_SECOND / 2);
+                odcore::base::Thread::usleepFor(ONE_SECOND / 4);
             }
         }
 
