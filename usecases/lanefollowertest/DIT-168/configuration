@@ -279,7 +279,7 @@ proxy.useRecorder = 0 # 1 = record all captured data directly, 0 otherwise.
 proxy.recorder.output = file://recs/
 proxy.camera.name = WebCam
 proxy.camera.type = OpenCV # OpenCV or UEYE
-proxy.camera.id = 0 # Select here the proper ID for OpenCV
+proxy.camera.id = 1 # Select here the proper ID for OpenCV
 proxy.camera.width = 640 #752-UEYE, 640-OpenCV 
 proxy.camera.height = 480
 proxy.camera.bpp = 3 #3- openCV, 1-UEYE
@@ -384,4 +384,4 @@ global.sim = 0    # Set simulation true or false
 #
 # CLIENT IP
 #
-udpconnectionstreamer.ip =
+udpconnectionstreamer.ip = 10.169.143.93

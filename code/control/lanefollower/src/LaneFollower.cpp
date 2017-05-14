@@ -302,7 +302,7 @@ namespace scaledcars {
                 }
             }
 
-            //prints the lines for debugging purposes if debug flag is set to true
+            //prints several pieces of information for debugging purposes if debug flag is set to true
             if (m_debug) {
                 std::string speed = std::to_string(m_vehicleControl.getSpeed());
                 putText(m_image_new, "Speed is " + speed , Point(m_image_new.cols - 150, 20), FONT_HERSHEY_PLAIN, 1,
