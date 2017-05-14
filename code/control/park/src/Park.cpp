@@ -32,11 +32,14 @@ namespace scaledcars {
         //*****************************//
         //	DIFFERENT PARKING STATES   //
         //*****************************//
-        const int PARALLEL = 0;
-        const int BOX = 1;
+        const int PARALLEL = 1;
+        const int BOX = 0;
         double counterS = 0;
         double counterO = 0;
         int counter = 0;
+        //MS
+        //int ChangeWheelAngleCounter =0;
+        //MS
         double timer = 0;
         double turnCount = 0;
 
@@ -135,25 +138,60 @@ namespace scaledcars {
                     counterO = 0;
                     parkingSpace = odometer - parkingStart;
                     cout << "ParkingSpace : " << parkingSpace << endl;
+                    cout << "counterO: " <<counterO << endl;
 
                 }
-            } else if (IRRRObstacle) {
+            }
+            else if (IRRRObstacle) {
                 counterO++;
                 if (counterO > 3) {
                     parkingStart = odometer;
                     parkingSpace = 0;
                     counterS = 0;
+                    cout << "counterS: " << counterS << endl;
                 }
             }
             if (parkingSpace >= GAP) {
                 backStart = odometer;
                 timer += 0.5;
-                if (timer >= 8) {
+                if (timer >= 4) {
                     vc.setBrakeLights(true);
                     isParking = true;
                 }
             }
+            /*void Park::unpark(){
+                // Parking space starting point
+                vc.setSteeringWheelAngle(.2);
 
+                vc.setBrakeLights(false);
+                vc.setSpeed(96);
+                cout << "IRRRObstacle : " << IRRRObstacle << endl;
+
+                if (!IRRRObstacle) {
+                    counterS++;
+                    if (counterS > 3) {
+                        counterO = 0;
+                        parkingSpace = odometer - parkingStart;
+                        cout << "ParkingSpace : " << parkingSpace << endl;
+
+                    }
+                } else if (IRRRObstacle) {
+                    counterO++;
+                    if (counterO > 3) {
+                        parkingStart = odometer;
+                        parkingSpace = 0;
+                        counterS = 0;
+                    }
+                }
+                if (parkingSpace >= GAP) {
+                    backStart = odometer;
+                    timer += 0.5;
+                    if (timer >= 8) {
+                        vc.setBrakeLights(true);
+                        isParking = true;
+                    }
+
+            }*/
 
 //            if ((IRRRObstacle == false) /*&& !IRFRObstacle */&& parkingStart == 0) {
 //                parkingStart = odometer;
@@ -233,7 +271,7 @@ namespace scaledcars {
             }
         }
 */
-        /*void Park::unpark() {
+        /*) {void Park::unpark(
             switch (parkingState) {
                 case START: {
 
@@ -295,9 +333,14 @@ namespace scaledcars {
                     break;
                 case RIGHT_TURN: {
                     vc.setBrakeLights(false);
-                    vc.setSpeed(60);
                     vc.setSteeringWheelAngle(1.5);
-
+                  /*  //MS change angle before moving the car to allow for a tighter turn
+                    ChangeWheelAngleCounter++;
+                    if(ChangeWheelAngleCounter >= 50){
+                        vc.setSpeed(60);
+                        ChangeWheelAngleCounter = 0;
+                    }
+                    //MS END*/
                     cout << "PARKING : Turning right" << endl;
                     cout << "adjDist" << adjDist << endl;
                     if (adjDist >= GAP / 1.2  /*&& parkingCounter >= 40*/) {
@@ -308,9 +351,14 @@ namespace scaledcars {
 
                 case LEFT_TURN: {
                     vc.setBrakeLights(false);
-                    vc.setSpeed(60);
                     vc.setSteeringWheelAngle(-1.5);
-
+                    //MS change angle before moving the car to allow for a tighter turn
+                    /*ChangeWheelAngleCounter++;
+                    if(ChangeWheelAngleCounter >= WAITFORWHEELANGLECHANGE){
+                        vc.setSpeed(60);
+                        ChangeWheelAngleCounter = 0;
+                    }*/
+                    //MS END
                     cout << "PARKING : Turning left" << endl;
                     cout << "adjDist" << adjDist << endl;
                     if (adjDist >= (GAP * 1.5)/*&& parkingCounter < 0 */ ) {
@@ -320,8 +368,14 @@ namespace scaledcars {
                     break;
                 case INGAP_RIGHT_TURN: {
                     vc.setBrakeLights(false);
-                    vc.setSpeed(96);
                     vc.setSteeringWheelAngle(1);
+                    //MS change angle before moving the car to allow for a tighter turn
+                    /*ChangeWheelAngleCounter++;
+                    if(ChangeWheelAngleCounter >= WAITFORWHEELANGLECHANGE){
+                        vc.setSpeed(96);
+                        ChangeWheelAngleCounter = 0;
+                    }*/
+                    //MS END
                     cout << "PARKING : In Gap Turning right" << endl;
                     cout << "turnCount" << turnCount << endl;
                     turnCount += 0.5;
@@ -382,4 +436,5 @@ namespace scaledcars {
         }
     }
 } // automotive::miniature
+
 

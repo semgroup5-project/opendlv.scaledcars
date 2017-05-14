@@ -153,6 +153,7 @@ namespace scaledcars {
             int stageMeasuring = 0;
             int stageMoving = 0;
 
+           // if (communicationLinkMSG.getStateParking () == 1){}
             while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
                    odcore::data::dmcp::ModuleStateMessage::RUNNING) {
 
