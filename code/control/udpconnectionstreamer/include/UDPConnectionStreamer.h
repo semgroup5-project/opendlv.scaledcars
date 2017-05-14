@@ -112,9 +112,24 @@ namespace scaledcars {
 
             virtual void nextContainer(odcore::data::Container &c);
 
+            void processImage();
+
+            double Median(cv::Mat mat);
+
             void stream();
 
             bool m_hasAttachedToSharedImageMemory;
+
+            cv::Mat m_image;
+            cv::Mat m_image_mat;
+            cv::Mat m_image_new;
+
+            shared_ptr <odcore::wrapper::SharedMemory> m_sharedImageMemory;
+            shared_ptr <odcore::wrapper::SharedMemory> m_sharedProcessedImageMemory;
+            odcore::data::image::SharedImage m_sharedProcessedImage;
+
+            int32_t m_threshold1;
+            int32_t m_threshold2;
 
             odcore::data::image::SharedImage si;
         };
