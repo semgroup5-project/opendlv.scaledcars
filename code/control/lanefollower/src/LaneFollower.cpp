@@ -36,12 +36,14 @@ namespace scaledcars {
         using namespace automotive::miniature;
         using namespace group5;
 
+        // Class variables
         Mat m_image_mat, m_image_new;
         bool stop = false;
         double stopCounter = 0, counter = 0;
         String state = "moving", prevState = "moving";
         bool inRightLane = true;   //Flip this value to indicate lane change
 
+        // Constructor
         LaneFollower::LaneFollower(const int32_t &argc, char **argv) :
                 TimeTriggeredConferenceClientModule(argc, argv, "lanefollower"),
                 m_sharedImageMemory(),
@@ -56,18 +58,18 @@ namespace scaledcars {
                 m_eOld(0),
                 m_vehicleControl(),
                 laneFollowerMSG(),
-                m_threshold1(50),  //50
-                m_threshold2(200),  // 150
-                m_control_scanline(250),//needs testing with real c
-                m_stop_scanline(160),//needs testing with real car
-                m_distance(130),  //needs testing with real car as well
-                p_gain(0),       // the gain values can be adjusted here outside of simulation scenario (see @setUp() )
+                m_threshold1(50),  // Both thresholds are dynamically adjusted at image processing
+                m_threshold2(200),
+                m_control_scanline(250),// Lane markings are searched for at this pixel line
+                m_stop_scanline(160),// Stop line lane marking searched for at this pixel line
+                m_distance(130),  // Distance from the lane marking at which the car attempts to drive
+                p_gain(0),       // The gain values for the PID control algorithm
                 i_gain(0),
                 d_gain(0),
                 _state(0) {}
 
+        // Class responsible for lane follower function
         LaneFollower::~LaneFollower() {}
-
         // This method will be call automatically _before_ running body().
         void LaneFollower::setUp() {
             // Get configuration data for this class.
@@ -78,11 +80,12 @@ namespace scaledcars {
             d_gain = kv.getValue<double>("lanefollower.d");
             i_gain = kv.getValue<double>("lanefollower.i");
 
-            // setup window for debugging
+            // Setup window for debugging if debug flag set
             if (m_debug) {
                 cvNamedWindow("Debug Image", CV_WINDOW_AUTOSIZE);
                 cvMoveWindow("Debug Image", 300, 100);
             }
+            // Values adjusted for simulation environment, if sim flag is set
             if (Sim) {
                 m_control_scanline = 462; // calibrated length to right: 280px
                 m_distance = 250;  // distance from right lane marking
@@ -99,7 +102,7 @@ namespace scaledcars {
             }
         }
 
-        // This method returns a boolean true if it gets an image from the shared image memory
+        // This method returns a boolean true if it gets an image from the shared image memory, copying it into a iplimage
         bool LaneFollower::readSharedImage(Container &c) {
             bool retVal = false;
 
@@ -117,16 +120,16 @@ namespace scaledcars {
                     // Lock the memory region to gain exclusive access using a scoped lock.
                     m_sharedImageMemory->lock();
 
-                    if (m_image.empty()) { // If image is empty, create a new cv::Mat image
+                    if (m_image.empty()) { // If image is empty, create a new image to hold the shared image data
                         m_image.create(si.getHeight(), si.getWidth(),
-                                       CV_8UC3); //From opencv documentation: CV_8UC3 = unsigned integer 8bit matrix/image wih 3 mats (typically RGB or BRG in opencv case)
+                                       CV_8UC3); //From opencv documentation: CV_8UC3 = unsigned integer 8bit matrix/image wih 3 channels (typically RGB or BRG in opencv case)
                     } else { // Copying the image data
                         memcpy(m_image.data, m_sharedImageMemory->getSharedMemory(),
                                si.getWidth() * si.getHeight() * si.getBytesPerPixel());
                     }
                     m_sharedImageMemory->unlock(); // Release the memory region lock
-
-                    if (Sim) { // If in Sim mode, flip the image
+                    // If in Sim mode, flip the image
+                    if (Sim) {
                         flip(m_image, m_image, -1);
                     }
                     retVal = true;
@@ -134,26 +137,26 @@ namespace scaledcars {
             }
             return retVal;
         }
-        // Process Image
+
+        // Process image logic
         void LaneFollower::processImage() {
-            // New image
+            // New mat image
             m_image_mat = Mat(m_image.rows, m_image.cols, CV_8UC1);
             // Copy the original image to the new image as greyscale
-
             cvtColor(m_image, m_image_mat, COLOR_BGR2GRAY);
-
+            // Apply a gaussian blur to the image, to smooth it out
             GaussianBlur(m_image_mat, m_image_new, Size(5, 5), 0, 0);
-            // calc median of pixel color
+            // Calculate median of pixel color in order to dynamically calculate Canny thresholds
             double median;
             median = Median(m_image_new);
-
+            // Thresholds calculation
             m_threshold1 = max(static_cast<double>(0), ((1.0 - 0.33) * median));
             m_threshold2 = min(static_cast<double>(255), (1.0 + 0.33) * median);
-
+            // See header for algorithm and threshold explanation
             Canny(m_image_new, m_image_new, m_threshold1, m_threshold2,
-                  3); // see header for algorithm and threshold explanation
+                  3);
         }
-
+        // Pixel median value calculation
         double LaneFollower::Median(Mat mat) {
             double m = (mat.rows * mat.cols) / 2;
             int bin = 0;
@@ -193,7 +196,7 @@ namespace scaledcars {
             // Search from middle to the left
             for (int x = m_image_new.cols / 2; x > 0; x--) {//from the middle to the left
                 pixelLeft = m_image_new.at<uchar>(Point(x, y));
-                if (pixelLeft >= 150) {   //tentative value, might need adjustment: lower it closer to 100
+                if (pixelLeft >= 150) {
                     left.x = x;
                     break;
                 }
@@ -207,29 +210,36 @@ namespace scaledcars {
             for (int x = m_image_new.cols / 2;
                  x < m_image_new.cols ; x++) {
                 pixelRight = m_image_new.at<uchar>(Point(x, y));
-                if (pixelRight >= 150) {   //tentative value, might need adjustment: lower it closer to 100
+                if (pixelRight >= 150) {
                     right.x = x;
                     break;
                 }
             }
-            for (int x = m_image_new.cols / 2; x > 0; x--) {//from the middle to the left
-                pixelLeft2 = m_image_new.at<uchar>(Point(x,100));
-                if (pixelLeft2 >= 150) {   //tentative value, might need adjustment: lower it closer to 100
-                    left2.x = x;
-                    break;
+
+
+            if (right.x == -1 && left.x == -1) {  //setting state if the car does not see any line
+                // The following 2 for loops search for lane markings at a row close to the top of the image if no lane markings are found at the control_scanline
+                for (int x = m_image_new.cols / 2; x > 0; x--) {
+                    pixelLeft2 = m_image_new.at<uchar>(Point(x,100));
+                    if (pixelLeft2 >= 150) {
+                        left2.x = x;
+                        break;
+                    }
                 }
-            }
-            // Search from middle to the right
-            for (int x = m_image_new.cols / 2;
-                 x < m_image_new.cols - 30; x++) {
-                pixelRight2 = m_image_new.at<uchar>(Point(x, 100));
-                if (pixelRight2 >= 150) {   //tentative value, might need adjustment: lower it closer to 100
-                    right2.x = x;
-                    break;
+                // Search from middle to the right
+                for (int x = m_image_new.cols / 2;
+                     x < m_image_new.cols - 30; x++) {
+                    pixelRight2 = m_image_new.at<uchar>(Point(x, 100));
+                    if (pixelRight2 >= 150) {
+                        right2.x = x;
+                        break;
+                    }
                 }
-            }
-            if (right.x == -1 && left.x == -1 && right2.x == -1 && left2.x == -1) {  //setting state if the car does not see any line
+                // If the second check also returns -1 for both sides, then no followable lane markings are found
+                if (right2.x == -1 && left2.x == -1){
                     state = "danger";
+                }
+
             }
             else{
                 if(state != "stop" && state != "resume"){
@@ -237,11 +247,11 @@ namespace scaledcars {
                 }
             }
 
+            // Moving the pixel perception to the right, as to better keep track of right lane marking
             if (right.x > 0) right.x += 10;
             if (left.x > 0) left.x += 10;
 
             if (y == m_control_scanline) {
-
                 if (inRightLane) { //Adapt to following the right lane
                     if (right.x > 0) {
                         e = ((right.x - m_image_new.cols / 2.0) - m_distance) / m_distance;
@@ -257,13 +267,13 @@ namespace scaledcars {
                 }
             }
 
-            // stopline logic
+            // Stopline logic
             uchar front_left, front_right;
             Point stop_left, stop_right;
 
             int left_dist = 0;
-
-            stop_left.x = (m_image_new.cols / 2) - 10;   // stop line checker needs to be moved more towards the left side
+            // Set the column/ row at which to search
+            stop_left.x = (m_image_new.cols / 2) - 10;
             stop_left.y = m_control_scanline;
 
             // Find first grey pixel in the front of the car left side
@@ -277,8 +287,8 @@ namespace scaledcars {
             }
 
             int right_dist = 0;
-
-            stop_right.x = (m_image_new.cols / 2) + 30;  // stop line checker needs to be moved more towards the left side
+            // Set the column/ row at which to search
+            stop_right.x = (m_image_new.cols / 2) + 30;
             stop_right.y = m_control_scanline;
 
             // Find first grey pixel in front of the car right side
@@ -302,7 +312,7 @@ namespace scaledcars {
                 }
             }
 
-            //prints the lines for debugging purposes if debug flag is set to true
+            // Prints several pieces of information onto the image for debugging purposes if debug flag is set to true
             if (m_debug) {
                 std::string speed = std::to_string(m_vehicleControl.getSpeed());
                 putText(m_image_new, "Speed is " + speed , Point(m_image_new.cols - 150, 20), FONT_HERSHEY_PLAIN, 1,
@@ -321,7 +331,7 @@ namespace scaledcars {
 
                 putText(m_image_new, "Stop counter :" + std::to_string(stopCounter) , Point(m_image_new.cols - 150, 100), FONT_HERSHEY_PLAIN, 1,
                         CV_RGB(255, 255, 255));
-//
+
                 putText(m_image_new, "Distance " + std::to_string(m_distance) , Point(m_image_new.cols - 150, 120), FONT_HERSHEY_PLAIN, 1,
                         CV_RGB(255, 255, 255));
 
@@ -357,7 +367,7 @@ namespace scaledcars {
                 }
             }
 
-            // is the detected stopline at a similar distance on both sides
+            // Checks whether the detected stopline is at a similar distance on both sides
             if (counter < 3 && (left_dist - right_dist) > -15 && (left_dist - right_dist) < 15 && left_dist != 0 &&
                 right_dist != 0) {
                 if(left_dist > 40 || right_dist > 40){
@@ -376,12 +386,13 @@ namespace scaledcars {
             return e;
         }
 
+        // PID control algorithm
         void LaneFollower::laneFollower(double e) {
             TimeStamp currentTime;
             double timeStep = (currentTime.toMicroseconds() - m_previousTime.toMicroseconds()) / (1000.0 * 1000.0);
             m_previousTime = currentTime;
 
-            //a more soft way to handle instead of resetting to 0 a way to mitigate toggling in corners
+            // A way to handle toggling in corners
             if(fabs(e) < 1e-2) {
                 m_eSum = 0;
             } else {
@@ -389,11 +400,9 @@ namespace scaledcars {
             }
 
             // PID control algorithm uses the following values, with the meaning:
-            //Kp = p_gain -> Proportional -> how big of a turn when the car try to "fix" the error
-            //Ki = i_gain-> Integral -> Current -> might be the middle position of the car
-            //Kd = d_gain-> derivative -> how frequent the reaction the car will be -> the smaller the better.
-
-
+            //Kp = p_gain -> Proportional -> the oscillation in the trajectory as the algorithm attempts to approach the error state to 0, moving towards the goal
+            //Ki = i_gain-> Integral -> Current -> how long/ how much of the oscillation is spent on either side of the goal, "look at the past"
+            //Kd = d_gain-> derivative -> how sharp the approximation to the goal is made, directly influencing the oscillation
             const double p = p_gain * e;
             const double i = i_gain * timeStep * m_eSum;
             const double d = d_gain * (e - m_eOld) / timeStep;
@@ -406,7 +415,7 @@ namespace scaledcars {
             if (fabs(e) > 1e-2) {
                 desiredSteering = y;
             }
-            // set an upper and lower limit for the desired steering
+            // Set an upper and lower limit for the desired steering
             if (desiredSteering > 1.5) {
                 desiredSteering = 1.5;
             }
@@ -414,7 +423,7 @@ namespace scaledcars {
                 desiredSteering = -1.5;
             }
 
-            // Show resulting image from image processing
+            // Show resulting image from image processing if debuf flag set
             if (m_debug) {
                 if (m_image.data != NULL) {
                     imshow("Debug Image",
@@ -423,28 +432,10 @@ namespace scaledcars {
                 }
             }
             m_vehicleControl.setSteeringWheelAngle(desiredSteering);
-
-
-            // change this to use distance readings from image processing, same as line drawing
-//            int curveCheckerRight, curveCheckerLeft;
-//
-//            if (desiredSteering < 0) {
-//                curveCheckerLeft++;
-//            }
-//            if (desiredSteering > 0) {
-//                curveCheckerRight++;
-//            }
-//
-//            if (curveCheckerLeft > 5) {
-//                m_distance = 220;
-//            } else if (curveCheckerRight > 5) {
-//                m_distance = 190;
-//            }
         }
 
         // Body method does the main data processing job.
-        ModuleExitCodeMessage::ModuleExitCode LaneFollower::body() {    // this method still needs
-            // Overall state machine handler.
+        ModuleExitCodeMessage::ModuleExitCode LaneFollower::body() {
             while (getModuleStateAndWaitForRemainingTimeInTimeslice() == ModuleStateMessage::RUNNING) {
                 Container communicationLinkContainer = getKeyValueDataStore().get(CommunicationLinkMSG::ID());
                 if (communicationLinkContainer.getDataType() == CommunicationLinkMSG::ID()) {
@@ -461,14 +452,14 @@ namespace scaledcars {
                     if (image_container.getDataType() == SharedImage::ID()) {
                         has_next_frame = readSharedImage(image_container);
                     }
-                    // If we have an image from the previous call, it is then processed
+                    // If we have an image from the previous call, it is then processed, error state calculated and desired steering derived from the error
                     if (has_next_frame) {
                         processImage();
                         double error = errorCalculation();
                         laneFollower(error);
                     }
 
-                    // State control for intersection stop
+                    // State control algorithm, attempts to stop briefly at each intersection and stops the car if danger zone (image processing could not find a lane to follow)
                     if (state == "moving") {
                         if (Sim) {
                             m_vehicleControl.setSpeed(1);
@@ -523,12 +514,14 @@ namespace scaledcars {
                             }
                     }
                     if (state == "danger") {
+                        // After a stop line, go forward and don't steer at all, it is expected to not find any reference lane markings for a stretch of road following an intersection
                         if (prevState ==
-                            "stopLine") {  // The idea here is, after a stop line, go forward and dont steer at all, it is expected to not find any reference line markings
+                            "stopLine") {
                             m_vehicleControl.setBrakeLights(false);
                             m_vehicleControl.setSpeed(96);
                             m_vehicleControl.setSteeringWheelAngle(0);
                         }
+                        // If the previous state is moving, lane markings were not found in image processing and car applies brake
                         if (prevState ==
                             "moving") {
                             prevState = "danger";
@@ -544,4 +537,4 @@ namespace scaledcars {
             return ModuleExitCodeMessage::OKAY;
         }
     }
-} // scaledcars::contr
+} // scaledcars::control

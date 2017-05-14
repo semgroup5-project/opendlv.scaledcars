@@ -378,3 +378,4 @@ communicationlink.function2 = 0
 #
 global.debug = 1      # set to 0 to disable any windows and further output
 global.sim = 0    # Set simulation true or false
+
