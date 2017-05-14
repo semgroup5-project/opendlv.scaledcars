@@ -26,7 +26,7 @@ namespace scaledcars {
         bool isSensorValues = false;
         int count_values[] = {0, 0, 0, 0, 0};
         int _values[] = {0, 0, 0, 0, 0};
-        list<int> ur_list_values;
+        vector<int> ur_list_values;
         const uint32_t ONE_SECOND = 1000 * 1000;
 
         // Your class needs to implement the method void beforeStop().
@@ -63,7 +63,7 @@ namespace scaledcars {
                     for (int j = 2; j < 5; ++j) {
                         sensors[j + 1] = _values[j];
                     }
-                    ur_list_values.sort();
+                    sort(ur_list_values.begin(), ur_list_values.end());
                     int med = (int) ur_list_values.size() / 2;
                     sensors[1] = ur_list_values[med];
                     isSensorValues = true;
@@ -90,13 +90,13 @@ namespace scaledcars {
 //                    _values[id-1]= value;
 //                }
 //                count_values[id-1] += 1;
-                ur_list_values.push_front(value);
+                ur_list_values.push_back(value);
 
                 //IR-SENSOR [ID 3] [ID 4] with value between 3 - 30
             } else if ((id == 1 || id == 2) && value == 0) {
 //                _values[id-1] = -1;
 //                cout << "[SensorBoardData to conference] ID: " << id << " VALUE: " << -1 << endl;
-                ur_list_values.push_front(-1);
+                ur_list_values.push_back(-1);
 
                 //IR-SENSOR [ID 3] [ID 4] with value between 3 - 40
             } else if ((id == 3 || id == 4 || id == 5) && value > 2) {
