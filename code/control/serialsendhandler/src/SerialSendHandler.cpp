@@ -24,9 +24,10 @@ namespace scaledcars {
         int realOdometer = 0;
         long counter = 0;
         bool isSensorValues = false;
-        int count_values[] = {0, 0, 0, 0, 0};
-        int _values[] = {0, 0, 0, 0, 0};
         vector<int> ur_list_values;
+        vector<int> ir_side_front_list_values;
+        vector<int> ir_side_back_list_values;
+        vector<int> ir_back_list_values;
         const uint32_t ONE_SECOND = 1000 * 1000;
 
         // Your class needs to implement the method void beforeStop().
@@ -50,26 +51,51 @@ namespace scaledcars {
                 cout << "This message is printed every second." << endl;
                 int pending = g_async_queue_length(serial_->incoming_queue);
                 protocol_data incoming;
-                for (int j = 2; j < 5; ++j) {
-                    count_values[j] = 0;
-                    _values[j] = 0;
-                }
                 ur_list_values.clear();
+                ir_side_front_list_values.clear();
+                ir_side_back_list_values.clear();
+                ir_back_list_values.clear();
                 for (int i = 0; i < pending; i++) {
                     if (serial_receive(serial_, &incoming)) {
                         cerr << "RECEIVED : id=" << incoming.id << " value=" << incoming.value << endl;
                         filterData(incoming.id, incoming.value);
                     }
-                    for (int j = 2; j < 5; ++j) {
-                        sensors[j + 1] = _values[j];
+
+                    if (ur_list_values.size() > 0) {
+                        sort(ur_list_values.begin(), ur_list_values.end());
+                        int med = (int) ur_list_values.size() / 2;
+                        sensors[ID_IN_ULTRASONIC_CENTER] = ur_list_values[med];
+                    } else {
+                        sensors[ID_IN_ULTRASONIC_CENTER] = 0;
                     }
-                    sort(ur_list_values.begin(), ur_list_values.end());
-                    int med = (int) ur_list_values.size() / 2;
-                    sensors[1] = ur_list_values[med];
+
+                    if (ir_side_front_list_values.size() > 0) {
+                        sort(ir_side_front_list_values.begin(), ir_side_front_list_values.end());
+                        int med = (int) ir_side_front_list_values.size() / 2;
+                        sensors[ID_IN_ULTRASONIC_CENTER] = ir_side_front_list_values[med];
+                    } else {
+                        sensors[ID_IN_ULTRASONIC_CENTER] = 0;
+                    }
+
+                    if (ir_side_back_list_values.size() > 0) {
+                        sort(ir_side_back_list_values.begin(), ir_side_back_list_values.end());
+                        int med = (int) ir_side_back_list_values.size() / 2;
+                        sensors[ID_IN_ULTRASONIC_CENTER] = ir_side_back_list_values[med];
+                    } else {
+                        sensors[ID_IN_ULTRASONIC_CENTER] = 0;
+                    }
+
+                    if (ir_back_list_values.size() > 0) {
+                        sort(ir_back_list_values.begin(), ir_back_list_values.end());
+                        int med = (int) ir_back_list_values.size() / 2;
+                        sensors[ID_IN_ULTRASONIC_CENTER] = ir_back_list_values[med];
+                    } else {
+                        sensors[ID_IN_ULTRASONIC_CENTER] = 0;
+                    }
                     isSensorValues = true;
                 }
 
-                odcore::base::Thread::usleepFor(ONE_SECOND/2);
+                odcore::base::Thread::usleepFor(ONE_SECOND / 2);
             }
         }
 
@@ -82,35 +108,31 @@ namespace scaledcars {
        */
         void MyService::filterData(int id, int value) {
 
-            //US-SENSOR [ID 1] [ID 2] with value between 1 - 70
             if ((id == 1 || id == 2) && value > 0) {
-//                if (sensors[id] > -1) {
-//                    _values[id-1] += value;
-//                } else {
-//                    _values[id-1]= value;
-//                }
-//                count_values[id-1] += 1;
                 ur_list_values.push_back(value);
 
                 //IR-SENSOR [ID 3] [ID 4] with value between 3 - 30
             } else if ((id == 1 || id == 2) && value == 0) {
-//                _values[id-1] = -1;
-//                cout << "[SensorBoardData to conference] ID: " << id << " VALUE: " << -1 << endl;
                 ur_list_values.push_back(-1);
 
                 //IR-SENSOR [ID 3] [ID 4] with value between 3 - 40
             } else if ((id == 3 || id == 4 || id == 5) && value > 2) {
-                if (sensors[id] > -1) {
-                    _values[id-1] += value;
+                if (id == 3) {
+                    ir_side_front_list_values.push_back(value);
+                } else if (id == 4) {
+                    ir_side_back_list_values.push_back(value);
                 } else {
-                    _values[id-1] = value;
+                    ir_back_list_values.push_back(value);
                 }
-                count_values[id-1] += 1;
 
-                //ODOMETER [ID 6] with value between 0 - 255
             } else if ((id == 3 || id == 4 || id == 5) && value == 0) {
-                _values[id-1] = -1;
-                cout << "[SensorBoardData to conference] ID: " << id << " VALUE: " << -1 << endl;
+                if (id == 3) {
+                    ir_side_front_list_values.push_back(-1);
+                } else if (id == 4) {
+                    ir_side_back_list_values.push_back(-1);
+                } else {
+                    ir_back_list_values.push_back(-1);
+                }
 
                 //ODOMETER [ID 6] with value between 0 - 255
             } else if (id == 6) {
@@ -271,14 +293,6 @@ namespace scaledcars {
                 serial_send(this->serial, d_servo);
 
                 if (isSensorValues) {
-                    for (int i = 1; i < 6; ++i) {
-                       if (sensors[i] > 0) {
-                            cerr << "Normalizing ID:" << i << " value total:" << sensors[i] << " divided by:" << count_values[i-1] << endl;
-                            sensors[i] /= count_values[i-1];
-                           cout << "[SensorBoardData to conference] ID: " << i << " VALUE: " << sensors[i] << " RECEIVED: " << count_values[i-1] << " TIMES" << endl;
-
-                       }
-                    }
                     sendSensorBoardData(sensors);
                 }
 
