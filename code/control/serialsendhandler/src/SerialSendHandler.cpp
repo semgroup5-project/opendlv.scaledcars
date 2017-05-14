@@ -25,6 +25,7 @@ namespace scaledcars {
         long counter = 0;
         bool isSensorValues = false;
         vector<int> ur_list_values;
+        vector<int> ur2_list_values;
         vector<int> ir_side_front_list_values;
         vector<int> ir_side_back_list_values;
         vector<int> ir_back_list_values;
@@ -52,6 +53,7 @@ namespace scaledcars {
                 int pending = g_async_queue_length(serial_->incoming_queue);
                 protocol_data incoming;
                 ur_list_values.clear();
+                ur2_list_values.clear();
                 ir_side_front_list_values.clear();
                 ir_side_back_list_values.clear();
                 ir_back_list_values.clear();
@@ -68,30 +70,51 @@ namespace scaledcars {
                     } else {
                         sensors[ID_IN_ULTRASONIC_CENTER] = 0;
                     }
+                    cout << "[SensorBoardData to conference] ID: " << ID_IN_ULTRASONIC_CENTER << " VALUE: "
+                         << sensors[ID_IN_ULTRASONIC_CENTER] << endl;
+
+                    if (ur2_list_values.size() > 0) {
+                        sort(ur2_list_values.begin(), ur2_list_values.end());
+                        int med = (int) ur2_list_values.size() / 2;
+                        sensors[ID_IN_ULTRASONIC_SIDE_FRONT] = ur2_list_values[med];
+                    } else {
+                        sensors[ID_IN_ULTRASONIC_SIDE_FRONT] = 0;
+                    }
+                    cout << "[SensorBoardData to conference] ID: " << ID_IN_ULTRASONIC_SIDE_FRONT << " VALUE: "
+                         << sensors[ID_IN_ULTRASONIC_SIDE_FRONT] << endl;
+
 
                     if (ir_side_front_list_values.size() > 0) {
                         sort(ir_side_front_list_values.begin(), ir_side_front_list_values.end());
                         int med = (int) ir_side_front_list_values.size() / 2;
-                        sensors[ID_IN_ULTRASONIC_CENTER] = ir_side_front_list_values[med];
+                        sensors[ID_IN_INFRARED_SIDE_FRONT] = ir_side_front_list_values[med];
                     } else {
-                        sensors[ID_IN_ULTRASONIC_CENTER] = 0;
+                        sensors[ID_IN_INFRARED_SIDE_FRONT] = 0;
                     }
+                    cout << "[SensorBoardData to conference] ID: " << ID_IN_INFRARED_SIDE_FRONT << " VALUE: "
+                         << sensors[ID_IN_INFRARED_SIDE_FRONT] << endl;
 
                     if (ir_side_back_list_values.size() > 0) {
                         sort(ir_side_back_list_values.begin(), ir_side_back_list_values.end());
                         int med = (int) ir_side_back_list_values.size() / 2;
-                        sensors[ID_IN_ULTRASONIC_CENTER] = ir_side_back_list_values[med];
+                        sensors[ID_IN_INFRARED_SIDE_BACK] = ir_side_back_list_values[med];
                     } else {
-                        sensors[ID_IN_ULTRASONIC_CENTER] = 0;
+                        sensors[ID_IN_INFRARED_SIDE_BACK] = 0;
                     }
+                    cout << "[SensorBoardData to conference] ID: " << ID_IN_INFRARED_SIDE_BACK << " VALUE: "
+                         << sensors[ID_IN_INFRARED_SIDE_BACK] << endl;
+
 
                     if (ir_back_list_values.size() > 0) {
                         sort(ir_back_list_values.begin(), ir_back_list_values.end());
                         int med = (int) ir_back_list_values.size() / 2;
-                        sensors[ID_IN_ULTRASONIC_CENTER] = ir_back_list_values[med];
+                        sensors[ID_IN_INFRARED_BACK] = ir_back_list_values[med];
                     } else {
-                        sensors[ID_IN_ULTRASONIC_CENTER] = 0;
+                        sensors[ID_IN_INFRARED_BACK] = 0;
                     }
+                    cout << "[SensorBoardData to conference] ID: " << ID_IN_INFRARED_BACK << " VALUE: "
+                         << sensors[ID_IN_INFRARED_BACK] << endl;
+
                     isSensorValues = true;
                 }
 
@@ -108,34 +131,46 @@ namespace scaledcars {
        */
         void MyService::filterData(int id, int value) {
 
-            if ((id == 1 || id == 2) && value > 0) {
-                ur_list_values.push_back(value);
+            if ((id == ID_IN_ULTRASONIC_CENTER || id == ID_IN_ULTRASONIC_SIDE_FRONT) && value > 0) {
+                if (id == ID_IN_ULTRASONIC_CENTER) {
+                    ur_list_values.push_back(value);
+                } else {
+                    ur2_list_values.push_back(value);
+                }
 
                 //IR-SENSOR [ID 3] [ID 4] with value between 3 - 30
-            } else if ((id == 1 || id == 2) && value == 0) {
-                ur_list_values.push_back(-1);
+            } else if ((id == ID_IN_ULTRASONIC_CENTER || id == ID_IN_ULTRASONIC_SIDE_FRONT) && value == 0) {
+                if (id == ID_IN_ULTRASONIC_CENTER) {
+                    ur_list_values.push_back(-1);
+                } else {
+                    ur2_list_values.push_back(-1);
+                }
 
                 //IR-SENSOR [ID 3] [ID 4] with value between 3 - 40
-            } else if ((id == 3 || id == 4 || id == 5) && value > 2) {
-                if (id == 3) {
+            } else if (
+                    (id == ID_IN_INFRARED_SIDE_FRONT || id == ID_IN_INFRARED_SIDE_BACK || id == ID_IN_INFRARED_BACK) &&
+                    value > 2) {
+                if (id == ID_IN_INFRARED_SIDE_FRONT) {
                     ir_side_front_list_values.push_back(value);
-                } else if (id == 4) {
+                } else if (id == ID_IN_INFRARED_SIDE_BACK) {
                     ir_side_back_list_values.push_back(value);
                 } else {
                     ir_back_list_values.push_back(value);
                 }
 
-            } else if ((id == 3 || id == 4 || id == 5) && value == 0) {
-                if (id == 3) {
+            } else if (
+                    (id == ID_IN_INFRARED_SIDE_FRONT || id == ID_IN_INFRARED_SIDE_BACK || id == ID_IN_INFRARED_BACK) &&
+                    value == 0) {
+                if (id == ID_IN_INFRARED_SIDE_FRONT) {
                     ir_side_front_list_values.push_back(-1);
-                } else if (id == 4) {
+                } else if (id == ID_IN_INFRARED_SIDE_BACK) {
                     ir_side_back_list_values.push_back(-1);
                 } else {
                     ir_back_list_values.push_back(-1);
                 }
 
                 //ODOMETER [ID 6] with value between 0 - 255
-            } else if (id == 6) {
+            } else if (id == ID_IN_ENCODER) {
                 cout << "ODOMETER VALUE IS : " << value << endl;
                 realOdometer += value;
                 cout << "ODOMETER REAL IS : " << realOdometer << endl;
