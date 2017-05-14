@@ -43,9 +43,9 @@
 #define START 0
 #define RIGHT_TURN 1
 #define LEFT_TURN 2
-#define INGAP_RIGHT_TURN 3
+#define MOVE_LEFT_A_BIT 3
 #define END 4
-#define INTHEMIDD 5
+
 //MS
 //#define WAITFORWHEELANGLECHANGE 100
 //MS

@@ -33,7 +33,7 @@ namespace scaledcars {
         //	DIFFERENT PARKING STATES   //
         //*****************************//
         const int PARALLEL = 1;
-       // const int BOX = 0;
+        // const int BOX = 0;
         double counterS = 0;
         double counterO = 0;
         int counter = 0;
@@ -124,7 +124,7 @@ namespace scaledcars {
             return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
         }
 
-       //going forwards till finds a gap
+        //going forwards till finds a gap
         void Park::parkingFinder() {
             // Parking space starting point
 
@@ -139,11 +139,10 @@ namespace scaledcars {
                     counterO = 0;
                     parkingSpace = odometer - parkingStart;
                     cout << "ParkingSpace : " << parkingSpace << endl;
-                    cout << "counterO: " <<counterO << endl;
+                    cout << "counterO: " << counterO << endl;
                 }
 
-            }
-            else if (IRRRObstacle) {
+            } else if (IRRRObstacle) {
                 counterO++;
                 if (counterO > 3) {
                     parkingStart = odometer;
@@ -153,12 +152,12 @@ namespace scaledcars {
                 }
             }
             if (parkingSpace >= GAP) {
-                cout <<  "parking Space  : " << parkingSpace << endl;
+                cout << "parking Space  : " << parkingSpace << endl;
                 backStart = odometer;
                 //timer += 0.5;
                 //if (timer >= 4) {
-                    vc.setBrakeLights(true);
-                    isParking = true;
+                vc.setBrakeLights(true);
+                isParking = true;
                 //}
             }
             /*void Park::unpark(){
@@ -331,28 +330,24 @@ namespace scaledcars {
 
             switch (parkingState) {
                 case START: {
-                    vc.setBrakeLights(true);
-                    setParkingState(RIGHT_TURN);
+                    vc.setBrakeLights(false);
+                    vc.setSteeringWheelAngle(-0.4);
+                    vc.setSpeed(96);
+                    if (backEnd - parkingSpace > 1) {
+                        setParkingState(RIGHT_TURN);
+                    }
                 }
                     break;
-                /*case INTHEMIDD: {
-                    vc.setBrakeLights(false);
-                    vc.setSteeringWheelAngle(1.4);
-                    vc.setSpeed(96);
-                    cout << "In the middle" << endl;
-                    setParkingState(RIGHT_TURN);
-                }
-                break;*/
                 case RIGHT_TURN: {
                     vc.setBrakeLights(false);
                     vc.setSteeringWheelAngle(1.5);
-                     /*//MS change angle before moving the car to allow for a tighter turn
-                      ChangeWheelAngleCounter++;
-                      if(ChangeWheelAngleCounter >= 50){
-                          vc.setSpeed(60);
-                          ChangeWheelAngleCounter = 0;
-                      }
-                      //MS END*/
+                    /*//MS change angle before moving the car to allow for a tighter turn
+                     ChangeWheelAngleCounter++;
+                     if(ChangeWheelAngleCounter >= 50){
+                         vc.setSpeed(60);
+                         ChangeWheelAngleCounter = 0;
+                     }
+                     //MS END*/
                     vc.setSpeed(60);
                     cout << "PARKING : Turning right" << endl;
                     cout << "adjDist:   " << adjDist << endl;
@@ -445,13 +440,13 @@ namespace scaledcars {
         }
 
         double Park::adjDistCalculation(double start) {
-       /*     backDist = end - start;
-            //turn degrees toradians
-            double cosVal = cos(backDist / (GAP / 2)); // cos value with the proximity angle
-            adjDist = abs(cosVal) * backDist;   // proximity value of the car traveled distance (paralleled to the road)
+            /*     backDist = end - start;
+                 //turn degrees toradians
+                 double cosVal = cos(backDist / (GAP / 2)); // cos value with the proximity angle
+                 adjDist = abs(cosVal) * backDist;   // proximity value of the car traveled distance (paralleled to the road)
 
-       */
-            adjDist=start/cos(40);
+            */
+            adjDist = start / cos(40);
             return abs(adjDist);
         }
 
