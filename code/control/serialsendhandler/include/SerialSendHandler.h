@@ -20,8 +20,9 @@
 #include <memory>
 #include <stdint.h>
 #include <string>
-#include <list>
+#include <vector>
 #include <cctype>
+#include <algorithm>
 
 #include "serial.h"
 
