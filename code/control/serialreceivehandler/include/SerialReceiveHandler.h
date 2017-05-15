@@ -1,5 +1,5 @@
-#ifndef SERIALSENDHANDLER_H
-#define SERIALSENDHANDLER_H
+#ifndef SERIALRECEIVEHANDLER_H
+#define SERIALRECEIVEHANDLER_H
 
 #include <automotivedata/GeneratedHeaders_AutomotiveData.h>
 #include "odvdscaledcarsdatamodel/generated/group5/SensorsMSG.h"
@@ -13,6 +13,8 @@
 #include <opendavinci/odcore/wrapper/SerialPortFactory.h>
 #include <opendavinci/odcore/wrapper/SharedMemory.h>
 #include <opendavinci/odcore/wrapper/SharedMemoryFactory.h>
+
+#include <opendavinci/odcore/base/Service.h>
 
 #include <iostream>
 #include <memory>
@@ -42,7 +44,7 @@ namespace scaledcars {
 
         void __on_write(uint8_t b);
 
-        class SerialSendHandler :
+        class SerialReceiveHandler :
                 public odcore::base::module::TimeTriggeredConferenceClientModule {
 
         private:
@@ -55,7 +57,7 @@ namespace scaledcars {
              *
              * @param obj Reference to an object of this class.
              */
-            SerialSendHandler(const SerialSendHandler &/*obj*/);
+            SerialReceiveHandler(const SerialReceiveHandler &/*obj*/);
 
             /**
              * "Forbidden" assignment operator.
@@ -67,7 +69,7 @@ namespace scaledcars {
              * @param obj Reference to an object of this class.
              * @return Reference to this instance.
              */
-            SerialSendHandler &operator=(const SerialSendHandler &/*obj*/);
+            SerialReceiveHandler &operator=(const SerialReceiveHandler &/*obj*/);
 
             serial_state *serial;
 
@@ -78,9 +80,9 @@ namespace scaledcars {
              * @param argc Number of command line arguments.
              * @param argv Command line arguments.
              */
-            SerialSendHandler(const int32_t &argc, char **argv);
+            SerialReceiveHandler(const int32_t &argc, char **argv);
 
-            virtual ~SerialSendHandler();
+            virtual ~SerialReceiveHandler();
 
             odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
 
@@ -90,14 +92,9 @@ namespace scaledcars {
 
             virtual void tearDown();
 
-            int motor;
-            int servo;
+            void filterData(int id, int value);
 
-            int arduinoStopAngle;
-            int arduinoBrake;
-
-            int arduinoAngle;
-            int speed;
+            void sendSensorBoardData(std::map<uint32_t, double> sensor);
         };
     }
 }
