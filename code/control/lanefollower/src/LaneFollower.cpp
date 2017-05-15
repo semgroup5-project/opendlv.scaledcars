@@ -273,7 +273,7 @@ namespace scaledcars {
 
             int left_dist = 0;
             // Set the column/ row at which to search
-            stop_left.x = (m_image_new.cols / 2) - 30;
+            stop_left.x = (m_image_new.cols / 2) - 25;
             stop_left.y = m_control_scanline;
 
             // Find first grey pixel in the front of the car left side
@@ -288,7 +288,7 @@ namespace scaledcars {
 
             int right_dist = 0;
             // Set the column/ row at which to search
-            stop_right.x = (m_image_new.cols / 2) + 20;
+            stop_right.x = (m_image_new.cols / 2) + 15 ;
             stop_right.y = m_control_scanline;
 
             // Find first grey pixel in front of the car right side
@@ -371,7 +371,7 @@ namespace scaledcars {
             // Checks whether the detected stopline is at a similar distance on both sides
             if (counter < 3 && (left_dist - right_dist) > -10 && (left_dist - right_dist) < 10 && left_dist != 0 &&
                 right_dist != 0) {
-                if(left_dist > 40 || right_dist > 40){
+                if(left_dist > 35 || right_dist > 35){
 
                 }else {
                     counter++;
@@ -511,7 +511,7 @@ namespace scaledcars {
                             if (Sim) {
                                 m_vehicleControl.setSpeed(1);
                             } else {
-                                if (stopCounter > 45.9999) {
+                                if (stopCounter < 45.9999) {
                                     stopCounter += 0.5;
                                     m_vehicleControl.setSpeed(96);
                                     m_vehicleControl.setSteeringWheelAngle(0);
@@ -538,10 +538,12 @@ namespace scaledcars {
                             m_vehicleControl.setBrakeLights(true);
                         }
                     }
+
                     laneFollowerMSG.setDistanceToRightLane(currentDistance);
                     laneFollowerMSG.setStateLane(inRightLane);
+
                     Container lfMessage(laneFollowerMSG);
-                    getConference().send(laneFollowerMSG);
+                    getConference().send(lfMessage);
                     // Create container for finally sending the set values for the control algorithm.
                     Container c2(m_vehicleControl);
                     // Send container.
