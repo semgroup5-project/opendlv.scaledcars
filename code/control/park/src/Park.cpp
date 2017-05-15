@@ -44,8 +44,7 @@ namespace scaledcars {
         double turnCount = 0;
 
         Park::Park(const int32_t &argc, char **argv) :
-                TimeTriggeredConferenceClientModule(argc, argv, "Park"),
-                communicationLinkMSG(),
+                DataTriggeredConferenceClientModule(argc, argv, "Park"),
                 vc(),
                 parkingSpace(0),
                 IRRObstacle(false),
@@ -65,7 +64,8 @@ namespace scaledcars {
                 backStart(0),
                 backEnd(0),
                 adjDist(0),
-                isParking(false) {}
+                isParking(false),
+                isParked(false) {}
 
         Park::~Park() {}
 
@@ -80,47 +80,56 @@ namespace scaledcars {
 
 
         // This method will do the main data processing job.
-        odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Park::body() {
+        void Park::nextContainer(Container &c){
 
-            while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
-                   odcore::data::dmcp::ModuleStateMessage::RUNNING) {
+            if (c.getDataType() == CommunicationLinkMSG::ID()){
+                CommunicationLinkMSG communicationLinkMSG = c.getData<CommunicationLinkMSG>();
+                
+                // DO THE PARKING IF PARKING IS SET
+                if(isOkay(communicationLinkMSG)){
 
-                Container communicationLinkMSGContainer = getKeyValueDataStore().get(CommunicationLinkMSG::ID());
-                communicationLinkMSG = communicationLinkMSGContainer.getData<CommunicationLinkMSG>();
+                	//     setParkingType(communicationLinkMSG.getParkingType());
+                	irRear = communicationLinkMSG.getInfraredBack();
+                	usFront = communicationLinkMSG.getUltraSonicFrontCenter();
+                	irFrontRight = communicationLinkMSG.getInfraredSideFront();
+                	irRearRight = communicationLinkMSG.getInfraredSideBack();
+                	odometer = communicationLinkMSG.getWheelEncoder();
 
-                //     setParkingType(communicationLinkMSG.getParkingType());
-                irRear = communicationLinkMSG.getInfraredBack();
-                usFront = communicationLinkMSG.getUltraSonicFrontCenter();
-                irFrontRight = communicationLinkMSG.getInfraredSideFront();
-                irRearRight = communicationLinkMSG.getInfraredSideBack();
-                odometer = communicationLinkMSG.getWheelEncoder();
+                	IRRObstacle = obstacleDetection(irRear, IR);
+                	IRFRObstacle = obstacleDetection(irFrontRight, IR);
+                	IRRRObstacle = obstacleDetection(irRearRight, IR);
+                	USFObstacle = obstacleDetection(usFront, US);
+                	
 
-                IRRObstacle = obstacleDetection(irRear, IR);
-                IRFRObstacle = obstacleDetection(irFrontRight, IR);
-                IRRRObstacle = obstacleDetection(irRearRight, IR);
-                USFObstacle = obstacleDetection(usFront, US);
-
-                if (IRRObstacle && irRear < 5 && irRear > 0) {
-                    vc.setBrakeLights(true);
-                    cerr << "TOO CLOSE AT THE BACK, EMERGENCY STOP!!" << endl;
-                }
+                	if (IRRObstacle && irRear < 5 && irRear > 0) {
+                    	vc.setBrakeLights(true);
+                  	cerr << "TOO CLOSE AT THE BACK, EMERGENCY STOP!!" << endl;
+                	}
 //                if (USFObstacle && usFront > 0 && usFront < 10) {
 //                    vc.setBrakeLights(true);
 //                    cerr << "TOO CLOSE AT THE FRONT, EMERGENCY STOP!!" << endl;
 //                }
-                if (isParking) {
-                    parallelPark();
-                    cout << "PARKING : Now I'm parking" << endl;
-                } else if (!isParking) {
-                    parkingFinder();
-                    cout << "PARKING : Finding values" << endl;
-                }
+                	
+                	// PARK IF THE CAR IS NOT PARKED
+                	if(communicationLinkMSG.getUnpark() == 0 && !isParked){
+               		if (isParking) {
+                  		parallelPark();
+                  		cout << "PARKING : Now I'm parking" << endl;
+                		} else if (!isParking) {
+                  		parkingFinder();
+                  		cout << "PARKING : Finding values" << endl;
+                		}
+                	
+                	// UNPARK IF THE CAR IS PARKED
+                	} else if (communicationLinkMSG.getUnpark() == 1 && isParked){
+                		unpark();
+                	}
 
-                Container c(vc);
-                getConference().send(c);
-
+                	Container ct(vc);
+                	getConference().send(ct);
+                
+					}
             }
-            return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
         }
 
        //going forwards till finds a gap
@@ -271,9 +280,12 @@ namespace scaledcars {
                 }
             }
         }
+
+        ) {
 */
-        /*) {void Park::unpark(
-            switch (parkingState) {
+        
+        void Park::unpark(){
+            /*switch (parkingState) {
                 case START: {
 
                     if (parkingType == PARALLEL) {
@@ -314,9 +326,9 @@ namespace scaledcars {
                     setParkingState(START);
                     cout << "UNPARKING : I'm unparked" << endl;
                 }
-            }
+            }*/
         }
-*/
+
 
         void Park::setParkingType(int type) {
             parkingType = type;
@@ -409,6 +421,7 @@ namespace scaledcars {
                 }
                 case END: {
                     vc.setBrakeLights(true);
+                    isParked = true;
                     cout << "PARKING : I'm parked" << endl;
                 }
             }
@@ -460,6 +473,14 @@ namespace scaledcars {
             Container c(p);
             getConference().send(c);
         }
+        
+        bool Park::isOkay(CommunicationLinkMSG c){
+        		if(c.getStateParker() == 1 && c.getStateLaneFollower() == 0 && c.getStateOvertaker() == 0)
+        			return true;
+        		
+        		return false;
+        }
+        
     }
 } // automotive::miniature
 
