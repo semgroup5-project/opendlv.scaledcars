@@ -129,10 +129,10 @@ namespace scaledcars {
 
                 cerr << "serial open" << endl;
                 serial_handshake(this->serial, '\n');
-                protocol_data d_motor;
-                d_motor.id = 0;
-                d_motor.value = 90;
-                serial_send(this->serial, 'h');
+                protocol_data d;
+                d.id = 0;
+                d.value = 90;
+                serial_send(this->serial, d);
                 cerr << "serial handshake" << endl;
 
                 odcore::base::Thread::usleepFor(5 * ONE_SECOND);
