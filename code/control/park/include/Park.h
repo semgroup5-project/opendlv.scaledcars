@@ -140,6 +140,8 @@ namespace scaledcars {
 
             double usFront;
 
+            double usFrontRight;
+
             double irFrontRight;
 
             double irRear;
