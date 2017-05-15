@@ -13,7 +13,7 @@
 
 #include <opendavinci/odcore/base/KeyValueConfiguration.h>
 #include <opendavinci/odcore/base/Lock.h>
-#include <opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h>
+#include <opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h>
 #include <opendavinci/odcore/io/conference/ContainerConference.h>
 #include <opendavinci/odcore/data/Container.h>
 #include <opendavinci/odcore/data/TimeStamp.h>
@@ -33,8 +33,10 @@ namespace scaledcars {
 
         using namespace std;
         using namespace group5;
+        using namespace odcore::base::module;
+        using namespace odcore::data;
 
-        class Overtaker : public odcore::base::module::TimeTriggeredConferenceClientModule {
+        class Overtaker : public DataTriggeredConferenceClientModule {
             private:
                 Overtaker(const Overtaker &/*obj*/);
                 Overtaker& operator=(const Overtaker &/*obj*/);
@@ -42,7 +44,7 @@ namespace scaledcars {
             public:
                 Overtaker(const int32_t &argc, char **argv);
                 virtual ~Overtaker();
-                odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
+
 
                 automotive::VehicleControl m_vehicleControl;
                 bool Sim;
@@ -51,9 +53,10 @@ namespace scaledcars {
             private:
                 virtual void setUp();
                 virtual void tearDown();
+                virtual void nextContainer(Container &c);
 
-                void movingMachine(bool /*hasNextFrame*/);
-                void measuringMachine();
+                void movingMachine(CommunicationLinkMSG clm);
+                void measuringMachine(CommunicationLinkMSG clm);
         };
 
     }

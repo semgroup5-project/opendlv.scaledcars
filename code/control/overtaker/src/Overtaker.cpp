@@ -29,7 +29,7 @@ namespace scaledcars {
         const int32_t INFRARED_BACK = 1;
         const int32_t WHEEL_ENCODER = 5;
 
-        const double OVERTAKING_DISTANCE = 40.0;
+        const double OVERTAKING_DISTANCE = 55.0;
         const double HEADING_PARALLEL = 1;
 
         const double TURN_SPEED_SIM = 0.7;
@@ -86,14 +86,14 @@ namespace scaledcars {
         double distanceToObstacle = 0;
         double distanceToObstacleOld = 0;
 
-        const int OBJECT_PLAUSIBLE_COUNT = 1;
+        const int OBJECT_PLAUSIBLE_COUNT = 2;
         int objectPlausibleCount = 0;
 
         Overtaker::Overtaker(const int32_t &argc, char **argv) :
-            TimeTriggeredConferenceClientModule(argc, argv, "overtaker"),
-            m_vehicleControl(),
-            Sim(false),
-            _state(0) {
+                DataTriggeredConferenceClientModule(argc, argv, "overtaker"),
+                m_vehicleControl(),
+                Sim(false),
+                _state(0) {
         }
 
         Overtaker::~Overtaker() {}
@@ -105,45 +105,47 @@ namespace scaledcars {
 
         void Overtaker::tearDown() {}
 
-        odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Overtaker::body() {
-
-            while (getModuleStateAndWaitForRemainingTimeInTimeslice() == ModuleStateMessage::RUNNING) {
-
-                cycles++;
-
-                Container communicationLinkContainer = getKeyValueDataStore().get(CommunicationLinkMSG::ID());
-                if (communicationLinkContainer.getDataType() == CommunicationLinkMSG::ID()) {
-                    const CommunicationLinkMSG communicationLinkMSG = communicationLinkContainer.getData<CommunicationLinkMSG>();
-                    _state = communicationLinkMSG.getStateLaneFollower();
-                }
+        void Overtaker::nextContainer(Container &c) {
+            if (c.getDataType() == CommunicationLinkMSG::ID()) {
+                Container communicationLinkContainer = c.getData<CommunicationLinkMSG>();
+                const CommunicationLinkMSG communicationLinkMSG = c.getData<CommunicationLinkMSG>();
+                _state = communicationLinkMSG.getStateLaneFollower();
 
                 m_vehicleControl.setBrakeLights(false);
                 m_vehicleControl.setSpeed(96);
 
-                movingMachine(true);
-                measuringMachine();
+                movingMachine(communicationLinkMSG);
+                measuringMachine(communicationLinkMSG);
 
                 Container c3(m_vehicleControl);
                 getConference().send(c3);
             }
-
-            return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
         }
 
-        void Overtaker::movingMachine(bool hasNextFrame) {
-            // Get vehicle data
-            Container vdContainer = getKeyValueDataStore().get(VehicleData::ID());
-            VehicleData vd = vdContainer.getData<VehicleData>();
+        void Overtaker::movingMachine(CommunicationLinkMSG clm) {
+//            // Get vehicle data
+//            if(c.getDataType() == CommunicationLinkMSG::ID()){
+//                Container vdContainer = c.getKeyValueDataStore().get(VehicleData::ID());
+//            }else{
+//                VehicleData vd = vdContainer.getData<VehicleData>();
+//            }
 
-            // Get sensor board data
-            Container sbdContainer = getKeyValueDataStore().get(SensorBoardData::ID());
-            SensorBoardData sbd = sbdContainer.getData<SensorBoardData>();
 
-            // Get communication link message
-            Container clmContainer = getKeyValueDataStore().get(CommunicationLinkMSG::ID());
-            CommunicationLinkMSG clm = clmContainer.getData<CommunicationLinkMSG>();
 
-            if (stageMoving == FORWARD && hasNextFrame) {
+//            // Get sensor board data
+//            if(c.getDataType() == CommunicationLinkMSG::ID()) {
+//                Container sbdContainer = getKeyValueDataStore().get(SensorBoardData::ID());
+//            }else{
+//                SensorBoardData sbd = sbdContainer.getData<SensorBoardData>();
+//            }
+
+
+
+//            // Get communication link message
+//            Container clmContainer = getKeyValueDataStore().get(CommunicationLinkMSG::ID());
+//            CommunicationLinkMSG clm = clmContainer.getData<CommunicationLinkMSG>();
+
+            if (stageMoving == FORWARD) {
                 cerr << "FORWARD" << endl;
 
                 if (Sim) {
@@ -208,11 +210,11 @@ namespace scaledcars {
                 if (USE_CYCLES) {
                     traveled = cycles;
                 } else {
-                    if (Sim) {
-                        traveled = vd.getAbsTraveledPath();
-                    } else {
-                        traveled = clm.getWheelEncoder();
-                    }
+//                    if (Sim) {
+//                        traveled = vd.getAbsTraveledPath();
+//                    } else {
+                    traveled = clm.getWheelEncoder();
+//                    }
                 }
 
                 double traveledSoFar = traveled - distanceINtoR_0;
@@ -226,11 +228,11 @@ namespace scaledcars {
                     if (USE_CYCLES) {
                         distanceINtoL_0 = cycles;
                     } else {
-                        if (Sim) {
-                            distanceINtoL_0 = vd.getAbsTraveledPath();
-                        } else {
-                            distanceINtoL_0 = clm.getWheelEncoder();
-                        }
+//                        if (Sim) {
+//                            distanceINtoL_0 = vd.getAbsTraveledPath();
+//                        } else {
+                        distanceINtoL_0 = clm.getWheelEncoder();
+//                        }
                     }
 
                 }
@@ -250,11 +252,11 @@ namespace scaledcars {
                 if (USE_CYCLES) {
                     traveled = cycles;
                 } else {
-                    if (Sim) {
-                        traveled = vd.getAbsTraveledPath();
-                    } else {
-                        traveled = clm.getWheelEncoder();
-                    }
+//                    if (Sim) {
+//                        traveled = vd.getAbsTraveledPath();
+//                    } else {
+                    traveled = clm.getWheelEncoder();
+//                    }
                 }
 
                 double traveledSoFar = traveled - distanceINtoL_0;
@@ -271,47 +273,43 @@ namespace scaledcars {
 
                     distanceToObstacle = 0;
                     distanceToObstacleOld = 0;
-
-                    // Reset PID controller
-                    //m_eSum = 0;
-                    //m_eOld = 0;
                 }
             }
         }
 
-        void Overtaker::measuringMachine() {
+        void Overtaker::measuringMachine(CommunicationLinkMSG clm) {
             // Get vehicle data
-            Container vdContainer = getKeyValueDataStore().get(VehicleData::ID());
-            VehicleData vd = vdContainer.getData<VehicleData>();
-
-            // Get sensor board data
-            Container sbdContainer = getKeyValueDataStore().get(SensorBoardData::ID());
-            SensorBoardData sbd = sbdContainer.getData<SensorBoardData>();
-
-            // Get communication link message
-            Container clmContainer = getKeyValueDataStore().get(CommunicationLinkMSG::ID());
-            CommunicationLinkMSG clm = clmContainer.getData<CommunicationLinkMSG>();
+//            Container vdContainer = getKeyValueDataStore().get(VehicleData::ID());
+//            VehicleData vd = vdContainer.getData<VehicleData>();
+//
+//            // Get sensor board data
+//            Container sbdContainer = getKeyValueDataStore().get(SensorBoardData::ID());
+//            SensorBoardData sbd = sbdContainer.getData<SensorBoardData>();
+//
+//            // Get communication link message
+            //Container clmContainer = getKeyValueDataStore().get(CommunicationLinkMSG::ID());
+            //CommunicationLinkMSG clm = c.getData<CommunicationLinkMSG>();
 
             if (stageMeasuring == FIND_OBJECT_INIT) {
                 cerr << "FIND_OBJECT_INIT" << endl;
 
                 // Read initial distance to obstacle
-                if (Sim) {
-                    distanceToObstacleOld = sbd.getValueForKey_MapOfDistances(ULTRASONIC_FRONT_CENTER);
-                } else {
-                    distanceToObstacleOld = clm.getUltraSonicFrontCenter();
-                }
+//                if (Sim) {
+//                    distanceToObstacleOld = sbd.getValueForKey_MapOfDistances(ULTRASONIC_FRONT_CENTER);
+//                } else {
+                distanceToObstacleOld = clm.getUltraSonicFrontCenter();
+                //}
 
                 stageMeasuring = FIND_OBJECT;
 
             } else if (stageMeasuring == FIND_OBJECT) {
                 cerr << "FIND_OBJECT" << endl;
 
-                if (Sim) {
-                    distanceToObstacle = sbd.getValueForKey_MapOfDistances(ULTRASONIC_FRONT_CENTER);
-                } else {
-                    distanceToObstacle = clm.getUltraSonicFrontCenter();
-                }
+//                if (Sim) {
+//                    distanceToObstacle = sbd.getValueForKey_MapOfDistances(ULTRASONIC_FRONT_CENTER);
+//                } else {
+                distanceToObstacle = clm.getUltraSonicFrontCenter();
+//                }
 
                 // Approaching an obstacle (stationary or driving slower than us).
                 if ((distanceToObstacle > 0) && (((distanceToObstacleOld - distanceToObstacle) > 0) ||
@@ -329,11 +327,11 @@ namespace scaledcars {
 
                 double distance;
 
-                if (Sim) {
-                    distance = sbd.getValueForKey_MapOfDistances(ULTRASONIC_FRONT_CENTER);
-                } else {
-                    distance = clm.getUltraSonicFrontCenter();
-                }
+//                if (Sim) {
+//                    distance = sbd.getValueForKey_MapOfDistances(ULTRASONIC_FRONT_CENTER);
+//                } else {
+                distance = clm.getUltraSonicFrontCenter();
+                //}
 
                 if (distance > 0 && distance < OVERTAKING_DISTANCE) {
                     objectPlausibleCount++;
@@ -346,11 +344,11 @@ namespace scaledcars {
                         if (USE_CYCLES) {
                             distanceOUTtoL_0 = cycles;
                         } else {
-                            if (Sim) {
-                                distanceOUTtoL_0 = vd.getAbsTraveledPath();
-                            } else {
-                                distanceOUTtoL_0 = clm.getWheelEncoder();
-                            }
+//                            if (Sim) {
+//                                distanceOUTtoL_0 = vd.getAbsTraveledPath();
+//                            } else {
+                            distanceOUTtoL_0 = clm.getWheelEncoder();
+//                            }
                         }
 
                         stageMeasuring = DISABLE;
@@ -367,14 +365,14 @@ namespace scaledcars {
 
                 double infraredFrontRightDistance;
                 double infraredRearRightDistance;
-
-                if (Sim) {
-                    infraredFrontRightDistance = sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT);
-                    infraredRearRightDistance = sbd.getValueForKey_MapOfDistances(INFRARED_REAR_RIGHT);
-                } else {
-                    infraredFrontRightDistance = clm.getInfraredSideFront();
-                    infraredRearRightDistance = clm.getInfraredSideBack();
-                }
+//
+//                if (Sim) {
+//                    infraredFrontRightDistance = sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT);
+//                    infraredRearRightDistance = sbd.getValueForKey_MapOfDistances(INFRARED_REAR_RIGHT);
+//                } else {
+                infraredFrontRightDistance = clm.getInfraredSideFront();
+                infraredRearRightDistance = clm.getInfraredSideBack();
+                //}
 
                 //if ((infraredFrontRightDistance > 1) &&
                 //    (infraredRearRightDistance > 1)) {
@@ -386,22 +384,22 @@ namespace scaledcars {
                     if (USE_CYCLES) {
                         distanceOUTtoL_1 = cycles;
                     } else {
-                        if (Sim) {
-                            distanceOUTtoL_1 = vd.getAbsTraveledPath();
-                        } else {
-                            distanceOUTtoL_1 = clm.getWheelEncoder();
-                        }
+//                        if (Sim) {
+//                            distanceOUTtoL_1 = vd.getAbsTraveledPath();
+//                        } else {
+                        distanceOUTtoL_1 = clm.getWheelEncoder();
+//                        }
                     }
 
                     stageMoving = OUT_TO_RIGHT;
                     if (USE_CYCLES) {
                         distanceOUTtoR_0 = cycles;
                     } else {
-                        if (Sim) {
-                            distanceOUTtoR_0 = vd.getAbsTraveledPath();
-                        } else {
-                            distanceOUTtoR_0 = clm.getWheelEncoder();
-                        }
+//                        if (Sim) {
+//                            distanceOUTtoR_0 = vd.getAbsTraveledPath();
+//                        } else {
+                        distanceOUTtoR_0 = clm.getWheelEncoder();
+//                        }
                     }
                 }
 
@@ -411,23 +409,23 @@ namespace scaledcars {
                 double IR_FR;
                 double IR_RR;
 
-                if (Sim) {
-                    IR_FR = sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT);
-                    IR_RR = sbd.getValueForKey_MapOfDistances(INFRARED_REAR_RIGHT);
-                } else {
-                    IR_FR = clm.getInfraredSideFront();
-                    IR_RR = clm.getInfraredSideBack();
-                }
+//                if (Sim) {
+//                    IR_FR = sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT);
+//                    IR_RR = sbd.getValueForKey_MapOfDistances(INFRARED_REAR_RIGHT);
+//                } else {
+                IR_FR = clm.getInfraredSideFront();
+                IR_RR = clm.getInfraredSideBack();
+//                }
 
                 double traveled;
                 if (USE_CYCLES) {
                     traveled = cycles;
                 } else {
-                    if (Sim) {
-                        traveled = vd.getAbsTraveledPath();
-                    } else {
-                        traveled = clm.getWheelEncoder();
-                    }
+//                    if (Sim) {
+//                        traveled = vd.getAbsTraveledPath();
+//                    } else {
+                    traveled = clm.getWheelEncoder();
+                    //                   }
                 }
 
                 double distanceOUTtoL = distanceOUTtoL_1 - distanceOUTtoL_0;
@@ -460,11 +458,11 @@ namespace scaledcars {
                     if (USE_CYCLES) {
                         distanceOUTtoR_1 = cycles;
                     } else {
-                        if (Sim) {
-                            distanceOUTtoR_1 = vd.getAbsTraveledPath();
-                        } else {
-                            distanceOUTtoR_1 = clm.getWheelEncoder();
-                        }
+//                        if (Sim) {
+//                            distanceOUTtoR_1 = vd.getAbsTraveledPath();
+//                        } else {
+                        distanceOUTtoR_1 = clm.getWheelEncoder();
+//                        }
                     }
 
                     // Reset PID controller.
@@ -475,44 +473,46 @@ namespace scaledcars {
             } else if (stageMeasuring == END_OF_OBJECT) {
                 cerr << "END_OF_OBJECT" << endl;
 
-                if (Sim) {
-                    distanceToObstacle = sbd.getValueForKey_MapOfDistances(ULTRASONIC_FRONT_RIGHT);
-                } else {
-                    distanceToObstacle = clm.getUltraSonicFrontCenter();
-                }
+//                if (Sim) {
+//                    distanceToObstacle = sbd.getValueForKey_MapOfDistances(ULTRASONIC_FRONT_RIGHT);
+//                } else {
+                distanceToObstacle = clm.getUltraSonicFrontCenter();
+//                }
 
                 double IR_FR;
                 double IR_RR;
 
-                if (Sim) {
-                    IR_FR = sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT);
-                    IR_RR = sbd.getValueForKey_MapOfDistances(INFRARED_REAR_RIGHT);
-                } else {
-                    IR_FR = clm.getInfraredSideFront();
-                    IR_RR = clm.getInfraredSideBack();
-                }
+//                if (Sim) {
+//                    IR_FR = sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT);
+//                    IR_RR = sbd.getValueForKey_MapOfDistances(INFRARED_REAR_RIGHT);
+//                } else {
+                IR_FR = clm.getInfraredSideFront();
+                IR_RR = clm.getInfraredSideBack();
+//            }
 
                 IR_FR = IR_FR;
                 IR_RR = IR_RR;
 
-                // if (distanceToObstacle < 0) {
-                if (IR_FR < 0) {
-                    stageMoving = IN_TO_RIGHT;
-                    if (USE_CYCLES) {
-                        distanceINtoR_0 = cycles;
-                    } else {
-                        if (Sim) {
-                            distanceINtoR_0 = vd.getAbsTraveledPath();
+                if (distanceToObstacle < 0) {
+                    if (IR_FR < 0) {
+                        stageMoving = IN_TO_RIGHT;
+                        if (USE_CYCLES) {
+                            distanceINtoR_0 = cycles;
                         } else {
+//                        if (Sim) {
+//                            distanceINtoR_0 = vd.getAbsTraveledPath();
+//                        } else {
                             distanceINtoR_0 = clm.getWheelEncoder();
+//                        }
                         }
-                    }
 
-                    stageMeasuring = DISABLE;
+                        stageMeasuring = DISABLE;
+                    }
                 }
             }
-        }
 
+        }
     }
-} // automotive::miniature
+}
+ // automotive::miniature
 

@@ -172,8 +172,8 @@ namespace scaledcars {
                         sort(ur_list_values.begin(), ur_list_values.end());
                         int med = (int) ur_list_values.size() / 2;
                         sensors[ID_IN_ULTRASONIC_CENTER] = ur_list_values[med];
-                    } else {
-                        sensors[ID_IN_ULTRASONIC_CENTER] = 0;
+                    //} else {
+                    //    sensors[ID_IN_ULTRASONIC_CENTER] = 0;
                     }
                     cout << "[SensorBoardData to conference] ID: " << ID_IN_ULTRASONIC_CENTER << " VALUE: "
                          << sensors[ID_IN_ULTRASONIC_CENTER] << endl;
@@ -182,8 +182,8 @@ namespace scaledcars {
                         sort(ur2_list_values.begin(), ur2_list_values.end());
                         int med = (int) ur2_list_values.size() / 2;
                         sensors[ID_IN_ULTRASONIC_SIDE_FRONT] = ur2_list_values[med];
-                    } else {
-                        sensors[ID_IN_ULTRASONIC_SIDE_FRONT] = 0;
+                    //} else {
+                    //    sensors[ID_IN_ULTRASONIC_SIDE_FRONT] = 0;
                     }
                     cout << "[SensorBoardData to conference] ID: " << ID_IN_ULTRASONIC_SIDE_FRONT << " VALUE: "
                          << sensors[ID_IN_ULTRASONIC_SIDE_FRONT] << endl;
@@ -193,8 +193,8 @@ namespace scaledcars {
                         sort(ir_side_front_list_values.begin(), ir_side_front_list_values.end());
                         int med = (int) ir_side_front_list_values.size() / 2;
                         sensors[ID_IN_INFRARED_SIDE_FRONT] = ir_side_front_list_values[med];
-                    } else {
-                        sensors[ID_IN_INFRARED_SIDE_FRONT] = 0;
+                    //} else {
+                    //    sensors[ID_IN_INFRARED_SIDE_FRONT] = 0;
                     }
                     cout << "[SensorBoardData to conference] ID: " << ID_IN_INFRARED_SIDE_FRONT << " VALUE: "
                          << sensors[ID_IN_INFRARED_SIDE_FRONT] << endl;
@@ -203,8 +203,8 @@ namespace scaledcars {
                         sort(ir_side_back_list_values.begin(), ir_side_back_list_values.end());
                         int med = (int) ir_side_back_list_values.size() / 2;
                         sensors[ID_IN_INFRARED_SIDE_BACK] = ir_side_back_list_values[med];
-                    } else {
-                        sensors[ID_IN_INFRARED_SIDE_BACK] = 0;
+                    //} else {
+                    //    sensors[ID_IN_INFRARED_SIDE_BACK] = 0;
                     }
                     cout << "[SensorBoardData to conference] ID: " << ID_IN_INFRARED_SIDE_BACK << " VALUE: "
                          << sensors[ID_IN_INFRARED_SIDE_BACK] << endl;
@@ -214,8 +214,8 @@ namespace scaledcars {
                         sort(ir_back_list_values.begin(), ir_back_list_values.end());
                         int med = (int) ir_back_list_values.size() / 2;
                         sensors[ID_IN_INFRARED_BACK] = ir_back_list_values[med];
-                    } else {
-                        sensors[ID_IN_INFRARED_BACK] = 0;
+                    //} else {
+                    //    sensors[ID_IN_INFRARED_BACK] = 0;
                     }
                     cout << "[SensorBoardData to conference] ID: " << ID_IN_INFRARED_BACK << " VALUE: "
                          << sensors[ID_IN_INFRARED_BACK] << endl;
