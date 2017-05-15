@@ -47,7 +47,7 @@ void Car::run() {
 
 void Car::provideSensorsData() {
     int count = 0;
-//    while (count++ < 5) {
+    while (count++ < 5) {
         infraredBack.encodeAndWrite(ID_IN_INFRARED_BACK, infraredBack.getDistance());
         infraredSideFront.encodeAndWrite(ID_IN_INFRARED_SIDE_FRONT, infraredSideFront.getDistance2());
         infraredSideBack.encodeAndWrite(ID_IN_INFRARED_SIDE_BACK, infraredSideBack.getDistance());
@@ -68,7 +68,7 @@ void Car::provideSensorsData() {
             wheelEncoder.encodeAndWrite(ID_IN_ENCODER, 255);
             encoderPos = wheelEncoder.getDistance();
         }
-//    }
+    }
 }
 
 void Car::rcControl() {
