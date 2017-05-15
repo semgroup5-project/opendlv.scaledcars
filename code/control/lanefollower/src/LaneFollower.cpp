@@ -38,7 +38,7 @@ namespace scaledcars {
 
         // Class variables
         Mat m_image_mat, m_image_new;
-        bool stop = false;
+        int stop = 1;
         double stopCounter = 0, counter = 0;
         String state = "moving", prevState = "moving";
         bool inRightLane = true;   //Flip this value to indicate lane change
@@ -379,9 +379,7 @@ namespace scaledcars {
                 counter = 0;
             }
             if (counter > 2) {
-                stop = true;
-            } else {
-                stop = false;
+                stop++;
             }
             return e;
         }
@@ -464,7 +462,7 @@ namespace scaledcars {
                         if (Sim) {
                             m_vehicleControl.setSpeed(1);
                         } else {
-                            if (stop) {
+                            if ((stop % 2) == 0  ) {
                                 state = "stop";
                                 stopCounter = 0;
                             }else {
@@ -505,19 +503,20 @@ namespace scaledcars {
                         }
                     }
                     if (state == "resume"){
-
+                        m_vehicleControl.setBrakeLights(false);
                             if (Sim) {
                                 m_vehicleControl.setSpeed(1);
                             } else {
-                                if (stopCounter > 25.9999) {
+                                if (stopCounter > 30.9999) {
                                     stopCounter += 0.5;
                                     m_vehicleControl.setSpeed(96);
                                     m_vehicleControl.setSteeringWheelAngle(0);
 
+                                }else{
+                                    state = "moving";
+                                   // m_vehicleControl.setBrakeLights(false);
+                                    m_vehicleControl.setSpeed(96);
                                 }
-                                state = "moving";
-                                m_vehicleControl.setBrakeLights(false);
-                                m_vehicleControl.setSpeed(96);
                             }
                     }
                     if (state == "danger") {
