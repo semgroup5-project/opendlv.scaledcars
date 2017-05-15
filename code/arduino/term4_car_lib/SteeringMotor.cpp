@@ -63,11 +63,11 @@ unsigned int SteeringMotor::filterAngle(int degrees, int isRC) {
 
     } else {
         if (degrees >= MAX_LEFT_ANGLE && degrees < STRAIGHT_DEGREES) {
-            filtered = map(degrees, MAX_LEFT_ANGLE, STRAIGHT_DEGREES - 1, MAX_LEFT_ANGLE, STRAIGHT_DEGREES - 1);
+            filtered = map(degrees, MAX_LEFT_ANGLE, STRAIGHT_DEGREES - 1, MAX_LEFT_ANGLE + 50, STRAIGHT_DEGREES - 1);
         } else if (degrees == STRAIGHT_DEGREES) {
             filtered = STRAIGHT_DEGREES;
         } else if (degrees > STRAIGHT_DEGREES && degrees <= MAX_RIGHT_ANGLE) {
-            filtered = map(degrees, STRAIGHT_DEGREES + 1, MAX_RIGHT_ANGLE, STRAIGHT_DEGREES + 1, MAX_RIGHT_ANGLE);
+            filtered = map(degrees, STRAIGHT_DEGREES + 1, MAX_RIGHT_ANGLE, STRAIGHT_DEGREES + 1, MAX_RIGHT_ANGLE - 50);
         }
     }
     return filtered;

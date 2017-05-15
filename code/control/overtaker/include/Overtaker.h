@@ -1,76 +1,64 @@
-/**
- * overtaker - Sample application for overtaking obstacles.
- * Copyright (C) 2012 - 2015 Christian Berger
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- */
-
 #ifndef OVERTAKER_H_
 #define OVERTAKER_H_
 
 #include "opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h"
 
-namespace automotive {
-    namespace miniature {
+#include <iostream>
+#include <stdint.h>
+#include <memory>
+#include <math.h>
+
+#include <opencv2/opencv.hpp>
+#include <opencv2/highgui/highgui.hpp>
+
+#include <opendavinci/odcore/base/KeyValueConfiguration.h>
+#include <opendavinci/odcore/base/Lock.h>
+#include <opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h>
+#include <opendavinci/odcore/io/conference/ContainerConference.h>
+#include <opendavinci/odcore/data/Container.h>
+#include <opendavinci/odcore/data/TimeStamp.h>
+#include <opendavinci/odcore/wrapper/SharedMemoryFactory.h>
+#include <opendavinci/odcore/wrapper/SharedMemory.h>
+#include <opendavinci/GeneratedHeaders_OpenDaVINCI.h>
+
+#include <automotivedata/GeneratedHeaders_AutomotiveData.h>
+
+#include "automotivedata/generated/automotive/VehicleData.h"
+#include "automotivedata/generated/automotive/miniature/SensorBoardData.h"
+#include "odvdscaledcarsdatamodel/generated/group5/CommunicationLinkMSG.h"
+#include "odvdscaledcarsdatamodel/generated/group5/LaneFollowerMSG.h"
+
+namespace scaledcars {
+    namespace control {
 
         using namespace std;
+        using namespace group5;
+        using namespace odcore::base::module;
+        using namespace odcore::data;
 
-        /**
-         * This class is a skeleton to send driving commands to Hesperia-light's vehicle driving dynamics simulation.
-         */
-        class Overtaker : public odcore::base::module::TimeTriggeredConferenceClientModule {
-            private:
-                /**
-                 * "Forbidden" copy constructor. Goal: The compiler should warn
-                 * already at compile time for unwanted bugs caused by any misuse
-                 * of the copy constructor.
-                 *
-                 * @param obj Reference to an object of this class.
-                 */
-                Overtaker(const Overtaker &/*obj*/);
+        class Overtaker : public DataTriggeredConferenceClientModule {
+        private:
+            Overtaker(const Overtaker &/*obj*/);
+            Overtaker& operator=(const Overtaker &/*obj*/);
 
-                /**
-                 * "Forbidden" assignment operator. Goal: The compiler should warn
-                 * already at compile time for unwanted bugs caused by any misuse
-                 * of the assignment operator.
-                 *
-                 * @param obj Reference to an object of this class.
-                 * @return Reference to this instance.
-                 */
-                Overtaker& operator=(const Overtaker &/*obj*/);
+        public:
+            Overtaker(const int32_t &argc, char **argv);
+            virtual ~Overtaker();
 
-            public:
-                /**
-                 * Constructor.
-                 *
-                 * @param argc Number of command line arguments.
-                 * @param argv Command line arguments.
-                 */
-                Overtaker(const int32_t &argc, char **argv);
 
-                virtual ~Overtaker();
+            automotive::VehicleControl m_vehicleControl;
+            bool Sim;
+            int _state;
 
-                odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
+        private:
+            virtual void setUp();
+            virtual void tearDown();
+            virtual void nextContainer(Container &c);
 
-            private:
-                virtual void setUp();
-
-                virtual void tearDown();
+            void movingMachine();
+            void measuringMachine();
         };
-
     }
-} // automotive::miniature
+}
 
-#endif /*OVERTAKER_H_*/
+#endif
