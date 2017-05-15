@@ -72,7 +72,7 @@ services:
             - odsupercomponent
         restart: on-failure
         privileged: true
-        command: bash -c "sleep 10; /opt/opendlv.scaledcars/bin/scaledcars-control-serialsendhandler --verbose=1 --cid=${CID} --rm=true --freq=30"
+        command: bash -c "sleep 10; /opt/opendlv.scaledcars/bin/scaledcars-control-serialsendhandler --verbose=1 --cid=${CID} --rm=true --freq=15"
 
     #communicationlink
     communicationlink:

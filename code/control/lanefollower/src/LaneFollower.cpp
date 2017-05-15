@@ -38,11 +38,11 @@ namespace scaledcars {
 
         // Class variables
         Mat m_image_mat, m_image_new;
-        int stop = 1;
+        bool stop = false;
         double stopCounter = 0, counter = 0;
         String state = "moving", prevState = "moving";
         bool inRightLane = true;   //Flip this value to indicate lane change
-
+        int currentDistance = 0;
         // Constructor
         LaneFollower::LaneFollower(const int32_t &argc, char **argv) :
                 TimeTriggeredConferenceClientModule(argc, argv, "lanefollower"),
@@ -346,6 +346,7 @@ namespace scaledcars {
                 if (right.x > 0) {
                     line(m_image_new, cvPoint(m_image.cols / 2, y), right, Scalar(255, 0, 0), 1, 8);
                     std::string right_reading = std::to_string((right.x - m_image_new.cols / 2));
+                    currentDistance = (right.x - m_image_new.cols / 2);
 
                     putText(m_image_new, right_reading, Point(m_image_new.cols / 2 + 100, y - 2), FONT_HERSHEY_PLAIN, 1,
                             CV_RGB(255, 255, 255));
@@ -379,7 +380,9 @@ namespace scaledcars {
                 counter = 0;
             }
             if (counter > 2) {
-                stop++;
+                stop = true;
+            } else {
+                stop = false;
             }
             return e;
         }
@@ -440,6 +443,7 @@ namespace scaledcars {
                     const CommunicationLinkMSG communicationLinkMSG = communicationLinkContainer.getData<CommunicationLinkMSG>();
                     _state = communicationLinkMSG.getStateLaneFollower();
                 }
+
                 cerr << "STATE IS : " << _state << endl;
                 if (_state == 1) {
                     bool has_next_frame = false;
@@ -462,7 +466,7 @@ namespace scaledcars {
                         if (Sim) {
                             m_vehicleControl.setSpeed(1);
                         } else {
-                            if ((stop % 2) == 0  ) {
+                            if (stop) {
                                 state = "stop";
                                 stopCounter = 0;
                             }else {
@@ -507,7 +511,7 @@ namespace scaledcars {
                             if (Sim) {
                                 m_vehicleControl.setSpeed(1);
                             } else {
-                                if (stopCounter > 30.9999) {
+                                if (stopCounter > 45.9999) {
                                     stopCounter += 0.5;
                                     m_vehicleControl.setSpeed(96);
                                     m_vehicleControl.setSteeringWheelAngle(0);
@@ -534,6 +538,10 @@ namespace scaledcars {
                             m_vehicleControl.setBrakeLights(true);
                         }
                     }
+                    laneFollowerMSG.setDistanceToRightLane(currentDistance);
+                    laneFollowerMSG.setStateLane(inRightLane);
+                    Container lfMessage(laneFollowerMSG);
+                    getConference().send(laneFollowerMSG);
                     // Create container for finally sending the set values for the control algorithm.
                     Container c2(m_vehicleControl);
                     // Send container.
