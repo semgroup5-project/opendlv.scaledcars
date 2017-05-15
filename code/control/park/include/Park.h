@@ -40,7 +40,6 @@
 #define IR 0
 #define US 1
 #define GAP 13
-#define START 0
 #define RIGHT_TURN 1
 #define LEFT_TURN 2
 #define INGAP_RIGHT_TURN 3
