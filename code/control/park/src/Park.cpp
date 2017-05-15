@@ -57,7 +57,6 @@ namespace scaledcars {
                 irRear(0),
                 irRearRight(0),
                 parkingState(0),
-                parkingType(0),
                 parkingCounter(0),
                 parkingStart(0),
                 backDist(0),
@@ -70,7 +69,7 @@ namespace scaledcars {
         Park::~Park() {}
 
         void Park::setUp() {
-
+			
 
         }
 
@@ -85,22 +84,12 @@ namespace scaledcars {
             if (c.getDataType() == CommunicationLinkMSG::ID()){
                 CommunicationLinkMSG communicationLinkMSG = c.getData<CommunicationLinkMSG>();
                 
-                // DO THE PARKING IF PARKING IS SET
+                // Do parking if it's activated in the CommunicationLink
                 if(isOkay(communicationLinkMSG)){
 
-                	//     setParkingType(communicationLinkMSG.getParkingType());
-                	irRear = communicationLinkMSG.getInfraredBack();
-                	usFront = communicationLinkMSG.getUltraSonicFrontCenter();
-                	irFrontRight = communicationLinkMSG.getInfraredSideFront();
-                	irRearRight = communicationLinkMSG.getInfraredSideBack();
-                	odometer = communicationLinkMSG.getWheelEncoder();
-
-                	IRRObstacle = obstacleDetection(irRear, IR);
-                	IRFRObstacle = obstacleDetection(irFrontRight, IR);
-                	IRRRObstacle = obstacleDetection(irRearRight, IR);
-                	USFObstacle = obstacleDetection(usFront, US);
+                	sensorSetup(communicationLinkMSG);
+                	obstacleSetup();
                 	
-
                 	if (IRRObstacle && irRear < 5 && irRear > 0) {
                     	vc.setBrakeLights(true);
                   	cerr << "TOO CLOSE AT THE BACK, EMERGENCY STOP!!" << endl;
@@ -110,7 +99,7 @@ namespace scaledcars {
 //                    cerr << "TOO CLOSE AT THE FRONT, EMERGENCY STOP!!" << endl;
 //                }
                 	
-                	// PARK IF THE CAR IS NOT PARKED
+                	// Parking
                 	if(communicationLinkMSG.getUnpark() == 0 && !isParked){
                		if (isParking) {
                   		parallelPark();
@@ -120,7 +109,7 @@ namespace scaledcars {
                   		cout << "PARKING : Finding values" << endl;
                 		}
                 	
-                	// UNPARK IF THE CAR IS PARKED
+                	// Unparking
                 	} else if (communicationLinkMSG.getUnpark() == 1 && isParked){
                 		unpark();
                 	}
@@ -285,14 +274,9 @@ namespace scaledcars {
 */
         
         void Park::unpark(){
-            /*switch (parkingState) {
+            switch (parkingState) {
                 case START: {
 
-                    if (parkingType == PARALLEL) {
-                        setParkingState(LEFT_TURN);
-                    } else if (parkingType == BOX) {
-                        setParkingState(RIGHT_TURN);
-                    }
                     vc.setBrakeLights(false);
                 }
                     break;
@@ -326,14 +310,8 @@ namespace scaledcars {
                     setParkingState(START);
                     cout << "UNPARKING : I'm unparked" << endl;
                 }
-            }*/
+            }
         }
-
-
-        void Park::setParkingType(int type) {
-            parkingType = type;
-        }
-
 
         void Park::parallelPark() {
             backEnd = odometer;
@@ -481,6 +459,21 @@ namespace scaledcars {
         		return false;
         }
         
+        void Park::sensorSetup(CommunicationLinkMSG communicationLinkMSG){
+        		irRear = communicationLinkMSG.getInfraredBack();
+            usFront = communicationLinkMSG.getUltraSonicFrontCenter();
+            irFrontRight = communicationLinkMSG.getInfraredSideFront();
+            irRearRight = communicationLinkMSG.getInfraredSideBack();
+            odometer = communicationLinkMSG.getWheelEncoder();
+        }
+        
+        void Park::obstacleSetup(){
+        		IRRObstacle = obstacleDetection(irRear, IR);
+            IRFRObstacle = obstacleDetection(irFrontRight, IR);
+            IRRRObstacle = obstacleDetection(irRearRight, IR);
+            USFObstacle = obstacleDetection(usFront, US);
+        }
+ 
     }
 } // automotive::miniature
 

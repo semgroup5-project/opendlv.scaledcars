@@ -17,8 +17,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#ifndef PARK_H_
-#define PARK_H_
+#ifndef PARALLELPARKER_H_
+#define PARALLELPARKER_H_
 
 #include <cstdio>
 #include <cmath>
@@ -31,24 +31,14 @@
 #include "opendavinci/GeneratedHeaders_OpenDaVINCI.h"
 #include "automotivedata/GeneratedHeaders_AutomotiveData.h"
 
-#include <opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h>
+#include "opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h"
 #include "odvdscaledcarsdatamodel/generated/group5/CommunicationLinkMSG.h"
-#include "odvdscaledcarsdatamodel/generated/group5/ParkerMSG.h"
 #include <automotivedata/GeneratedHeaders_AutomotiveData.h>
 #include <opendavinci/GeneratedHeaders_OpenDaVINCI.h>
 
-#define IR 0
+#define PI 3.14159265859
 #define US 1
-#define GAP 13
-#define START 0
-#define RIGHT_TURN 1
-#define LEFT_TURN 2
-#define INGAP_RIGHT_TURN 3
-#define END 4
-#define INTHEMIDD 5
-//MS
-//#define WAITFORWHEELANGLECHANGE 100
-//MS
+#define IR 2
 
 namespace scaledcars {
     namespace control {
@@ -64,7 +54,7 @@ namespace scaledcars {
         /**
          * This class is a skeleton to send driving commands to Hesperia-light's vehicle driving dynamics simulation.
          */
-        class Park : public odcore::base::module::DataTriggeredConferenceClientModule {
+        class ParallelParker : public odcore::base::module::TimeTriggeredConferenceClientModule {
         private:
             /**
              * "Forbidden" copy constructor. Goal: The compiler should warn
@@ -73,7 +63,7 @@ namespace scaledcars {
              *
              * @param obj Reference to an object of this class.
              */
-            Park(const Park &/*obj*/);
+            ParallelParker(const ParallelParker &/*obj*/);
 
             /**
              * "Forbidden" assignment operator. Goal: The compiler should warn
@@ -83,7 +73,7 @@ namespace scaledcars {
              * @param obj Reference to an object of this class.
              * @return Reference to this instance.
              */
-            Park &operator=(const Park &/*obj*/);
+            ParallelParker &operator=(const ParallelParker &/*obj*/);
 
         public:
             /**
@@ -92,80 +82,34 @@ namespace scaledcars {
              * @param argc Number of command line arguments.
              * @param argv Command line arguments.
              */
-            Park(const int32_t &argc, char **argv);
+            ParallelParker(const int32_t &argc, char **argv);
 
-            virtual ~Park();
+            virtual ~ParallelParker();
 
-            virtual void nextContainer(Container &c);
+            odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
 
-            // Methods
         private:
+            bool sim;
+            bool IRRObstacle;
+            bool USFObstacle;
+            bool IRFRObstacle;
+            int guardGoodV;
+            int guardBadV;
+            double odometer;
+            double usFront;
+            double irFrontRight;
+            double irRear;
+            double irRearRight;
+
             virtual void setUp();
 
             virtual void tearDown();
 
-            void parkingFinder();
+            bool obstacleDetect(int i,int id);
 
-            void parallelPark();
+            CommunicationLinkMSG communicationLinkMSG;
 
-            void setParkingState(int state);
-
-            double adjDistCalculation(double start);
-
-            bool obstacleDetection(int i, int id);
-
-            void park();
-
-            void unpark();
-
-            void sendParkerMSG();
-            
-            bool isOkay(CommunicationLinkMSG c);
-            
-            void sensorSetup(CommunicationLinkMSG c);
-            
-            void obstacleSetup();
-
-				VehicleControl vc;
-				
-				double parkingSpace;
-
-            bool IRRObstacle;
-
-            bool USFObstacle;
-
-            bool IRFRObstacle;
-
-            bool IRRRObstacle;
-
-            double odometer;
-
-            double usFront;
-
-            double irFrontRight;
-
-            double irRear;
-
-            double irRearRight;
-
-            int parkingState;
-
-            int parkingCounter;
-
-            int parkingStart;
-
-            double backDist;
-
-            double backStart;
-
-            double backEnd;
-
-            double adjDist;
-
-            bool isParking;
-            
-            bool isParked;
-
+            VehicleControl vc;
 
         };
 
