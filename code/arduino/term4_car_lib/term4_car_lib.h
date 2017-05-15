@@ -150,6 +150,7 @@ public:
     void provideSensorsData();
     void rcControl();
     void automatedDrive();
+    void readSerial();
     int readChannel1();
     int readChannel2();
     int isFunctionChanged();
