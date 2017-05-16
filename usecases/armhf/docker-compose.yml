@@ -116,7 +116,7 @@ services:
         - ./DIT-168:/opt/configuration
         depends_on:
             - odsupercomponent
-            - odsimcamera
+            - proxy
             - communicationlink
         restart: on-failure
         privileged: true
