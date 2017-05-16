@@ -101,6 +101,6 @@ services:
             - communicationlink
         restart: on-failure
         privileged: true
-        command: bash -c "sleep 15; /opt/opendlv.scaledcars/bin/scaledcars-control-parallelparker --verbose=1  --cid=${CID} --freq=10"
+        command: bash -c "sleep 15; /opt/opendlv.scaledcars/bin/scaledcars-control-park --verbose=1  --cid=${CID} --freq=10"
 
 

@@ -39,12 +39,15 @@
 
 #define IR 0
 #define US 1
-#define GAP 10
-#define START 0
+#define GAP 13
 #define RIGHT_TURN 1
 #define LEFT_TURN 2
 #define INGAP_RIGHT_TURN 3
 #define END 4
+
+//MS
+//#define WAITFORWHEELANGLECHANGE 100
+//MS
 
 namespace scaledcars {
     namespace control {
@@ -108,7 +111,7 @@ namespace scaledcars {
 
             void setParkingType(int type);
 
-            double adjDistCalculation(double start, double end);
+            double adjDistCalculation(double start);
 
             bool obstacleDetection(int i, int id);
 
@@ -135,6 +138,8 @@ namespace scaledcars {
             double odometer;
 
             double usFront;
+
+            double usFrontRight;
 
             double irFrontRight;
 
