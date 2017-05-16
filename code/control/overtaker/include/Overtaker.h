@@ -27,6 +27,7 @@
 #include "automotivedata/generated/automotive/miniature/SensorBoardData.h"
 #include "odvdscaledcarsdatamodel/generated/group5/CommunicationLinkMSG.h"
 #include "odvdscaledcarsdatamodel/generated/group5/LaneFollowerMSG.h"
+#include "odvdscaledcarsdatamodel/generated/group5/OvertakerMSG.h"
 
 namespace scaledcars {
     namespace control {
@@ -55,8 +56,9 @@ namespace scaledcars {
             virtual void tearDown();
             virtual void nextContainer(Container &c);
 
-            void movingMachine();
             void measuringMachine();
+
+            OvertakerMSG overtakerMSG;
         };
     }
 }

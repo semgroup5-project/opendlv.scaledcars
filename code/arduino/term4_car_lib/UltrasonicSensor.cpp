@@ -61,7 +61,7 @@ unsigned int UltrasonicSensor::getDistance() {
         reading |= Wire.read(); // receive low byte as lower 8 bits
     }
 
-    if (reading > 60) {
+    if (reading > 62) {
         return 0;
     }
     return reading;
