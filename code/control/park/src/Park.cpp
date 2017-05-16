@@ -93,7 +93,7 @@ namespace scaledcars {
                     //     setParkingType(communicationLinkMSG.getParkingType());
                     irRear = communicationLinkMSG.getInfraredBack();
                     usFront = communicationLinkMSG.getUltraSonicFrontCenter();
-                    usFrontRight = communicationLinkMSG.getUltrasonicFrontRight();
+                    usFrontRight = communicationLinkMSG.getUltraSonicFrontRight();
                     irFrontRight = communicationLinkMSG.getInfraredSideFront();
                     irRearRight = communicationLinkMSG.getInfraredSideBack();
                     odometer = communicationLinkMSG.getWheelEncoder();
