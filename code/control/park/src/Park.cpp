@@ -33,13 +33,10 @@ namespace scaledcars {
         //	DIFFERENT PARKING STATES   //
         //*****************************//
         const int PARALLEL = 1;
-        // const int BOX = 0;
         double counterS = 0;
         double counterO = 0;
         int counter = 0;
-        //MS
-        //int ChangeWheelAngleCounter =0;
-        //MS
+
         bool parked = false;
         double timer = 0;
         double turnCount = 0;
@@ -73,7 +70,6 @@ namespace scaledcars {
 
         void Park::setUp() {
 
-
         }
 
         void Park::tearDown() {
@@ -103,14 +99,6 @@ namespace scaledcars {
                 IRRRObstacle = obstacleDetection(irRearRight, IR);
                 USFObstacle = obstacleDetection(usFront, US);
 
-//                if (IRRObstacle && irRear < 5 && irRear > 0) {
-//                    vc.setBrakeLights(true);
-//                    cerr << "TOO CLOSE AT THE BACK, EMERGENCY STOP!!" << endl;
-//                }
-//                if (USFObstacle && usFront > 0 && usFront < 10) {
-//                    vc.setBrakeLights(true);
-//                    cerr << "TOO CLOSE AT THE FRONT, EMERGENCY STOP!!" << endl;
-//                }
                 if (isParking) {
                     parallelPark();
                     cout << "PARKING : Now I'm parking" << endl;
