@@ -40,10 +40,10 @@ namespace scaledcars {
         bool parked = false;
         double timer = 0;
         double turnCount = 0;
+        CommunicationLinkMSG communicationLinkMSG;
 
         Park::Park(const int32_t &argc, char **argv) :
                 TimeTriggeredConferenceClientModule(argc, argv, "Park"),
-                communicationLinkMSG(),
                 vc(),
                 parkingSpace(0),
                 IRRObstacle(false),
@@ -85,7 +85,7 @@ namespace scaledcars {
 
                 Container communicationLinkContainer = getKeyValueDataStore().get(CommunicationLinkMSG::ID());
                 if (communicationLinkContainer.getDataType() == CommunicationLinkMSG::ID()) {
-                    const CommunicationLinkMSG communicationLinkMSG = communicationLinkContainer.getData<CommunicationLinkMSG>();
+                    communicationLinkMSG = communicationLinkContainer.getData<CommunicationLinkMSG>();
                     _state = communicationLinkMSG.getStateParker();
                 }
 
@@ -191,9 +191,9 @@ namespace scaledcars {
             cout << "adjDist:   " << adjDist << endl;
 
             switch (parkingState) {
-                case START: {
+              //  case START: {
 
-                    cout << "start and parkingSpace is " << parkingSpace << endl;
+                //    cout << "start and parkingSpace is " << parkingSpace << endl;
                     //    vc.setBrakeLights(false);
                     //     vc.setSpeed(96);
                     // timer+=0.5;
@@ -202,7 +202,7 @@ namespace scaledcars {
                     // vc.setSpeed(96);
 
 
-                }
+            //    }
                     break;
                 case RIGHT_TURN: {
 

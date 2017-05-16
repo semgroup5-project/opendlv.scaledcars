@@ -121,8 +121,6 @@ namespace scaledcars {
 
             void sendParkerMSG();
 
-            CommunicationLinkMSG communicationLinkMSG;
-
             VehicleControl vc;
 
             double parkingSpace;
