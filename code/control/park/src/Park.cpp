@@ -35,7 +35,7 @@ namespace scaledcars {
         const int PARALLEL = 1;
         double counterS = 0;
         double counterO = 0;
-        int counter = 0;
+        int counter = 0, _state = 0;
 
         bool parked = false;
         double timer = 0;
@@ -83,35 +83,41 @@ namespace scaledcars {
             while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
                    odcore::data::dmcp::ModuleStateMessage::RUNNING) {
 
-                Container communicationLinkMSGContainer = getKeyValueDataStore().get(CommunicationLinkMSG::ID());
-                communicationLinkMSG = communicationLinkMSGContainer.getData<CommunicationLinkMSG>();
-
-                //     setParkingType(communicationLinkMSG.getParkingType());
-                irRear = communicationLinkMSG.getInfraredBack();
-                usFront = communicationLinkMSG.getUltraSonicFrontCenter();
-                usFrontRight = communicationLinkMSG.getUltrasonicFrontRight();
-                irFrontRight = communicationLinkMSG.getInfraredSideFront();
-                irRearRight = communicationLinkMSG.getInfraredSideBack();
-                odometer = communicationLinkMSG.getWheelEncoder();
-
-                IRRObstacle = obstacleDetection(irRear, IR);
-                IRFRObstacle = obstacleDetection(irFrontRight, IR);
-                IRRRObstacle = obstacleDetection(irRearRight, IR);
-                USFObstacle = obstacleDetection(usFront, US);
-
-                if (isParking) {
-                    parallelPark();
-                    cout << "PARKING : Now I'm parking" << endl;
-                } else if (!isParking) {
-                    parkingFinder();
-                    cout << "PARKING : Finding values" << endl;
-                } else if (parked) {
-                    vc.setBrakeLights(true);
-                    cout << "Car Parked!" << endl;
+                Container communicationLinkContainer = getKeyValueDataStore().get(CommunicationLinkMSG::ID());
+                if (communicationLinkContainer.getDataType() == CommunicationLinkMSG::ID()) {
+                    const CommunicationLinkMSG communicationLinkMSG = communicationLinkContainer.getData<CommunicationLinkMSG>();
+                    _state = communicationLinkMSG.getStateParker();
                 }
 
-                Container c(vc);
-                getConference().send(c);
+                if (_state == 1){
+                    //     setParkingType(communicationLinkMSG.getParkingType());
+                    irRear = communicationLinkMSG.getInfraredBack();
+                    usFront = communicationLinkMSG.getUltraSonicFrontCenter();
+                    usFrontRight = communicationLinkMSG.getUltrasonicFrontRight();
+                    irFrontRight = communicationLinkMSG.getInfraredSideFront();
+                    irRearRight = communicationLinkMSG.getInfraredSideBack();
+                    odometer = communicationLinkMSG.getWheelEncoder();
+
+                    IRRObstacle = obstacleDetection(irRear, IR);
+                    IRFRObstacle = obstacleDetection(irFrontRight, IR);
+                    IRRRObstacle = obstacleDetection(irRearRight, IR);
+                    USFObstacle = obstacleDetection(usFront, US);
+
+                    if (isParking) {
+                        parallelPark();
+                        cout << "PARKING : Now I'm parking" << endl;
+                    } else if (!isParking) {
+                        parkingFinder();
+                        cout << "PARKING : Finding values" << endl;
+                    } else if (parked) {
+                        vc.setBrakeLights(true);
+                        cout << "Car Parked!" << endl;
+                    }
+
+                    Container c(vc);
+                    getConference().send(c);
+                }
+
 
             }
             return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
