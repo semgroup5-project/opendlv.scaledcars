@@ -34,11 +34,14 @@ namespace scaledcars {
             communicationLinkMSG.setStateLaneFollower(kv.getValue<int32_t>("communicationlink.functionlane"));
             int func2 = kv.getValue<int32_t>("communicationlink.function2");
 
-            if (func2) {
+            if (func2 == 1) {
                 communicationLinkMSG.setStateOvertaker(0);
                 communicationLinkMSG.setStateParker(1);
-            } else {
+            } else if (func2 == 0){
                 communicationLinkMSG.setStateOvertaker(1);
+                communicationLinkMSG.setStateParker(0);
+            } else {
+                communicationLinkMSG.setStateOvertaker(0);
                 communicationLinkMSG.setStateParker(0);
             }
         }

@@ -87,38 +87,38 @@ namespace scaledcars {
                 if (communicationLinkContainer.getDataType() == CommunicationLinkMSG::ID()) {
                     communicationLinkMSG = communicationLinkContainer.getData<CommunicationLinkMSG>();
                     _state = communicationLinkMSG.getStateParker();
-                }
 
-                if (_state == 1){
-                    //     setParkingType(communicationLinkMSG.getParkingType());
-                    irRear = communicationLinkMSG.getInfraredBack();
-                    usFront = communicationLinkMSG.getUltraSonicFrontCenter();
-                    usFrontRight = communicationLinkMSG.getUltraSonicFrontRight();
-                    irFrontRight = communicationLinkMSG.getInfraredSideFront();
-                    irRearRight = communicationLinkMSG.getInfraredSideBack();
-                    odometer = communicationLinkMSG.getWheelEncoder();
 
-                    IRRObstacle = obstacleDetection(irRear, IR);
-                    IRFRObstacle = obstacleDetection(irFrontRight, IR);
-                    IRRRObstacle = obstacleDetection(irRearRight, IR);
-                    USFObstacle = obstacleDetection(usFront, US);
+                    if (_state == 1) {
+                        //     setParkingType(communicationLinkMSG.getParkingType());
+                        irRear = communicationLinkMSG.getInfraredBack();
+                        usFront = communicationLinkMSG.getUltraSonicFrontCenter();
+                        usFrontRight = communicationLinkMSG.getUltraSonicFrontRight();
+                        irFrontRight = communicationLinkMSG.getInfraredSideFront();
+                        irRearRight = communicationLinkMSG.getInfraredSideBack();
+                        odometer = communicationLinkMSG.getWheelEncoder();
 
-                    if (isParking) {
-                        parallelPark();
-                        cout << "PARKING : Now I'm parking" << endl;
-                    } else if (!isParking) {
-                        parkingFinder();
-                        cout << "PARKING : Finding values" << endl;
-                    } else if (parked) {
-                        vc.setBrakeLights(true);
-                        cout << "Car Parked!" << endl;
+                        IRRObstacle = obstacleDetection(irRear, IR);
+                        IRFRObstacle = obstacleDetection(irFrontRight, IR);
+                        IRRRObstacle = obstacleDetection(irRearRight, IR);
+                        USFObstacle = obstacleDetection(usFront, US);
+
+                        if (isParking) {
+                            parallelPark();
+                            cout << "PARKING : Now I'm parking" << endl;
+                        } else if (!isParking) {
+                            parkingFinder();
+                            cout << "PARKING : Finding values" << endl;
+                        } else if (parked) {
+                            vc.setBrakeLights(true);
+                            cout << "Car Parked!" << endl;
+                        }
+
+                        Container c(vc);
+                        getConference().send(c);
                     }
 
-                    Container c(vc);
-                    getConference().send(c);
                 }
-
-
             }
             return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
         }
@@ -128,7 +128,7 @@ namespace scaledcars {
             // Parking space starting point
             vc.setBrakeLights(false);
             vc.setSpeed(96);
-            double angle = (irRearRight-irFrontRight ) / 10;
+            double angle = (irRearRight - irFrontRight) / 10;
             if (irFrontRight < 10 && irFrontRight > 0 && (int) (irRearRight - irFrontRight) != 0) {
 
                 vc.setSteeringWheelAngle(angle);
@@ -171,10 +171,10 @@ namespace scaledcars {
                 //if (timer >= 4) {
                 //  vc.setBrakeLights(true);
 
-   //             if (IRRObstacle && IRFRObstacle && (int) (irRearRight - irFrontRight) == 0) {
-                    isParking = true;
-                    parkingState = RIGHT_TURN;
-     //           }
+                //             if (IRRObstacle && IRFRObstacle && (int) (irRearRight - irFrontRight) == 0) {
+                isParking = true;
+                parkingState = RIGHT_TURN;
+                //           }
 
                 //}
             }
@@ -191,19 +191,19 @@ namespace scaledcars {
             cout << "adjDist:   " << adjDist << endl;
 
             switch (parkingState) {
-              //  case START: {
+                //  case START: {
 
                 //    cout << "start and parkingSpace is " << parkingSpace << endl;
-                    //    vc.setBrakeLights(false);
-                    //     vc.setSpeed(96);
-                    // timer+=0.5;
+                //    vc.setBrakeLights(false);
+                //     vc.setSpeed(96);
+                // timer+=0.5;
 
 //                        vc.setBrakeLights(true);
-                    // vc.setSpeed(96);
+                // vc.setSpeed(96);
 
 
-            //    }
-                    break;
+                //    }
+                break;
                 case RIGHT_TURN: {
 
                     //  vc.setBrakeLights(false);
@@ -272,14 +272,14 @@ namespace scaledcars {
                         ChangeWheelAngleCounter = 0;
                     }*/
                     //MS END
-                        cout<< "odo - backEnd"<<(odometer - backEnd)<<endl;
-                    if ( (abs(odometer - backEnd) <= 3) || (obstacleDetection(usFront, 4))){
+                    cout << "odo - backEnd" << (odometer - backEnd) << endl;
+                    if ((abs(odometer - backEnd) <= 3) || (obstacleDetection(usFront, 4))) {
                         vc.setSpeed(96);
                         vc.setSteeringWheelAngle(0.24);
 
                     } else {
                         vc.setBrakeLights(true);
-                        parked =  true;
+                        parked = true;
                     }
 
                 }
@@ -325,7 +325,7 @@ namespace scaledcars {
                 case (4) : {
                     if ((i > 1) && (i < 30)) {
                         ifObstacle = true;
-                    } else if (i < 1){
+                    } else if (i < 1) {
                         ifObstacle = false;
                     }
                 }

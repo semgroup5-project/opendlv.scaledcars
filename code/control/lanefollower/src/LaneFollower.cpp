@@ -37,6 +37,7 @@ namespace scaledcars {
         using namespace group5;
 
         // Class variables
+        int _stop = 0;
         Mat m_image_mat, m_image_new;
         bool stop = false;
         double stopCounter = 0, counter = 0;
@@ -446,6 +447,7 @@ namespace scaledcars {
 
                 cerr << "STATE IS : " << _state << endl;
                 if (_state == 1) {
+                    _stop = 0;
                     bool has_next_frame = false;
 
                     // Get the most recent available container for a SharedImage.
@@ -548,6 +550,12 @@ namespace scaledcars {
                     Container c2(m_vehicleControl);
                     // Send container.
                     getConference().send(c2);
+                } else if(!_state && !_stop){
+                    _stop = 1;
+                    m_vehicleControl.setBrakeLights(true);
+                    Container c3(m_vehicleControl);
+                    // Send container.
+                    getConference().send(c3);
                 }
             }
             return ModuleExitCodeMessage::OKAY;

@@ -126,25 +126,31 @@ namespace scaledcars {
 
                     Container c3(m_vehicleControl);
                     getConference().send(c3);
-                } else {
-                    US_C = communicationLinkMSG.getUltraSonicFrontCenter();
-                    double distance = US_C;
-                    double us = abs(US_C - us_c_old);
-
-                    if ((us <= 5) && distance <= 62) {
-                        objectPlausibleCount++;
-                        us_c_old = distance;
-                        if (objectPlausibleCount >= OBJECT_PLAUSIBLE_COUNT) {
-
-                            objectPlausibleCount = 0;
-                            us_c_old = 0;
-
-                            overtakerMSG.setStateStop(1);
-                            Container c1(overtakerMSG);
-                            getConference().send(c1);
-                        }
-                    }
                 }
+//                else
+//                {
+//                    US_C = communicationLinkMSG.getUltraSonicFrontCenter();
+//                    double distance = US_C;
+//                    double us = abs(US_C - us_c_old);
+//
+//                    if ((us <= 5) && distance <= 62) {
+//                        objectPlausibleCount++;
+//                        us_c_old = distance;
+//                        if (objectPlausibleCount >= OBJECT_PLAUSIBLE_COUNT) {
+//
+//                            objectPlausibleCount = 0;
+//                            us_c_old = 0;
+//
+//                            overtakerMSG.setStateStop(1);
+//                            Container c1(overtakerMSG);
+//                            getConference().send(c1);
+//
+//                            m_vehicleControl.setBrakeLights(true);
+//                            Container c4(m_vehicleControl);
+//                            getConference().send(c4);
+//                        }
+//                    }
+//                }
             }
         }
 
