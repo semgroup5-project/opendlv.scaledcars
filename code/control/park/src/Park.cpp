@@ -134,16 +134,18 @@ namespace scaledcars {
             // Parking space starting point
             vc.setBrakeLights(false);
             vc.setSpeed(96);
-            double angle = (irFrontRight - irRearRight) / 10;
-            if (irFrontRight < 15 && irFrontRight > 0 && (int) (irRearRight - irFrontRight) != 0) {
+            double angle = (irRearRight-irFrontRight ) / 10;
+            if (irFrontRight < 10 && irFrontRight > 0 && (int) (irRearRight - irFrontRight) != 0) {
 
                 vc.setSteeringWheelAngle(angle);
 
-            } else if (irFrontRight < 0) {
+            } else if (irFrontRight < 0 && (int) (irRearRight - irFrontRight) == 0) {
                 if (usFrontRight < 20 && usFrontRight > 0) {
-                    vc.setSteeringWheelAngle(-0.3);
+                    vc.setSteeringWheelAngle(-0.26
+                    );
+
                 } else {
-                    vc.setSteeringWheelAngle(abs(angle));
+                    vc.setSteeringWheelAngle(angle);
                 }
 
             }
@@ -175,10 +177,10 @@ namespace scaledcars {
                 //if (timer >= 4) {
                 //  vc.setBrakeLights(true);
 
-                if (IRRObstacle && IRFRObstacle && (int) (irRearRight - irFrontRight) == 0) {
+   //             if (IRRObstacle && IRFRObstacle && (int) (irRearRight - irFrontRight) == 0) {
                     isParking = true;
                     parkingState = RIGHT_TURN;
-                }
+     //           }
 
                 //}
             }
@@ -225,7 +227,7 @@ namespace scaledcars {
                         vc.setSteeringWheelAngle(1.5);
                         cout << "PARKING : Turning right" << endl;
                         cout << "calc " << (odometer - backStart) << endl;
-                        if (odometer - backStart >= (adjDist * 0.8)) {
+                        if (odometer - backStart >= (adjDist * 0.60)) {
                             // vc.setBrakeLights(true);
                             setParkingState(LEFT_TURN);
                         }
@@ -256,7 +258,7 @@ namespace scaledcars {
                     //if (adjDist >= (GAP / 1.5)/*&& parkingCounter < 0 */ ) {
 
                     //     if (odometer - backStart >= (adjDist * 1.1)) {
-                    if (obstacleDetection(irRear, 3) || (odometer - backStart >= (adjDist * 1.1))) {
+                    if (obstacleDetection(irRear, 3) || (odometer - backStart >= (adjDist * 1.125))) {
                         //  vc.setBrakeLights(true);
 
                         setParkingState(INGAP_RIGHT_TURN);
@@ -276,12 +278,14 @@ namespace scaledcars {
                         ChangeWheelAngleCounter = 0;
                     }*/
                     //MS END
-                    if ((!(obstacleDetection(usFront, 4))) || (odometer - backEnd) < 3) {
+                        cout<< "odo - backEnd"<<(odometer - backEnd)<<endl;
+                    if ( (abs(odometer - backEnd) <= 3) || (obstacleDetection(usFront, 4))){
                         vc.setSpeed(96);
                         vc.setSteeringWheelAngle(0.24);
+
                     } else {
                         vc.setBrakeLights(true);
-                        parked = true;
+                        parked =  true;
                     }
 
                 }
@@ -327,7 +331,7 @@ namespace scaledcars {
                 case (4) : {
                     if ((i > 1) && (i < 30)) {
                         ifObstacle = true;
-                    } else {
+                    } else if (i < 1){
                         ifObstacle = false;
                     }
                 }
