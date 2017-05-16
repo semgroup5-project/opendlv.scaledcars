@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<testsuites>
-<testsuite name="scaledcars-perception-example-ExamplePerceptionTestSuite.h" tests="1" failures="0" errors="0" time="0" timestamp="Fri Apr 21 11:35:03 2017" file="/opt/opendlv.scaledcars.sources/code/perception/example/testsuites/ExamplePerceptionTestSuite.h" >
-    <testcase name="testApplication" classname="ExamplePerceptionTest" line="37" >    </testcase>
-</testsuite>
-</testsuites>

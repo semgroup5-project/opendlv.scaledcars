@@ -15,6 +15,7 @@ void SteeringMotor::arm() {
 }
 
 void SteeringMotor::setAngle(int degrees, int isRC) { // receives some degrees in the scale of MAX_LEFT_ANGLE, MAX_RIGHT_ANGLE
+    //write(degrees);
     if (degrees == 0 && isRC) {
         _angle = STRAIGHT_DEGREES;
     } else{
@@ -23,8 +24,10 @@ void SteeringMotor::setAngle(int degrees, int isRC) { // receives some degrees i
         } else {
             _angle = filterAngle(degrees, 1); //_angle now holds a value between MAX_LEFT_RAW_DEGREES and MAX_RIGHT_RAW_DEGREES
         }
+
         write(_angle); //writes the angle to the servo motor
-    }}
+    }
+ }
 
 void SteeringMotor::setDegrees() {
     STRAIGHT_DEGREES = 90;
@@ -60,11 +63,11 @@ unsigned int SteeringMotor::filterAngle(int degrees, int isRC) {
 
     } else {
         if (degrees >= MAX_LEFT_ANGLE && degrees < STRAIGHT_DEGREES) {
-            filtered = map(degrees, MAX_LEFT_ANGLE, STRAIGHT_DEGREES - 1, 50, STRAIGHT_DEGREES - 1);
+            filtered = map(degrees, MAX_LEFT_ANGLE, STRAIGHT_DEGREES - 1, MAX_LEFT_ANGLE + 50, STRAIGHT_DEGREES - 1);
         } else if (degrees == STRAIGHT_DEGREES) {
             filtered = STRAIGHT_DEGREES;
         } else if (degrees > STRAIGHT_DEGREES && degrees <= MAX_RIGHT_ANGLE) {
-            filtered = map(degrees, STRAIGHT_DEGREES + 1, MAX_RIGHT_ANGLE, STRAIGHT_DEGREES + 1, 130);
+            filtered = map(degrees, STRAIGHT_DEGREES + 1, MAX_RIGHT_ANGLE, STRAIGHT_DEGREES + 1, MAX_RIGHT_ANGLE - 50);
         }
     }
     return filtered;

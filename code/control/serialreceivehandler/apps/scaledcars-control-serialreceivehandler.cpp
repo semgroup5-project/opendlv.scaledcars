@@ -1,5 +1,5 @@
 /**
- * serialreceivehandler
+ * SerialReceiveHandler
  * Copyright (C) 2017 Mattias Landkvist
  *
  * This program is free software; you can redistribute it and/or

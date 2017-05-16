@@ -1,4 +1,4 @@
-# boxparker - Sample application for realizing a box parking car.
+# parallelParkingSim - Sample application for realizing a box parking car.
 # Copyright (C) 2012 - 2015  Christian Berger
 #
 # This program is free software; you can redistribute it and/or

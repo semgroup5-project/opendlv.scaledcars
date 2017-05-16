@@ -49,7 +49,7 @@ unsigned int UltrasonicSensor::getDistance() {
     Wire.write(byte(0x51));
     Wire.endTransmission();
 
-    delay(_delay);
+    wait(_delay);
     Wire.beginTransmission(_address);
     Wire.write(byte(0x02));
     Wire.endTransmission();
@@ -60,6 +60,10 @@ unsigned int UltrasonicSensor::getDistance() {
         reading = reading << 8;    // shift high byte to be high 8 bits
         reading |= Wire.read(); // receive low byte as lower 8 bits
     }
+
+    if (reading > 60) {
+        return 0;
+    }
     return reading;
 }
 
@@ -68,7 +72,7 @@ unsigned short UltrasonicSensor::getLightReading() {
     Wire.write(byte(0x00));
     Wire.write(byte(0x51));
     Wire.endTransmission();
-    delay(_delay);
+    wait(_delay);
     Wire.beginTransmission(_address);
     Wire.write(byte(0x01));
     Wire.endTransmission();

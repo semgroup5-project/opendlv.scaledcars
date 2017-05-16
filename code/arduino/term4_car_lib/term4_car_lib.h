@@ -7,6 +7,7 @@
 #include <Wire.h>
 #include <Servo.h>
 #include "protocol.h"
+#include "Netstrings.h"
 
 #define BAUD 115200
 #define US_C 0x73 //front ultrasonic pin
@@ -24,6 +25,7 @@
 #define greenPin 24 //LED green pin
 #define bluePin 26 //LED blue pin
 #define COMMON_ANODE //LED common
+#define RELAY_PIN 12
 
 //Signal Conditioning limits for RC controller
 #define lo 1000
@@ -39,7 +41,9 @@ public:
     virtual unsigned int getDistance() = 0; //to be implemented by the child classes
     unsigned int getMedianDistance(short iterations = DEFAULT_ITERATIONS);
     void encodeAndWrite(int id, int value);
-
+    void wait(long milliseconds);
+    unsigned long currentMillis;
+    long interval;
 private:
     static const short DEFAULT_ITERATIONS;
 protected:
@@ -51,10 +55,12 @@ public:
     explicit InfraredSensor();
     void attach(unsigned short pin);
     unsigned int getDistance();
+    unsigned int getDistance2();
     void setMinAndMax(unsigned int min, unsigned int max);
 private:
     unsigned int readAnalogInput();
     unsigned int voltsToCentimeters(unsigned int volts);
+    unsigned int voltsToCentimeters2(unsigned int volts);
     unsigned short _pin;
 protected:
     unsigned int _maxDistance, _minDistance;
@@ -125,7 +131,8 @@ public:
 private:
     void setFreqsAndSpeeds();
     unsigned short _pin; //the pin the ESC is attached to
-    int filterSpeed(int speed, int isRC);
+    int filterSpeed(int speed);
+    int indicateDirection(int speed);
     int _speed, _direction;
     unsigned short FULL_FORWARD, FULL_BACKWARD, IDLE_SPEED; //what percentage of the motor's power is allowed be used at most
     int IDLE_RAW_SPEED, MAX_FRONT_RAW_SPEED, MAX_BACK_RAW_SPEED; //the raw value (in whatever metric, usually pwm signal) that the motors are idle, throttling full speed backwards and forward
@@ -139,9 +146,11 @@ class Car {
 public:
     explicit Car();
     void setUp();
+    void run();
     void provideSensorsData();
     void rcControl();
     void automatedDrive();
+    void readSerial();
     int readChannel1();
     int readChannel2();
     int isFunctionChanged();
@@ -175,6 +184,11 @@ private:
     int encoderPos, odometerStart, odometer;
     unsigned long currentMillis;
     long interval;
+    protocol_data dataMotor;
+    protocol_data dataServo;
+    long timer;
+    long oldMillis;
+    int noData;
 };
 
 #endif

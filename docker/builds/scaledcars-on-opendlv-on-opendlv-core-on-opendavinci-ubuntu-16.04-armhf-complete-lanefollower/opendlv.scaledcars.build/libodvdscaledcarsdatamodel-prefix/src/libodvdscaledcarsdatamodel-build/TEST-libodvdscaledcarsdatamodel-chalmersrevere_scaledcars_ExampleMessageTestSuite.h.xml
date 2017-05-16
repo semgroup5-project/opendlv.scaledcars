@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<testsuites>
-<testsuite name="libodvdscaledcarsdatamodel-chalmersrevere_scaledcars_ExampleMessageTestSuite.h" tests="4" failures="0" errors="0" time="0" timestamp="Tue Apr 18 06:42:17 2017" file="/opt/opendlv.scaledcars.build/libodvdscaledcarsdatamodel/testsuites/chalmersrevere_scaledcars_ExampleMessageTestSuite.h" >
-    <testcase name="testCreateObject" classname="chalmersrevere_scaledcars_ExampleMessage_TestSuite" line="28" >    </testcase>
-    <testcase name="testCreateAndCopyObject" classname="chalmersrevere_scaledcars_ExampleMessage_TestSuite" line="39" >    </testcase>
-    <testcase name="testCreateAndAssignObject" classname="chalmersrevere_scaledcars_ExampleMessage_TestSuite" line="60" >    </testcase>
-    <testcase name="testCreateAndSerializeObject" classname="chalmersrevere_scaledcars_ExampleMessage_TestSuite" line="81" >    </testcase>
-</testsuite>
-</testsuites>

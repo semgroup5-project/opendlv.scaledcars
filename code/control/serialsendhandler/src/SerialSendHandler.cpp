@@ -1,183 +1,157 @@
 #include "SerialSendHandler.h"
-
-#include <iostream>
-#include <memory>
-#include <stdint.h>
-#include <string>
-
-#include <opendavinci/odcore/base/Thread.h>
-#include <opendavinci/odcore/wrapper/SerialPort.h>
-#include <opendavinci/odcore/wrapper/SerialPortFactory.h>
-
 #include "protocol.c"
-
-#define pi 3.1415926535897
-
-using namespace std;
-
-using namespace odcore;
-using namespace odcore::base::module;
-using namespace odcore::data;
-using namespace odcore::wrapper;
+#include "serial.c"
+#include "arduino.c"
 
 namespace scaledcars {
     namespace control {
 
+        using namespace std;
+        using namespace odcore;
+        using namespace odcore::base::module;
+        using namespace odcore::data;
+        using namespace odcore::wrapper;
+        using namespace odcore::data::dmcp;
+        using namespace automotive;
+        using namespace automotive::miniature;
+
         int port = 0;
-        const string SERIAL_PORTS[] = {"/dev/ttyACM0", "/dev/ttyACM1", "/dev/ttyACM2", "/dev/ttyACM3"};
-        const uint32_t BAUD_RATE = 115200;
-        int counter = 0;
+        const string SERIAL_PORTS[] = {"/dev/ttyACM0"};
+        int BAUD_RATE = 115200;
+        serial_state *serial_;
+        const uint32_t ONE_SECOND = 1000 * 1000;
 
-
-        void SerialReceiveListener::nextString(const string &s) {
-            cerr << "RECEIVED: " << s << " CONTAINS: " << s.length() << " BYTES!" << endl;
+        void __on_read(uint8_t b) {
+            cout << ">> read " << (int) b << endl;
         }
 
-        SerialSendHandler::SerialSendHandler(const int32_t &argc, char **argv)
-                : DataTriggeredConferenceClientModule(argc, argv, "SerialSendHandler") {}
+        void __on_write(uint8_t b) {
+            cout << "<< write " << (int) b << endl;
+        }
+
+        SerialSendHandler::SerialSendHandler(const int32_t &argc, char **argv) :
+                TimeTriggeredConferenceClientModule(argc, argv, "SerialSendHandler"),
+                serial(),
+                motor(90),
+                servo(90),
+                arduinoStopAngle(90),
+                arduinoBrake(190),
+                arduinoAngle(90),
+                speed(190) {}
 
         SerialSendHandler::~SerialSendHandler() {}
 
         void SerialSendHandler::setUp() {
-            cerr << "Setting up serial handler"<< endl;
+            try {
+                cerr << "Setting up serial handler to port " << SERIAL_PORTS[port] << endl;
 
-//            try {
-//                shared_ptr <SerialPort> _serialPort(
-//                        SerialPortFactory::createSerialPort(SERIAL_PORTS[port], BAUD_RATE));
-//
-//                this->serialPort = _serialPort;
-//                this->serialPort->setStringListener(&(this->serialListener));
-//                this->serialPort->start();
+                this->serial = serial_new();
 
-                // Wait for serial port to be ready for communication
-//                cerr << "Sleeping for 5 secs" << endl;
-//                const uint32_t ONE_SECOND = 1000 * 1000;
-//                odcore::base::Thread::usleepFor(5 * ONE_SECOND);
+                this->serial->incoming_frame_t = FRAME_T2;
+                this->serial->outgoing_frame_t = FRAME_T1;
 
-//            } catch (string &exception) {
-//                cerr << "Serial error : " << exception << endl;
-//                port++;
-//                if (port < 4) {
-//                    cerr << "Trying port : " << SERIAL_PORTS[port] << endl;
-//                    setUp();
-//                }
-//            }
+                this->serial->on_write = &__on_write;
+                this->serial->on_read = &__on_read;
+
+                const char *_port = SERIAL_PORTS[port].c_str();
+                serial_open(this->serial, _port, BAUD_RATE);
+
+                cerr << "serial open" << endl;
+                serial_handshake(this->serial, '\n');
+                cerr << "serial handshake" << endl;
+
+                odcore::base::Thread::usleepFor(5 * ONE_SECOND);
+
+                protocol_data d_motor;
+                d_motor.id = ID_OUT_MOTOR;
+                d_motor.value = 90 / 3;
+
+                protocol_data d_servo;
+                d_servo.id = ID_OUT_SERVO;
+                d_servo.value = 90 / 3;
+                serial_send(this->serial, d_motor);
+                serial_send(this->serial, d_servo);
+
+                odcore::base::Thread::usleepFor(2 * ONE_SECOND);
+
+                serial_start(this->serial);
+                cerr << "serial start" << endl;
+
+                serial_ = this->serial;
+            } catch (const char *msg) {
+                cerr << "Serial error : " << msg << endl;
+            }
         }
 
         void SerialSendHandler::tearDown() {
             cerr << "Shutting down serial handler" << endl;
-//            this->serialPort->stop();
-//            this->serialPort->setStringListener(NULL);
+
+            protocol_data d_motor;
+            d_motor.id = ID_OUT_MOTOR;
+            d_motor.value = 90 / 3;
+
+            protocol_data d_servo;
+            d_servo.id = ID_OUT_SERVO;
+            d_servo.value = 90 / 3;
+            serial_send(this->serial, d_motor);
+            serial_send(this->serial, d_servo);
+
+            odcore::base::Thread::usleepFor(15 * ONE_SECOND);
+
+            serial_stop(this->serial);
+            serial_free(this->serial);
         }
 
-        void SerialSendHandler::nextContainer(Container &c) {
-                cerr << "NEXT CONTAINER " << c.getDataType() << endl;
-                if (c.getDataType() == automotive::VehicleControl::ID()) {
-                    cerr << "VehicleControl" << endl;
-                    const automotive::VehicleControl vd =
-                            c.getData<automotive::VehicleControl>();
-                    int arduinoAngle = 0;
-                    double angle = vd.getSteeringWheelAngle();
-                    cerr << "angle radius : " << angle << endl;
+        odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode SerialSendHandler::body() {
+            while (getModuleStateAndWaitForRemainingTimeInTimeslice() == ModuleStateMessage::RUNNING) {
 
-                    arduinoAngle = 90 + (angle * (180 / pi));
-                    if (arduinoAngle < 0) {
-                        arduinoAngle = 0;
-                    } else if(arduinoAngle > 180){
-                        arduinoAngle = 180;
+                Container vehicleControlContainer = getKeyValueDataStore().get(automotive::VehicleControl::ID());
+                if (vehicleControlContainer.getDataType() == automotive::VehicleControl::ID()) {
+                    const automotive::VehicleControl vc =
+                            vehicleControlContainer.getData<automotive::VehicleControl>();
+
+                    cerr << "BRAKE LIGHTS " << vc.getBrakeLights() << endl;
+                    if (!vc.getBrakeLights()) {
+                        double angle = vc.getSteeringWheelAngle();
+                        cerr << "angle radius : " << angle << endl;
+
+                        arduinoAngle = 90 + (angle * (180 / PI));
+                        if (arduinoAngle < 0) {
+                            arduinoAngle = 0;
+                        } else if (arduinoAngle > 180) {
+                            arduinoAngle = 180;
+                        }
+
+                        speed = vc.getSpeed();
+
+                        cerr << "angle degree " << arduinoAngle << endl;
+                        cerr << "speed to arduino : " << speed << endl;
+
+                        this->motor = speed;
+                        this->servo = arduinoAngle;
+
+                    } else {
+                        cerr << "Brake signal sent..." << endl;
+                        this->motor = arduinoBrake;
+                        this->servo = arduinoStopAngle;
                     }
-                    cerr << "angle degree " << arduinoAngle << endl;
-
-                    //(x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
-                    // int speed = 105;
-                    int speed = vd.getSpeed();
-                    cerr << "speed to arduino : " << speed << endl;
-//                    // TODO: int odometer = vd.getOdometer();
-
-                    string message = "m" + to_string(speed) + "t" + to_string(arduinoAngle) + "x";
-
-                    cerr << "speedMessage " << message << endl;
-//
-////                    string speedMessage = pack(ID_OUT_MOTOR, speed);
-////                    string angleMessage = pack(ID_OUT_SERVO, arduinoAngle);
-//
-//                    // TODO: string odometerMessage = pack(ID_OUT_ODOMETER, odometer);
-//
-                    if (counter % 30 == 0) {
-                        send(message);
-
-                    }
-                    counter++;
-//                    // TODO: send(odometerMessage);
                 }
-        }
 
-        string SerialSendHandler::pack(int id, int value) {
-            protocol_data protocolData;
-            protocol_data *pointerProtocolData = &protocolData;
 
-            pointerProtocolData->id = id;
-            pointerProtocolData->value = value;
+                protocol_data d_motor;
+                d_motor.id = ID_OUT_MOTOR;
+                d_motor.value = this->motor / 3;
 
-            protocol_frame protocolFrame = protocol_encode(protocolData);
-            protocol_frame *pointerProtocolFrame = &protocolFrame;
+                serial_send(this->serial, d_motor);
 
-            string message = "";
-            message.insert(message.end(), pointerProtocolFrame->a);
-            message.insert(message.end(), pointerProtocolFrame->b);
+                protocol_data d_servo;
+                d_servo.id = ID_OUT_SERVO;
+                d_servo.value = this->servo / 3;
 
-            return message;
-        }
-
-        void SerialSendHandler::send(string message) {
-
-            try {
-                cerr << "Connecting to port: " << SERIAL_PORTS[port] << " br: " << BAUD_RATE << endl;
-
-                shared_ptr <SerialPort> _serialPort(
-                            SerialPortFactory::createSerialPort(SERIAL_PORTS[port], BAUD_RATE));
-                this->serialPort = _serialPort;
-                this->serialPort->setStringListener(&(this->serialListener));
-                this->serialPort->start();
-
-                this->serialPort->send(message);
-
-//                cerr << "Sleeping for 1 secs" << endl;
-//                const uint32_t ONE_SECOND = 1000 * 1000;
-//                odcore::base::Thread::usleepFor(ONE_SECOND / 2);
-
-                this->serialPort->stop();
-                this->serialPort->setStringListener(NULL);
-                port = 0;
-
-                cerr << "Shutting down port: " << SERIAL_PORTS[port] << endl;
-            } catch (string &exception) {
-                cerr << exception << endl;
-                port++;
-                if (port < 4) {
-                    cerr << "Trying port : " << SERIAL_PORTS[port] << endl;
-                    send(message);
-                }
+                serial_send(this->serial, d_servo);
             }
-            //cerr << "sending : " << message << endl;
 
-            // baudrate-adjusted throttle (determines throughput)
-            // 1 / BAUDRATE * WORDSIZE = seconds
-            // WORDSIZE = 1 start + 8 bits + 1 stop = 10
-
-            // 1 / 115200 * 10 = 87 us (use as delay)
-
-
-            //odcore::base::Thread::usleepFor(87);
-
-
-            //odcore::base::Thread::usleepFor(10000);
-
-//            const uint32_t ONE_MS = 1000 * 1;
-//            odcore::base::Thread::usleepFor(100 * ONE_MS);
-
-
-            //cerr << "sending done" << endl;
+            return ModuleExitCodeMessage::OKAY;
         }
     }
 }

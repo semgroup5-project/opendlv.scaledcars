@@ -1,5 +1,0 @@
-# Hashes of file build rules.
-5243e212debc22f6ee25e731d9d340e5 control/example/ExampleControlTestSuite.h-TestSuite.cpp
-8d484339053e15ddc1e91c4475723a5c control/lanefollower/LaneFollowerTestSuite.h-TestSuite.cpp
-6fe0cf45e2933c426ac74a58b294bd90 control/proxy/ProxyTestSuite.h-TestSuite.cpp
-2d469b7d1cbc123aa5fc18e2eb3d89ac perception/example/ExamplePerceptionTestSuite.h-TestSuite.cpp

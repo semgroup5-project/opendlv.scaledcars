@@ -57,6 +57,7 @@ namespace scaledcars {
             if (useRecorder) {
                 // URL for storing containers.
                 stringstream recordingURL;
+
                 recordingURL << "file://" << "proxy_" << TimeStamp().getYYYYMMDD_HHMMSS_noBlankNoColons() << ".rec";
 
                 // Size of memory segments.

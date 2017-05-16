@@ -10,8 +10,8 @@
 
 #if you dont have xterm on your linux distro, run "sudo apt install xterm"
 
-xterm -hold -e "docker run -ti --rm --net=host -v $HOME/DIT-168:/opt/configuration -w /opt/configuration seresearch/scaledcars-on-opendlv-on-opendlv-core-on-opendavinci-on-base-dev:latest /opt/od4/bin/odsupercomponent --cid=111 --verbose=1" &
+#xterm -hold -e "docker run -ti --rm --net=host -v $HOME/DIT-168:/opt/configuration -w /opt/configuration seresearch/scaledcars-on-opendlv-on-opendlv-core-on-opendavinci-on-base-#dev:latest /opt/od4/bin/odsupercomponent --cid=111 --verbose=1" &
 
-sleep 3
+#sleep 3
 
 xterm -hold -e "docker run -ti --rm --privileged --device=/dev/ttyACM0 --net=host seresearch/scaledcars-on-opendlv-on-opendlv-core-on-opendavinci-on-base-dev:latest /opt/opendlv.scaledcars/bin/scaledcars-control-serialsendhandler --cid=111 --freq=10" &
