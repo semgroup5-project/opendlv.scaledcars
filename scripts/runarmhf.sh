@@ -1,7 +1,9 @@
 #!/bin/bash
 
 #define parameters which are passed in.
+#change config
 ANS=$1
+#change pid
 ANS2=$2
 IP=$3
 P=$4

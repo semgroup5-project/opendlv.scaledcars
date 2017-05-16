@@ -116,7 +116,6 @@ services:
         - ./DIT-168:/opt/configuration
         depends_on:
             - odsupercomponent
-            - odsimvehicle
             - odsimcamera
             - communicationlink
         restart: on-failure
@@ -132,7 +131,6 @@ services:
         - ./DIT-168:/opt/configuration
         depends_on:
              - odsupercomponent
-             - odsimvehicle
              - communicationlink
         restart: on-failure
         privileged: true
@@ -147,7 +145,6 @@ services:
         - ./DIT-168:/opt/configuration
         depends_on:
             - odsupercomponent
-            - odsimvehicle
             - communicationlink
         restart: on-failure
         privileged: true
