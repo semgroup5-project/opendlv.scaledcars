@@ -29,7 +29,8 @@ namespace scaledcars {
         const int32_t INFRARED_BACK = 1;
         const int32_t WHEEL_ENCODER = 5;
 
-        const double OVERTAKING_DISTANCE = 55.0;
+        const double OVERTAKING_DISTANCE = 50.0;
+        const double OVERTAKING_DISTANCE_DISPLACED = 65.0;
         const double HEADING_PARALLEL = 1;
 
         const double TURN_SPEED_SIM = 0.7;
@@ -45,38 +46,29 @@ namespace scaledcars {
         double IR_RR = 0;
         double IR_FR = 0;
         double IR_BACK = 0;
-        double UR_C = 0;
+        double US_C = 0;
+        double US_R = 0;
 
         long cycles = 0;
         const bool USE_CYCLES = false;
         int odometerReal = 0;
         int oldOdometer = 0;
+        int odo = 0;
 
-        int IR_FR_blindCount = 0;
+        int us_c_old = 0;
+        int us_r_count = 0;
 
-        enum StateMachineMoving {
-            FORWARD,
-            OUT_TO_LEFT,
-            OUT_TO_RIGHT,
-            NONE,
-            ADJUST_TO_LEFT,
-            IN_TO_RIGHT,
-            IN_TO_LEFT
-        };
-
-        enum StateMachineMeasuring {
-            DISABLE,
+        enum StateMachine {
             FIND_OBJECT,
             FIND_OBJECT_PLAUSIBLE,
             HAVE_BOTH_IR,
-            HAVE_BOTH_IR_SAME_DISTANCE,
-            HAVE_DISTANCE_IR_BACK,
-            HAVE_NO_IR_FRONT,
-            END_OF_OBJECT
+            HAVE_NO_READING,
+            KEEP_TURN_RIGHT,
+            KEEP_TURN_RIGHT_END,
+            ADJUST_TO_STRAIGHT
         };
 
-        StateMachineMoving stageMoving = FORWARD;
-        StateMachineMeasuring stageMeasuring = FIND_OBJECT;
+        StateMachine stage = FIND_OBJECT;
 
         double distanceOUTtoL_0 = 0;
         double distanceOUTtoL_1 = 0;
@@ -93,14 +85,16 @@ namespace scaledcars {
         double distanceToObstacle = 0;
         double distanceToObstacleOld = 0;
 
-        const int OBJECT_PLAUSIBLE_COUNT = 2;
+        const int OBJECT_PLAUSIBLE_COUNT = 3;
         int objectPlausibleCount = 0;
+        int objectDisplacedPlausibleCount = 0;
 
         Overtaker::Overtaker(const int32_t &argc, char **argv) :
                 DataTriggeredConferenceClientModule(argc, argv, "overtaker"),
                 m_vehicleControl(),
                 Sim(false),
-                _state(0) {
+                _state(0),
+                overtakerMSG(){
         }
 
         Overtaker::~Overtaker() {}
@@ -116,173 +110,185 @@ namespace scaledcars {
             if (c.getDataType() == CommunicationLinkMSG::ID()) {
                 Container communicationLinkContainer = c.getData<CommunicationLinkMSG>();
                 const CommunicationLinkMSG communicationLinkMSG = c.getData<CommunicationLinkMSG>();
-                _state = communicationLinkMSG.getStateLaneFollower();
+                _state = communicationLinkMSG.getStateOvertaker();
 
-                odometerReal = communicationLinkMSG.getWheelEncoder() - oldOdometer;
-                oldOdometer = communicationLinkMSG.getWheelEncoder();
-                IR_BACK = communicationLinkMSG.getInfraredBack();
-                IR_RR = communicationLinkMSG.getInfraredSideBack();
-                IR_FR = communicationLinkMSG.getInfraredSideFront();
-                UR_C =  communicationLinkMSG.getUltraSonicFrontCenter();
 
-                measuringMachine();
-                movingMachine();
+                if (_state) {
+                    odometerReal = communicationLinkMSG.getWheelEncoder() - oldOdometer;
+                    oldOdometer = communicationLinkMSG.getWheelEncoder();
+                    IR_BACK = communicationLinkMSG.getInfraredBack();
+                    IR_RR = communicationLinkMSG.getInfraredSideBack();
+                    IR_FR = communicationLinkMSG.getInfraredSideFront();
+                    US_C = communicationLinkMSG.getUltraSonicFrontCenter();
+                    US_R = communicationLinkMSG.getUltraSonicFrontRight();
 
-                Container c3(m_vehicleControl);
-                getConference().send(c3);
-            }
-        }
+                    measuringMachine();
 
-        void Overtaker::movingMachine() {
-
-            if (stageMoving == FORWARD) {
-                cerr << "FORWARD" << endl;
-
-                if (Sim) {
-                    m_vehicleControl.setSpeed(TURN_SPEED_SIM);
-                    m_vehicleControl.setSteeringWheelAngle(STRAIGHT_ANGLE_SIM);
+                    Container c3(m_vehicleControl);
+                    getConference().send(c3);
                 } else {
-                    m_vehicleControl.setBrakeLights(false);
-                    m_vehicleControl.setSpeed(TURN_SPEED_CAR);
-                    m_vehicleControl.setSteeringWheelAngle(0.3);
+                    US_C = communicationLinkMSG.getUltraSonicFrontCenter();
+                    double distance = US_C;
+                    double us = abs(US_C - us_c_old);
+
+                    if ((us <= 5) && distance <= 62) {
+                        objectPlausibleCount++;
+                        us_c_old = distance;
+                        if (objectPlausibleCount >= OBJECT_PLAUSIBLE_COUNT) {
+
+                            objectPlausibleCount = 0;
+                            us_c_old = 0;
+
+                            overtakerMSG.setStateStop(1);
+                            Container c1(overtakerMSG);
+                            getConference().send(c1);
+                        }
+                    }
                 }
-
-            }
-            else if (stageMoving == OUT_TO_LEFT) {
-                cerr << "OUT_TO_LEFT" << endl;
-                cerr << "ODO> " << odometerReal << endl;
-
-                if (odometerReal < 2) {
-                    m_vehicleControl.setBrakeLights(false);
-                    m_vehicleControl.setSpeed(TURN_SPEED_CAR);
-                    m_vehicleControl.setSteeringWheelAngle(-1.5);
-                }
-                stageMeasuring = HAVE_BOTH_IR;
-
-            }
- else if (stageMoving == OUT_TO_RIGHT) {
-                cerr << "OUT_TO_RIGHT" << endl;
-
-                m_vehicleControl.setSpeed(TURN_SPEED_CAR);
-                m_vehicleControl.setSteeringWheelAngle(1.5);
-
-                stageMeasuring = HAVE_BOTH_IR_SAME_DISTANCE;
-
-            } else if (stageMoving == IN_TO_RIGHT) {
-                cerr << "IN_TO_RIGHT" << endl;
-
-                if (odometerReal < 2) {
-                    m_vehicleControl.setBrakeLights(false);
-                    m_vehicleControl.setSpeed(TURN_SPEED_CAR);
-                    m_vehicleControl.setSteeringWheelAngle(TURN_ANGLE_CAR_RIGHT);
-                }
-                stageMeasuring = HAVE_DISTANCE_IR_BACK;
-
-            } else if (stageMoving == IN_TO_LEFT) {
-                cerr << "IN_TO_LEFT" << endl;
-                if (IR_BACK <= 10) {
-                    m_vehicleControl.setBrakeLights(false);
-                    m_vehicleControl.setSpeed(TURN_SPEED_CAR);
-                    m_vehicleControl.setSteeringWheelAngle(TURN_ANGLE_CAR_LEFT);
-                } else {
-                    m_vehicleControl.setBrakeLights(false);
-                    m_vehicleControl.setSpeed(TURN_SPEED_CAR);
-                    m_vehicleControl.setSteeringWheelAngle(0.3);
-                }
-                stageMoving = FORWARD;
-                stageMeasuring = FIND_OBJECT;
-
-                distanceToObstacle = 0;
-                distanceToObstacleOld = 0;
-            } else if (stageMoving == ADJUST_TO_LEFT) {
-                cerr << "ADJUST_TO_LEFT" << endl;
-                if (odometerReal < 2) {
-                    m_vehicleControl.setBrakeLights(false);
-                    m_vehicleControl.setSpeed(TURN_SPEED_CAR);
-                    m_vehicleControl.setSteeringWheelAngle(-0.15);
-                } else {
-                    m_vehicleControl.setBrakeLights(false);
-                    m_vehicleControl.setSpeed(TURN_SPEED_CAR);
-                    m_vehicleControl.setSteeringWheelAngle(0.3);
-                }
-                    stageMeasuring = HAVE_NO_IR_FRONT;
             }
         }
 
         void Overtaker::measuringMachine() {
 
-            if (stageMeasuring == FIND_OBJECT) {
+            if (stage == FIND_OBJECT) {
                 cerr << "FIND_OBJECT" << endl;
 
-                distanceToObstacle = UR_C;
+                m_vehicleControl.setBrakeLights(false);
+                m_vehicleControl.setSpeed(TURN_SPEED_CAR);
+                m_vehicleControl.setSteeringWheelAngle(0.3);
+
+                distanceToObstacle = US_C;
+                us_c_old = US_C;
 
                 // Approaching an obstacle (stationary or driving slower than us).
                 if ((distanceToObstacle >= 1) && (((distanceToObstacleOld - distanceToObstacle) > 0) ||
-                                                 (fabs(distanceToObstacleOld - distanceToObstacle) < 1e-2))) {
+                                                  (fabs(distanceToObstacleOld - distanceToObstacle) < 1e-2))) {
                     // Check if overtaking shall be started.
-                    stageMeasuring = FIND_OBJECT_PLAUSIBLE;
+                    stage = FIND_OBJECT_PLAUSIBLE;
 
                     objectPlausibleCount = 0;
                 }
 
                 distanceToObstacleOld = distanceToObstacle;
 
-            }
-            else if (stageMeasuring == FIND_OBJECT_PLAUSIBLE) {
+            } else if (stage == FIND_OBJECT_PLAUSIBLE) {
                 cerr << "FIND_OBJECT_PLAUSIBLE" << endl;
+
+                m_vehicleControl.setBrakeLights(false);
+                m_vehicleControl.setSpeed(TURN_SPEED_CAR);
+                m_vehicleControl.setSteeringWheelAngle(0.3);
 
                 double distance;
 
-                distance = UR_C;
+                if (US_R < 0) {
+                    us_r_count++;
+                }
 
-                if (distance >= 1 && distance <= OVERTAKING_DISTANCE) {
+                distance = US_C;
+                double us = abs(US_C - us_c_old);
+
+                if ((us <= 5) && distance <= OVERTAKING_DISTANCE) {
                     objectPlausibleCount++;
-                    cerr << "COUNT: " << objectPlausibleCount << endl;
+                    us_c_old = distance;
                     if (objectPlausibleCount >= OBJECT_PLAUSIBLE_COUNT) {
 
-                        stageMoving = OUT_TO_LEFT;
+                        stage = HAVE_BOTH_IR;
                     }
-                } else {
-                    stageMeasuring = FIND_OBJECT;
                 }
+                else if ((us <= 5) && distance <= OVERTAKING_DISTANCE_DISPLACED && us_r_count == 3) {
+                    objectDisplacedPlausibleCount++;
+                    us_c_old = distance;
+                    if (objectDisplacedPlausibleCount >= OBJECT_PLAUSIBLE_COUNT) {
 
-            }
-            else if (stageMeasuring == HAVE_NO_IR_FRONT) {
-                if (IR_FR < 0) {
-                    stageMoving = IN_TO_RIGHT;
+                        stage = HAVE_BOTH_IR;
+                        us_r_count = 0;
+                    }
+                }
+                else {
+                    stage = FIND_OBJECT;
+                }
+            } else if (stage == HAVE_NO_READING) {
+                cerr << "HAVE_NO_READING" << endl;
+                if (IR_FR < 0 && US_R < 0) {
+                    stage = KEEP_TURN_RIGHT_END;
+                } else if (IR_FR > IR_RR && IR_FR > 8) {
+                    m_vehicleControl.setBrakeLights(false);
+                    m_vehicleControl.setSpeed(TURN_SPEED_CAR);
+                    m_vehicleControl.setSteeringWheelAngle(0.7);
+                } else if (IR_RR > IR_FR && IR_RR > 8) {
+                    m_vehicleControl.setBrakeLights(false);
+                    m_vehicleControl.setSpeed(TURN_SPEED_CAR);
+                    m_vehicleControl.setSteeringWheelAngle(-0.6);
+                } else if ((IR_FR - IR_RR <= HEADING_PARALLEL) && !(IR_FR < 1) && !(IR_RR < 1)) {
+                    m_vehicleControl.setBrakeLights(false);
+                    m_vehicleControl.setSpeed(TURN_SPEED_CAR);
+                    m_vehicleControl.setSteeringWheelAngle(0);
                 }
             }
-            else if (stageMeasuring == HAVE_DISTANCE_IR_BACK) {
-
-                if (IR_RR < 0) {
-                    stageMoving = IN_TO_LEFT;
-                }
-            }
-            else if (stageMeasuring == HAVE_BOTH_IR) {
+ else if (stage == HAVE_BOTH_IR) {
                 cerr << "HAVE_BOTH_IR" << endl;
 
+                m_vehicleControl.setBrakeLights(false);
+                m_vehicleControl.setSpeed(TURN_SPEED_CAR);
+                m_vehicleControl.setSteeringWheelAngle(-1.30);
+
                 if ((IR_FR - IR_RR <= HEADING_PARALLEL) && !(IR_FR < 1) && !(IR_RR < 1)) {
-                    stageMoving = OUT_TO_RIGHT;
+                    stage = KEEP_TURN_RIGHT;
+                    odo = 0;
                 }
 
             }
-            else if (stageMeasuring == HAVE_BOTH_IR_SAME_DISTANCE) {
-                cerr << "HAVE_BOTH_IR_SAME_DISTANCE" << endl;
+ else if (stage == KEEP_TURN_RIGHT) {
+                cerr << "KEEP_TURN_RIGHT" << endl;
 
-                cerr << "IR_FR=" << IR_FR << endl;
-                cerr << "IR_RR=" << IR_RR << endl;
+                odo += odometerReal;
+                m_vehicleControl.setSpeed(TURN_SPEED_CAR);
+                m_vehicleControl.setSteeringWheelAngle(1.5);
 
-                if ((IR_FR - IR_RR <= HEADING_PARALLEL) && !(IR_FR < 1) && !(IR_RR < 1)) {
-                    stageMoving = ADJUST_TO_LEFT;
+                if (odo > 4) {
+                    m_vehicleControl.setBrakeLights(false);
+                    m_vehicleControl.setSpeed(TURN_SPEED_CAR);
+                    m_vehicleControl.setSteeringWheelAngle(0.5);
+                    stage = HAVE_NO_READING;
+                    odo = 0;
+                }
+            }
+ else if (stage == KEEP_TURN_RIGHT_END) {
+                cerr << "KEEP_TURN_RIGHT_END" << endl;
+                odo += odometerReal;
+                m_vehicleControl.setBrakeLights(false);
+                m_vehicleControl.setSpeed(TURN_SPEED_CAR);
+                m_vehicleControl.setSteeringWheelAngle(TURN_ANGLE_CAR_RIGHT);
+                if (odo > 8) {
+                    stage = ADJUST_TO_STRAIGHT;
+                    odo = 0;
                 }
 
             }
-            else if (stageMeasuring == END_OF_OBJECT) {
-                cerr << "END_OF_OBJECT" << endl;
+ else if (stage == ADJUST_TO_STRAIGHT) {
+                cerr << "ADJUST_TO_STRAIGHT" << endl;
+                odo += odometerReal;
 
-                distanceToObstacle = IR_FR;
+                m_vehicleControl.setBrakeLights(false);
+                m_vehicleControl.setSpeed(TURN_SPEED_CAR);
+                m_vehicleControl.setSteeringWheelAngle(TURN_ANGLE_CAR_LEFT);
 
-                stageMeasuring = DISABLE;
+                if (odo > 3) {
+                    m_vehicleControl.setBrakeLights(false);
+                    m_vehicleControl.setSpeed(TURN_SPEED_CAR);
+                    m_vehicleControl.setSteeringWheelAngle(0);
+
+                    overtakerMSG.setStateStop(1);
+                    Container c(overtakerMSG);
+                    getConference().send(c);
+                    _state = 0;
+
+                    stage = FIND_OBJECT;
+
+                    distanceToObstacle = 0;
+                    distanceToObstacleOld = 0;
+                    odo = 0;
+                }
             }
         }
     }

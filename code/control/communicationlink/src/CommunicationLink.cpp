@@ -61,7 +61,7 @@ namespace scaledcars {
                     cout << "ID:  " << ID_IN_ULTRASONIC_CENTER << " VALUE: "
                          << sensorsMSG.getValueForKey_MapOfDistances(ID_IN_ULTRASONIC_CENTER) << endl;
 
-                    communicationLinkMSG.setUltrasonicFrontRight(
+                    communicationLinkMSG.setUltraSonicFrontRight(
                             sensorsMSG.getValueForKey_MapOfDistances(ID_IN_ULTRASONIC_SIDE_FRONT));
                     cout << "ID:  " << ID_IN_ULTRASONIC_SIDE_FRONT << " VALUE: "
                          << sensorsMSG.getValueForKey_MapOfDistances(ID_IN_ULTRASONIC_SIDE_FRONT) << endl;
