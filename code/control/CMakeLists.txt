@@ -18,6 +18,7 @@
 project(scaledcars-control)
 
 add_subdirectory(lanefollower)
+add_subdirectory(overtaker)
 add_subdirectory(proxy)
 add_subdirectory(serialsendhandler)
 add_subdirectory(serialreceivehandler)

@@ -117,8 +117,8 @@ void updateDtAndCounter(
     unsigned long currentPulse = micros();
     unsigned long dt = currentPulse -
                        _previousPulse[odometerID]; //calculate the difference in time between the two pulses in microseconds
-    if (dt >
-        MINIMUM_PULSE_GAP) { //if the pulses have not arrived too fast, which is a sign of unstable signal (too much jitter) in microseconds
+//    if (dt >
+//        MINIMUM_PULSE_GAP) { //if the pulses have not arrived too fast, which is a sign of unstable signal (too much jitter) in microseconds
         _dt[odometerID] = dt; //update the _dt value
         _previousPulse[odometerID] = currentPulse; //update when the last pulse arrived (if it didn't arrive too fast)
 
@@ -143,7 +143,7 @@ void updateDtAndCounter(
                     _negativePulseCounter[odometerID]++; //update the pulse counter that measures how much backwards we are going
             }
         }
-    }
+//    }
 }
 
 void updateCounter1() {

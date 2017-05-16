@@ -38,7 +38,7 @@ void Car::setUp() {
 
 void Car::run() {
 //    if (!isRCControllerOn()) {
-        automatedDrive();
+    automatedDrive();
 //    } else {
 //        rcControl();
 //    }
@@ -52,13 +52,9 @@ void Car::provideSensorsData() {
         infraredSideFront.encodeAndWrite(ID_IN_INFRARED_SIDE_FRONT, infraredSideFront.getDistance2());
         infraredSideBack.encodeAndWrite(ID_IN_INFRARED_SIDE_BACK, infraredSideBack.getDistance());
 
-        int ur_val = ultrasonicFront.getDistance();
-        if (ur_val > 60) {
-            ultrasonicFront.encodeAndWrite(ID_IN_ULTRASONIC_CENTER, 0);
-        } else {
-            ultrasonicFront.encodeAndWrite(ID_IN_ULTRASONIC_CENTER, ur_val);
-        }
-//        ultrasonicRight.encodeAndWrite(ID_IN_ULTRASONIC_SIDE_FRONT, ultrasonicRight.getDistance());
+
+        ultrasonicFront.encodeAndWrite(ID_IN_ULTRASONIC_CENTER, ultrasonicFront.getDistance());
+        ultrasonicRight.encodeAndWrite(ID_IN_ULTRASONIC_SIDE_FRONT, ultrasonicRight.getDistance());
 
         odometer = wheelEncoder.getDistance() - encoderPos;
         if (odometer <= 255) {
