@@ -127,6 +127,8 @@ namespace scaledcars {
                         memcpy(m_image.data, m_sharedImageMemory->getSharedMemory(),
                                si.getWidth() * si.getHeight() * si.getBytesPerPixel());
                     }
+
+
                     m_sharedImageMemory->unlock(); // Release the memory region lock
                     // If in Sim mode, flip the image
                     if (Sim) {
