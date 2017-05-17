@@ -87,6 +87,7 @@ namespace scaledcars {
                 	sensorSetup(communicationLinkMSG);
                 	obstacleSetup();
                 	
+                	// Emergency stop if an object is detected to close to the back of the vehicle.
                 	if (IRRObstacle && irRear < 5 && irRear > 0) {
                     	vc.setBrakeLights(true);
                   	cerr << "TOO CLOSE AT THE BACK, EMERGENCY STOP!!" << endl;
@@ -114,28 +115,27 @@ namespace scaledcars {
             }
         }
 
-        //going forwards till finds a gap
+        /**
+        * Checks if there is enough space to park
+        */
         void Park::parkingFinder() {
             // Parking space starting point
             vc.setBrakeLights(false);
             vc.setSpeed(96);
             double angle = (irRearRight - irFrontRight) / 10;
+            
+            // Adjust the distance of the vehicle to a potential object
             if (irFrontRight < 10 && irFrontRight > 0 && (int) (irRearRight - irFrontRight) != 0) {
-
                 vc.setSteeringWheelAngle(angle);
-
             } else if (irFrontRight < 0 && (int) (irRearRight - irFrontRight) == 0) {
                 if (usFrontRight < 20 && usFrontRight > 0) {
-                    vc.setSteeringWheelAngle(-0.26
-                    );
-
+                    vc.setSteeringWheelAngle(-0.26);
                 } else {
                     vc.setSteeringWheelAngle(angle);
                 }
-
             }
 
-
+				// If it is no obstacle in the way
             if (!IRRRObstacle) {
                 counterS++;
                 if (counterS > 3) {
@@ -145,6 +145,7 @@ namespace scaledcars {
 
                 }
 
+				// If it is an obstacle in the way
             } else if (IRRRObstacle) {
                 counterO++;
                 if (counterO > 3) {
@@ -154,6 +155,8 @@ namespace scaledcars {
 
                 }
             }
+            
+            // If the gap for parking is sufficient
             if (parkingSpace >= GAP) {
                 cout << "parking Space  : " << parkingSpace << endl;
                 backStart = odometer;
@@ -164,6 +167,9 @@ namespace scaledcars {
             }
         }
 
+			/**
+			* Parks an unparked vehicle
+			*/
         void Park::park() {
             
             adjDist = adjDistCalculation(parkingSpace);
@@ -231,6 +237,9 @@ namespace scaledcars {
             }
         }
         
+        /**
+        * Unparks a parked vehicle
+        */
         void Park::unpark() {
            	
             adjDist = adjDistCalculation(parkingSpace);
@@ -299,31 +308,39 @@ namespace scaledcars {
             }
         }
 
+			/**
+			* Set the state of the parking and unparking functions
+			*/
         void Park::setParkingState(int state) {
             parkingState = state;
         }
 
-        bool Park::obstacleDetection(int i, int id) {
+			/**
+			* Detects if there is an obstacle
+			*
+			* @return true if there is an obstacle detected
+			*/
+        bool Park::obstacleDetection(int value, int id) {
             bool ifObstacle;
             switch (id) {
                 case (US) : {
-                    if (i > 70 || i < 0) {
+                    if (value > 70 || value < 0) {
                         ifObstacle = false;
-                    } else if (i <= 70 && i > 0) {
+                    } else if (value <= 70 && value > 0) {
                         ifObstacle = true;
                     }
                 }
                     break;
                 case (IR) : {
-                    if (i > 28 || i < 0) {
+                    if (value > 28 || value < 0) {
                         ifObstacle = false;
-                    } else if (i <= 28 && i > 0) {
+                    } else if (value <= 28 && value > 0) {
                         ifObstacle = true;
                     }
                 }
                     break;
                 case (3) : {
-                    if ((i > 2) && (i < 29)) {
+                    if ((value > 2) && (value < 29)) {
                         ifObstacle = true;
                     } else {
                         ifObstacle = false;
@@ -331,9 +348,9 @@ namespace scaledcars {
                 }
                     break;
                 case (4) : {
-                    if ((i > 1) && (i < 30)) {
+                    if ((value > 1) && (value < 30)) {
                         ifObstacle = true;
-                    } else if (i < 1) {
+                    } else if (value < 1) {
                         ifObstacle = false;
                     }
                 }
@@ -342,12 +359,18 @@ namespace scaledcars {
             return ifObstacle;
         }
 
+			/**
+			* @return the estimated maximum parking distance, maximum distance for the vehicle to travel.
+			*/
         double Park::adjDistCalculation(double start) {
            
             adjDist = start / cos(40);
             return abs(adjDist);
         }
 
+			/**
+			* Send a ParkerMSG to to the conference to let the parking algorithm take over.
+			*/
         void Park::sendParkerMSG() {
             ParkerMSG p;
             p.setStateStop(0);
@@ -355,6 +378,9 @@ namespace scaledcars {
             getConference().send(c);
         }
         
+        /**
+        * @return true if only the parker state is active in the CommunicationLinkMSG provided.
+        */
         bool Park::isOkay(CommunicationLinkMSG c){
         		if(c.getStateParker() == 1 && c.getStateLaneFollower() == 0 && c.getStateOvertaker() == 0)
         			return true;
@@ -362,6 +388,9 @@ namespace scaledcars {
         		return false;
         }
         
+        /**
+        * Setup private global sensors with the CommunicationLinkMSG provided.
+        */
         void Park::sensorSetup(CommunicationLinkMSG communicationLinkMSG){
         		irRear = communicationLinkMSG.getInfraredBack();
             usFront = communicationLinkMSG.getUltraSonicFrontCenter();
@@ -370,6 +399,9 @@ namespace scaledcars {
             odometer = communicationLinkMSG.getWheelEncoder();
         }
         
+        /**
+        * Setup the global private obstacle indicators with the private global sensor values.
+        */
         void Park::obstacleSetup(){
         		IRRObstacle = obstacleDetection(irRear, IR);
             IRFRObstacle = obstacleDetection(irFrontRight, IR);
