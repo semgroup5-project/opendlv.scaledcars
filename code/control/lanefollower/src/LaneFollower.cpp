@@ -43,6 +43,8 @@ namespace scaledcars {
         String state = "moving", prevState = "moving";
         bool inRightLane = true;   //Flip this value to indicate lane change
         int currentDistance = 0;
+        int _stop = 0;
+
         // Constructor
         LaneFollower::LaneFollower(const int32_t &argc, char **argv) :
                 TimeTriggeredConferenceClientModule(argc, argv, "lanefollower"),
@@ -70,6 +72,7 @@ namespace scaledcars {
 
         // Class responsible for lane follower function
         LaneFollower::~LaneFollower() {}
+
         // This method will be call automatically _before_ running body().
         void LaneFollower::setUp() {
             // Get configuration data for this class.
@@ -159,6 +162,7 @@ namespace scaledcars {
             Canny(m_image_new, m_image_new, m_threshold1, m_threshold2,
                   3);
         }
+
         // Pixel median value calculation
         double LaneFollower::Median(Mat mat) {
             double m = (mat.rows * mat.cols) / 2;
@@ -211,7 +215,7 @@ namespace scaledcars {
             right2.x = -1;
             // Search from middle to the right
             for (int x = m_image_new.cols / 2;
-                 x < m_image_new.cols ; x++) {
+                 x < m_image_new.cols; x++) {
                 pixelRight = m_image_new.at<uchar>(Point(x, y));
                 if (pixelRight >= 150) {
                     right.x = x;
@@ -219,11 +223,11 @@ namespace scaledcars {
                 }
             }
 
-            if (!Sim){
+            if (!Sim) {
                 if (right.x == -1 && left.x == -1) {  //setting state if the car does not see any line
                     // The following 2 for loops search for lane markings at a row close to the top of the image if no lane markings are found at the control_scanline
                     for (int x = m_image_new.cols / 2; x > 0; x--) {
-                        pixelLeft2 = m_image_new.at<uchar>(Point(x,100));
+                        pixelLeft2 = m_image_new.at<uchar>(Point(x, 100));
                         if (pixelLeft2 >= 150) {
                             left2.x = x;
                             break;
@@ -239,13 +243,12 @@ namespace scaledcars {
                         }
                     }
                     // If the second check also returns -1 for both sides, then no followable lane markings are found
-                    if (right2.x == -1 && left2.x == -1){
+                    if (right2.x == -1 && left2.x == -1) {
                         state = "danger";
                     }
 
-                }
-                else{
-                    if(state != "stop" && state != "resume"){
+                } else {
+                    if (state != "stop" && state != "resume") {
                         state = "moving";
                     }
                 }
@@ -293,7 +296,7 @@ namespace scaledcars {
 
             int right_dist = 0;
             // Set the column/ row at which to search
-            stop_right.x = (m_image_new.cols / 2) + 15 ;
+            stop_right.x = (m_image_new.cols / 2) + 15;
             stop_right.y = m_control_scanline;
 
             // Find first grey pixel in front of the car right side
@@ -320,24 +323,27 @@ namespace scaledcars {
             // Prints several pieces of information onto the image for debugging purposes if debug flag is set to true
             if (m_debug) {
                 std::string speed = std::to_string(m_vehicleControl.getSpeed());
-                putText(m_image_new, "Speed is " + speed , Point(m_image_new.cols - 150, 20), FONT_HERSHEY_PLAIN, 1,
+                putText(m_image_new, "Speed is " + speed, Point(m_image_new.cols - 150, 20), FONT_HERSHEY_PLAIN, 1,
                         CV_RGB(255, 255, 255));
 
-                std::string steer = std::to_string(90+ (m_vehicleControl.getSteeringWheelAngle() * (180/3.14)));
-                putText(m_image_new, "Steering: " + steer , Point(m_image_new.cols - 150, 40), FONT_HERSHEY_PLAIN, 1,
+                std::string steer = std::to_string(90 + (m_vehicleControl.getSteeringWheelAngle() * (180 / 3.14)));
+                putText(m_image_new, "Steering: " + steer, Point(m_image_new.cols - 150, 40), FONT_HERSHEY_PLAIN, 1,
                         CV_RGB(255, 255, 255));
 
-                putText(m_image_new, "State: " + state , Point(m_image_new.cols - 150, 60), FONT_HERSHEY_PLAIN, 1,
+                putText(m_image_new, "State: " + state, Point(m_image_new.cols - 150, 60), FONT_HERSHEY_PLAIN, 1,
                         CV_RGB(255, 255, 255));
 
-                putText(m_image_new, "Old state: " + prevState  , Point(m_image_new.cols - 150, 80), FONT_HERSHEY_PLAIN, 1,
+                putText(m_image_new, "Old state: " + prevState, Point(m_image_new.cols - 150, 80), FONT_HERSHEY_PLAIN,
+                        1,
                         CV_RGB(255, 255, 255));
 
 
-                putText(m_image_new, "Stop counter :" + std::to_string(stopCounter) , Point(m_image_new.cols - 150, 100), FONT_HERSHEY_PLAIN, 1,
+                putText(m_image_new, "Stop counter :" + std::to_string(stopCounter), Point(m_image_new.cols - 150, 100),
+                        FONT_HERSHEY_PLAIN, 1,
                         CV_RGB(255, 255, 255));
 
-                putText(m_image_new, "Distance " + std::to_string(m_distance) , Point(m_image_new.cols - 150, 120), FONT_HERSHEY_PLAIN, 1,
+                putText(m_image_new, "Distance " + std::to_string(m_distance), Point(m_image_new.cols - 150, 120),
+                        FONT_HERSHEY_PLAIN, 1,
                         CV_RGB(255, 255, 255));
 
                 if (left.x > 0) {
@@ -368,7 +374,8 @@ namespace scaledcars {
                     line(m_image_new, cvPoint(m_image.cols / 2, 50), right2, Scalar(255, 0, 0), 1, 8);
                     std::string right_reading = std::to_string((right.x - m_image_new.cols / 2));
 
-                    putText(m_image_new, right_reading, Point(m_image_new.cols / 2 + 100, 50 - 2), FONT_HERSHEY_PLAIN, 1,
+                    putText(m_image_new, right_reading, Point(m_image_new.cols / 2 + 100, 50 - 2), FONT_HERSHEY_PLAIN,
+                            1,
                             CV_RGB(255, 255, 255));
                 }
             }
@@ -376,12 +383,12 @@ namespace scaledcars {
             // Checks whether the detected stopline is at a similar distance on both sides
             if (counter < 3 && (left_dist - right_dist) > -10 && (left_dist - right_dist) < 10 && left_dist != 0 &&
                 right_dist != 0) {
-                if(left_dist > 35 || right_dist > 35){
+                if (left_dist > 35 || right_dist > 35) {
 
-                }else {
+                } else {
                     counter++;
                 }
-            }else{
+            } else {
                 counter = 0;
             }
             if (counter > 2) {
@@ -399,7 +406,7 @@ namespace scaledcars {
             m_previousTime = currentTime;
 
             // A way to handle toggling in corners
-            if(fabs(e) < 1e-2) {
+            if (fabs(e) < 1e-2) {
                 m_eSum = 0;
             } else {
                 m_eSum += e;
@@ -452,6 +459,7 @@ namespace scaledcars {
                 cerr << "STATE IS : " << _state << endl;
                 if (_state == 1) {
                     bool has_next_frame = false;
+                    _stop = 0;
 
                     // Get the most recent available container for a SharedImage.
                     Container image_container = getKeyValueDataStore().get(SharedImage::ID());
@@ -474,7 +482,7 @@ namespace scaledcars {
                             if (stop) {
                                 state = "stop";
                                 stopCounter = 0;
-                            }else {
+                            } else {
                                 m_vehicleControl.setBrakeLights(false);
                                 m_vehicleControl.setSpeed(96);
                                 prevState = "moving";
@@ -511,7 +519,7 @@ namespace scaledcars {
                             prevState = "stopLine";
                         }
                     }
-                    if (state == "resume"){
+                    if (state == "resume") {
                         m_vehicleControl.setBrakeLights(false);
                         if (Sim) {
                             m_vehicleControl.setSpeed(1);
@@ -521,7 +529,7 @@ namespace scaledcars {
                                 m_vehicleControl.setSpeed(96);
                                 m_vehicleControl.setSteeringWheelAngle(0);
 
-                            }else{
+                            } else {
                                 state = "moving";
                                 // m_vehicleControl.setBrakeLights(false);
                                 m_vehicleControl.setSpeed(96);
@@ -553,6 +561,12 @@ namespace scaledcars {
                     Container c2(m_vehicleControl);
                     // Send container.
                     getConference().send(c2);
+                } else if (!_state && !_stop) {
+                    _stop = 1;
+                    m_vehicleControl.setBrakeLights(true);
+                    Container c3(m_vehicleControl);
+                    // Send container.
+                    getConference().send(c3);
                 }
             }
             return ModuleExitCodeMessage::OKAY;

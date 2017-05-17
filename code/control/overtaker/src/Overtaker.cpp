@@ -89,6 +89,12 @@ namespace scaledcars {
         int objectPlausibleCount = 0;
         int objectDisplacedPlausibleCount = 0;
 
+        int enoughTurn = 0;
+
+        int _stop = 0;
+
+        UdpMSG _udpmsg;
+
         Overtaker::Overtaker(const int32_t &argc, char **argv) :
                 DataTriggeredConferenceClientModule(argc, argv, "overtaker"),
                 m_vehicleControl(),
@@ -114,6 +120,10 @@ namespace scaledcars {
 
 
                 if (_state) {
+                    _stop = 0;
+                    overtakerMSG.setStateStop(0);
+                    Container co(overtakerMSG);
+                    getConference().send(co);
                     odometerReal = communicationLinkMSG.getWheelEncoder() - oldOdometer;
                     oldOdometer = communicationLinkMSG.getWheelEncoder();
                     IR_BACK = communicationLinkMSG.getInfraredBack();
@@ -125,6 +135,18 @@ namespace scaledcars {
                     measuringMachine();
 
                     Container c3(m_vehicleControl);
+                    getConference().send(c3);
+                }else if(!_state && !_stop){
+                    _stop = 1;
+
+                    stage = FIND_OBJECT;
+
+                    distanceToObstacle = 0;
+                    distanceToObstacleOld = 0;
+                    odo = 0;
+                    m_vehicleControl.setBrakeLights(true);
+                    Container c3(m_vehicleControl);
+                    // Send container.
                     getConference().send(c3);
                 }
 //                else
@@ -238,9 +260,14 @@ namespace scaledcars {
                 m_vehicleControl.setSpeed(TURN_SPEED_CAR);
                 m_vehicleControl.setSteeringWheelAngle(-1.30);
 
-                if ((IR_FR - IR_RR <= HEADING_PARALLEL) && !(IR_FR < 1) && !(IR_RR < 1)) {
+                if (IR_FR > 13) {
+                    enoughTurn = 1;
+                }
+
+                if (enoughLeft && (IR_FR - IR_RR <= HEADING_PARALLEL) && !(IR_FR < 1) && !(IR_RR < 1)) {
                     stage = KEEP_TURN_RIGHT;
                     odo = 0;
+                    enoughTurn = 0;
                 }
 
             }
@@ -251,7 +278,7 @@ namespace scaledcars {
                 m_vehicleControl.setSpeed(TURN_SPEED_CAR);
                 m_vehicleControl.setSteeringWheelAngle(1.5);
 
-                if (odo > 4) {
+                if (odo > 4 || IR_FR < 8) {
                     m_vehicleControl.setBrakeLights(false);
                     m_vehicleControl.setSpeed(TURN_SPEED_CAR);
                     m_vehicleControl.setSteeringWheelAngle(0.5);
@@ -284,9 +311,16 @@ namespace scaledcars {
                     m_vehicleControl.setSpeed(TURN_SPEED_CAR);
                     m_vehicleControl.setSteeringWheelAngle(0);
 
+                    _udpmsg.setStateFunctionOvertaker(0);
+                    _udpmsg.setStateFunctionParker(0);
+
+                    Container co(_udpmsg);
+                    getConference().send(co);
+
                     overtakerMSG.setStateStop(1);
                     Container c(overtakerMSG);
                     getConference().send(c);
+
                     _state = 0;
 
                     stage = FIND_OBJECT;

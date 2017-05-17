@@ -88,7 +88,7 @@ namespace scaledcars {
                 if (overtakerMSGContainer.getDataType() == OvertakerMSG::ID()) {
                     overtakerMSG = overtakerMSGContainer.getData<OvertakerMSG>();
 
-                    communicationLinkMSG.setStateLaneFollower(!overtakerMSG.getStateStop());
+                    communicationLinkMSG.setStateLaneFollower(overtakerMSG.getStateStop());
                     communicationLinkMSG.setDrivingLane(overtakerMSG.getStateLane());
                 }
 
@@ -96,7 +96,7 @@ namespace scaledcars {
                 if (parkerMSGContainer.getDataType() == ParkerMSG::ID()) {
                     parkerMSG = parkerMSGContainer.getData<ParkerMSG>();
 
-                    communicationLinkMSG.setStateLaneFollower(!parkerMSG.getStateStop());
+                    communicationLinkMSG.setStateLaneFollower(parkerMSG.getStateStop());
                 }
 
                 Container laneFollowerMSGContainer = getKeyValueDataStore().get(LaneFollowerMSG::ID());
@@ -115,11 +115,21 @@ namespace scaledcars {
                         communicationLinkMSG.setStateLaneFollower(0);
                         communicationLinkMSG.setStateOvertaker(0);
                         communicationLinkMSG.setStateParker(0);
-                    } else if (!UDPMSG.getStateStop()) {
-                        communicationLinkMSG.setStateLaneFollower(1);
-                        communicationLinkMSG.setStateOvertaker(UDPMSG.getStateFunctionOvertaker());
-                        communicationLinkMSG.setStateParker(UDPMSG.getStateFunctionParker());
-                        communicationLinkMSG.setUnpark(UDPMSG.getUnpark());
+                    } else {
+                        if (UDPMSG.getStateFunctionOvertaker()) {
+                            communicationLinkMSG.setStateOvertaker(1);
+                            communicationLinkMSG.setStateLaneFollower(0);
+                            communicationLinkMSG.setStateParker(0);
+                        } else if (UDPMSG.getStateFunctionParker()) {
+                            communicationLinkMSG.setStateOvertaker(0);
+                            communicationLinkMSG.setStateLaneFollower(0);
+                            communicationLinkMSG.setStateParker(1);
+                            communicationLinkMSG.setUnpark(UDPMSG.getUnpark());
+                        } else {
+                            communicationLinkMSG.setStateOvertaker(0);
+                            communicationLinkMSG.setStateLaneFollower(1);
+                            communicationLinkMSG.setStateParker(0);
+                        }
                     }
                 }
 

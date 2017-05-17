@@ -61,7 +61,7 @@ namespace scaledcars {
                 _udpmsg.setStateFunctionParker(1);
                 _udpmsg.setUnpark(0);
             } else if (!(notValid = received.compare("unpark"))) {
-                _udpmsg.setStateStop(0);
+                _udpmsg.setStateFunctionParker(0);
                 _udpmsg.setUnpark(1);
             }
 

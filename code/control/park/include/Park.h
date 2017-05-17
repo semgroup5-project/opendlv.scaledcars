@@ -35,6 +35,7 @@
 #include "odvdscaledcarsdatamodel/generated/group5/CommunicationLinkMSG.h"
 #include "odvdscaledcarsdatamodel/generated/group5/ParkerMSG.h"
 #include <automotivedata/GeneratedHeaders_AutomotiveData.h>
+#include "odvdscaledcarsdatamodel/generated/group5/UdpMSG.h"
 #include <opendavinci/GeneratedHeaders_OpenDaVINCI.h>
 
 #define IR 0

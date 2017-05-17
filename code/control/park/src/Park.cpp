@@ -41,6 +41,7 @@ namespace scaledcars {
         double timer = 0;
         double turnCount = 0;
         CommunicationLinkMSG communicationLinkMSG;
+        int _stop = 0;
 
         Park::Park(const int32_t &argc, char **argv) :
                 TimeTriggeredConferenceClientModule(argc, argv, "Park"),
@@ -90,6 +91,7 @@ namespace scaledcars {
 
 
                     if (_state == 1) {
+                        _stop = 0;
                         //     setParkingType(communicationLinkMSG.getParkingType());
                         irRear = communicationLinkMSG.getInfraredBack();
                         usFront = communicationLinkMSG.getUltraSonicFrontCenter();
@@ -116,6 +118,27 @@ namespace scaledcars {
 
                         Container c(vc);
                         getConference().send(c);
+                    } else if (!_state && !_stop) {
+                        _stop = 1;
+                        parkingSpace = 0;
+                        IRRObstacle = false;
+                        USFObstacle = false;
+                        IRFRObstacle = false;
+                        IRRRObstacle = false;
+                        odometer = 0;
+                        parkingState = 0;
+                        parkingType = 0;
+                        parkingCounter = 0;
+                        parkingStart = 0;
+                        backDist = 0;
+                        backStart = 0;
+                        backEnd = 0;
+                        adjDist = 0;
+                        isParking = false;
+                        vc.setBrakeLights(true);
+                        Container c3(vc);
+                        // Send container.
+                        getConference().send(c3);
                     }
 
                 }
@@ -203,7 +226,7 @@ namespace scaledcars {
 
 
                 //    }
-                break;
+//                break;
                 case RIGHT_TURN: {
 
                     //  vc.setBrakeLights(false);
