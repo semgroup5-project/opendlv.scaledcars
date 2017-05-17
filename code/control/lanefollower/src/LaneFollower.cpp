@@ -37,7 +37,6 @@ namespace scaledcars {
         using namespace group5;
 
         // Class variables
-        int _stop = 0;
         Mat m_image_mat, m_image_new;
         bool stop = false;
         double stopCounter = 0, counter = 0;
@@ -88,6 +87,7 @@ namespace scaledcars {
             }
             // Values adjusted for simulation environment, if sim flag is set
             if (Sim) {
+                _state = 1;
                 m_control_scanline = 462; // calibrated length to right: 280px
                 m_distance = 250;  // distance from right lane marking
             }
@@ -128,6 +128,8 @@ namespace scaledcars {
                         memcpy(m_image.data, m_sharedImageMemory->getSharedMemory(),
                                si.getWidth() * si.getHeight() * si.getBytesPerPixel());
                     }
+
+
                     m_sharedImageMemory->unlock(); // Release the memory region lock
                     // If in Sim mode, flip the image
                     if (Sim) {
@@ -217,36 +219,38 @@ namespace scaledcars {
                 }
             }
 
+            if (!Sim){
+                if (right.x == -1 && left.x == -1) {  //setting state if the car does not see any line
+                    // The following 2 for loops search for lane markings at a row close to the top of the image if no lane markings are found at the control_scanline
+                    for (int x = m_image_new.cols / 2; x > 0; x--) {
+                        pixelLeft2 = m_image_new.at<uchar>(Point(x,100));
+                        if (pixelLeft2 >= 150) {
+                            left2.x = x;
+                            break;
+                        }
+                    }
+                    // Search from middle to the right
+                    for (int x = m_image_new.cols / 2;
+                         x < m_image_new.cols - 30; x++) {
+                        pixelRight2 = m_image_new.at<uchar>(Point(x, 100));
+                        if (pixelRight2 >= 150) {
+                            right2.x = x;
+                            break;
+                        }
+                    }
+                    // If the second check also returns -1 for both sides, then no followable lane markings are found
+                    if (right2.x == -1 && left2.x == -1){
+                        state = "danger";
+                    }
 
-            if (right.x == -1 && left.x == -1) {  //setting state if the car does not see any line
-                // The following 2 for loops search for lane markings at a row close to the top of the image if no lane markings are found at the control_scanline
-                for (int x = m_image_new.cols / 2; x > 0; x--) {
-                    pixelLeft2 = m_image_new.at<uchar>(Point(x,100));
-                    if (pixelLeft2 >= 150) {
-                        left2.x = x;
-                        break;
+                }
+                else{
+                    if(state != "stop" && state != "resume"){
+                        state = "moving";
                     }
                 }
-                // Search from middle to the right
-                for (int x = m_image_new.cols / 2;
-                     x < m_image_new.cols - 30; x++) {
-                    pixelRight2 = m_image_new.at<uchar>(Point(x, 100));
-                    if (pixelRight2 >= 150) {
-                        right2.x = x;
-                        break;
-                    }
-                }
-                // If the second check also returns -1 for both sides, then no followable lane markings are found
-                if (right2.x == -1 && left2.x == -1){
-                    state = "danger";
-                }
+            }
 
-            }
-            else{
-                if(state != "stop" && state != "resume"){
-                    state = "moving";
-                }
-            }
 
             // Moving the pixel perception to the right, as to better keep track of right lane marking
             if (right.x > 0) right.x += 10;
@@ -327,7 +331,7 @@ namespace scaledcars {
                         CV_RGB(255, 255, 255));
 
                 putText(m_image_new, "Old state: " + prevState  , Point(m_image_new.cols - 150, 80), FONT_HERSHEY_PLAIN, 1,
-                      CV_RGB(255, 255, 255));
+                        CV_RGB(255, 255, 255));
 
 
                 putText(m_image_new, "Stop counter :" + std::to_string(stopCounter) , Point(m_image_new.cols - 150, 100), FONT_HERSHEY_PLAIN, 1,
@@ -447,7 +451,6 @@ namespace scaledcars {
 
                 cerr << "STATE IS : " << _state << endl;
                 if (_state == 1) {
-                    _stop = 0;
                     bool has_next_frame = false;
 
                     // Get the most recent available container for a SharedImage.
@@ -478,21 +481,21 @@ namespace scaledcars {
                                 state = "moving";
                             }
                             //else{
-                                   // if (prevState == "stopLine"){
-                                     //   stopCounter = 0;
-                                     //   m_vehicleControl.setSpeed(99);
-                                    //}else{
+                            // if (prevState == "stopLine"){
+                            //   stopCounter = 0;
+                            //   m_vehicleControl.setSpeed(99);
+                            //}else{
 
-                                    //}
-                               // }
-                            }
+                            //}
+                            // }
+                        }
 //                        else {
 //                                m_vehicleControl.setSpeed(99);
 //                                prevState = "moving";
 //                            }
 //
-                        }
-                   // }
+                    }
+                    // }
                     if (state == "stop") {
                         m_vehicleControl.setSteeringWheelAngle(0);
                         if (Sim) {
@@ -510,20 +513,20 @@ namespace scaledcars {
                     }
                     if (state == "resume"){
                         m_vehicleControl.setBrakeLights(false);
-                            if (Sim) {
-                                m_vehicleControl.setSpeed(1);
-                            } else {
-                                if (stopCounter < 45.9999) {
-                                    stopCounter += 0.5;
-                                    m_vehicleControl.setSpeed(96);
-                                    m_vehicleControl.setSteeringWheelAngle(0);
+                        if (Sim) {
+                            m_vehicleControl.setSpeed(1);
+                        } else {
+                            if (stopCounter < 45.9999) {
+                                stopCounter += 0.5;
+                                m_vehicleControl.setSpeed(96);
+                                m_vehicleControl.setSteeringWheelAngle(0);
 
-                                }else{
-                                    state = "moving";
-                                   // m_vehicleControl.setBrakeLights(false);
-                                    m_vehicleControl.setSpeed(96);
-                                }
+                            }else{
+                                state = "moving";
+                                // m_vehicleControl.setBrakeLights(false);
+                                m_vehicleControl.setSpeed(96);
                             }
+                        }
                     }
                     if (state == "danger") {
                         // After a stop line, go forward and don't steer at all, it is expected to not find any reference lane markings for a stretch of road following an intersection
@@ -550,12 +553,6 @@ namespace scaledcars {
                     Container c2(m_vehicleControl);
                     // Send container.
                     getConference().send(c2);
-                } else if(!_state && !_stop){
-                    _stop = 1;
-                    m_vehicleControl.setBrakeLights(true);
-                    Container c3(m_vehicleControl);
-                    // Send container.
-                    getConference().send(c3);
                 }
             }
             return ModuleExitCodeMessage::OKAY;
