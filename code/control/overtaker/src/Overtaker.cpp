@@ -264,7 +264,7 @@ namespace scaledcars {
                     enoughTurn = 1;
                 }
 
-                if (enoughLeft && (IR_FR - IR_RR <= HEADING_PARALLEL) && !(IR_FR < 1) && !(IR_RR < 1)) {
+                if (/*enoughLeft && */(IR_FR - IR_RR <= HEADING_PARALLEL) && !(IR_FR < 1) && !(IR_RR < 1)) {
                     stage = KEEP_TURN_RIGHT;
                     odo = 0;
                     enoughTurn = 0;

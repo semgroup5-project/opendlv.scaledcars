@@ -91,6 +91,7 @@ namespace scaledcars {
             // Values adjusted for simulation environment, if sim flag is set
             if (Sim) {
                 _state = 1;
+                m_stop_scanline = 350;
                 m_control_scanline = 462; // calibrated length to right: 280px
                 m_distance = 250;  // distance from right lane marking
             }
@@ -383,11 +384,14 @@ namespace scaledcars {
             // Checks whether the detected stopline is at a similar distance on both sides
             if (counter < 3 && (left_dist - right_dist) > -10 && (left_dist - right_dist) < 10 && left_dist != 0 &&
                 right_dist != 0) {
-                if (left_dist > 35 || right_dist > 35) {
-
-                } else {
+                if (!Sim){
+                    if(left_dist < 35 || right_dist < 35){
+                        counter++;
+                    }
+                }else{
                     counter++;
                 }
+
             } else {
                 counter = 0;
             }
@@ -477,7 +481,15 @@ namespace scaledcars {
                     // State control algorithm, attempts to stop briefly at each intersection and stops the car if danger zone (image processing could not find a lane to follow)
                     if (state == "moving") {
                         if (Sim) {
-                            m_vehicleControl.setSpeed(1);
+                            if (stop) {
+                                state = "stop";
+                                stopCounter = 0;
+                            } else {
+                                m_vehicleControl.setBrakeLights(false);
+                                m_vehicleControl.setSpeed(1);
+                                prevState = "moving";
+                                state = "moving";
+                            }
                         } else {
                             if (stop) {
                                 state = "stop";
@@ -488,41 +500,44 @@ namespace scaledcars {
                                 prevState = "moving";
                                 state = "moving";
                             }
-                            //else{
-                            // if (prevState == "stopLine"){
-                            //   stopCounter = 0;
-                            //   m_vehicleControl.setSpeed(99);
-                            //}else{
-
-                            //}
-                            // }
                         }
-//                        else {
-//                                m_vehicleControl.setSpeed(99);
-//                                prevState = "moving";
-//                            }
-//
+
                     }
                     // }
                     if (state == "stop") {
                         m_vehicleControl.setSteeringWheelAngle(0);
                         if (Sim) {
                             m_vehicleControl.setSpeed(0);
+                            stopCounter += 0.5;
+
+                            if (stopCounter > 40.9999) {
+                                state = "resume";
+                                prevState = "stopLine";
+                            }
                         } else {
                             m_vehicleControl.setBrakeLights(true);
+                            stopCounter += 0.5;
+
+                            if (stopCounter > 20.9999) {
+                                state = "resume";
+                                prevState = "stopLine";
+                            }
                         }
 
-                        stopCounter += 0.5;
 
-                        if (stopCounter > 20.9999) {
-                            state = "resume";
-                            prevState = "stopLine";
-                        }
                     }
                     if (state == "resume") {
                         m_vehicleControl.setBrakeLights(false);
                         if (Sim) {
-                            m_vehicleControl.setSpeed(1);
+                            if (stopCounter < 65.9999) {
+                                stopCounter += 0.5;
+                                m_vehicleControl.setSpeed(1);
+                                m_vehicleControl.setSteeringWheelAngle(0);
+                            } else {
+                                state = "moving";
+                                // m_vehicleControl.setBrakeLights(false);
+                                m_vehicleControl.setSpeed(1);
+                            }
                         } else {
                             if (stopCounter < 45.9999) {
                                 stopCounter += 0.5;
