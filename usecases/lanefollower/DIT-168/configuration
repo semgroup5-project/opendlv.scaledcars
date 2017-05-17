@@ -225,8 +225,8 @@ odsimvehicle.LinearBicycleModel.KdynamicBrake=60.0
 #
 # CONFIGURATION FOR LANEFOLLOWER
 #
-lanefollower.p = 1.4     #OG val = 1.3
-lanefollower.d = 0.60  #OG val = 0.10
+lanefollower.p = 1.2     #OG val = 1.3
+lanefollower.d = 0.2    #OG val = 0.10
 lanefollower.i= 0.01     #OG val = 0.01
 
 ###############################################################################
@@ -369,7 +369,7 @@ lanedetector.threshBaseParameter=48
 # CONFIGURATION FOR CommunicationLink
 #
 communicationlink.functionlane = 1
-communicationlink.function2 = 0
+communicationlink.function2 = 1
 
 ###############################################################################
 ###############################################################################
@@ -379,3 +379,9 @@ communicationlink.function2 = 0
 global.debug = 1      # set to 0 to disable any windows and further output
 global.sim = 0    # Set simulation true or false
 
+###############################################################################
+###############################################################################
+#
+# CLIENT IP
+#
+udpconnectionstreamer.ip = 192.168.43.40

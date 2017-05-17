@@ -31,21 +31,8 @@ services:
         restart: on-failure
         command: "/opt/od4/bin/odsupercomponent --cid=${CID} --configuration=/opt/configuration/configuration --freq=20"
 
-    # Micro-service for odsimvehicle.
-    odsimvehicle:
-        build: .
-        network_mode: host
-        ipc : host
-        depends_on:
-            - odsupercomponent
-        logging:
-            driver: "none"
-        privileged: true
-        restart: on-failure
-        command: "/opt/od4/bin/odsimvehicle --cid=${CID} --freq=20"
-
     #Micro-service for camera
-    odsimcamera:
+    proxy:
         build: .
         network_mode: host
         ipc: host
@@ -60,26 +47,65 @@ services:
         command: "/opt/opendlv.scaledcars/bin/scaledcars-control-proxy --cid=${CID} --rm=true --freq=20 --configuration=/opt/configuration/configuration"
 
     #serial
-    serialhandler:
+    serialsendhandler:
         build: .
         network_mode: host
+        ipc : host
         group_add:
         - uucp
         depends_on:
             - odsupercomponent
         restart: on-failure
         privileged: true
-        command: bash -c "sleep 10; /opt/opendlv.scaledcars/bin/scaledcars-control-serialsendhandler --verbose=1 --cid=${CID} --rm=true --freq=1"
+        command: bash -c "sleep 10; /opt/opendlv.scaledcars/bin/scaledcars-control-serialsendhandler --verbose=1 --cid=${CID} --rm=true --freq=10"
+
+    #serial
+    serialreceivehandler:
+        build: .
+        network_mode: host
+        ipc : host
+        group_add:
+        - uucp
+        depends_on:
+            - odsupercomponent
+        restart: on-failure
+        privileged: true
+        command: bash -c "sleep 10; /opt/opendlv.scaledcars/bin/scaledcars-control-serialreceivehandler --verbose=1 --cid=${CID} --rm=true --freq=25"
 
     #communicationlink
     communicationlink:
         build: .
         network_mode: host
+        ipc : host
         depends_on:
             - odsupercomponent
         restart: on-failure
         privileged: true
         command: bash -c "sleep 5; /opt/opendlv.scaledcars/bin/scaledcars-control-communicationlink --verbose=1 --cid=${CID} --rm=true --freq=20"
+
+    #udpconnectionreceiver
+    udpconnectionreceiver:
+        build: .
+        network_mode: host
+        ipc : host
+        depends_on:
+            - odsupercomponent
+        restart: on-failure
+        privileged: true
+        command: bash -c "sleep 5; /opt/opendlv.scaledcars/bin/scaledcars-control-udpconnectionreceiver --verbose=1 --cid=${CID} --rm=true --freq=20"
+
+    #udpconnectionstreamer
+    udpconnectionstreamer:
+        build: .
+        network_mode: host
+        ipc : host
+        depends_on:
+            - odsupercomponent
+        volumes:
+        - ./DIT-168:/opt/configuration
+        restart: on-failure
+        privileged: true
+        command: bash -c "sleep 5; /opt/opendlv.scaledcars/bin/scaledcars-control-udpconnectionstreamer --verbose=1 --cid=${CID} --rm=true --freq=20"
 
    #Micro-service for lanedtecter scenario.
     lanefollower:
@@ -90,11 +116,37 @@ services:
         - ./DIT-168:/opt/configuration
         depends_on:
             - odsupercomponent
-            - odsimvehicle
-            - odsimcamera
+            - proxy
             - communicationlink
         restart: on-failure
         privileged: true
         command: bash -c "sleep 5; /opt/opendlv.scaledcars/bin/scaledcars-control-lanefollwer --verbose=1  --cid=${CID} --freq=20"
 
+    #Micro-service for Overtaker.
+    overtaker:
+        build: .
+        network_mode: host
+        ipc: host
+        volumes:
+        - ./DIT-168:/opt/configuration
+        depends_on:
+             - odsupercomponent
+             - communicationlink
+        restart: on-failure
+        privileged: true
+        command: bash -c "sleep 5; /opt/opendlv.scaledcars/bin/scaledcars-control-overtaker --verbose=1  --cid=${CID} --freq=20 --configuration=/opt/configuration/configuration"
+
+    #Micro-service for Park.
+    park:
+        build: .
+        network_mode: host
+        ipc: host
+        volumes:
+        - ./DIT-168:/opt/configuration
+        depends_on:
+            - odsupercomponent
+            - communicationlink
+        restart: on-failure
+        privileged: true
+        command: bash -c "sleep 5; /opt/opendlv.scaledcars/bin/scaledcars-control-park --verbose=1  --cid=${CID} --freq=20"
 

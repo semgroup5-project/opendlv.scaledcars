@@ -34,11 +34,14 @@ namespace scaledcars {
             communicationLinkMSG.setStateLaneFollower(kv.getValue<int32_t>("communicationlink.functionlane"));
             int func2 = kv.getValue<int32_t>("communicationlink.function2");
 
-            if (func2) {
+            if (func2 == 1) {
                 communicationLinkMSG.setStateOvertaker(0);
                 communicationLinkMSG.setStateParker(1);
-            } else {
+            } else if (func2 == 0){
                 communicationLinkMSG.setStateOvertaker(1);
+                communicationLinkMSG.setStateParker(0);
+            } else {
+                communicationLinkMSG.setStateOvertaker(0);
                 communicationLinkMSG.setStateParker(0);
             }
         }
@@ -61,7 +64,7 @@ namespace scaledcars {
                     cout << "ID:  " << ID_IN_ULTRASONIC_CENTER << " VALUE: "
                          << sensorsMSG.getValueForKey_MapOfDistances(ID_IN_ULTRASONIC_CENTER) << endl;
 
-                    communicationLinkMSG.setUltrasonicFrontRight(
+                    communicationLinkMSG.setUltraSonicFrontRight(
                             sensorsMSG.getValueForKey_MapOfDistances(ID_IN_ULTRASONIC_SIDE_FRONT));
                     cout << "ID:  " << ID_IN_ULTRASONIC_SIDE_FRONT << " VALUE: "
                          << sensorsMSG.getValueForKey_MapOfDistances(ID_IN_ULTRASONIC_SIDE_FRONT) << endl;

@@ -166,7 +166,7 @@ namespace scaledcars {
                     retVal = odcore::wrapper::jpg::JPG::compress(buffer, compressedSize, m_image_new.cols,
                                                                  m_image_new.rows,1,
                                                                  m_image_new.data,
-                                                                 100);
+                                                                 50);
                 }
                 // Check if the size of the compressed image fits in a UDP packet.
                 const int32_t MAX_SIZE_UDP_PAYLOAD = 65000;

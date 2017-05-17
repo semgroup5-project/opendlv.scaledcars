@@ -27,97 +27,96 @@
 
 using namespace std;
 using namespace odcore::data;
-using namespace automotive::miniature;
+using namespace scaledcars::control;
 
 /**
  * This class derives from SensorBoard to allow access to protected methods.
  */
 class OvertakerTestling : public Overtaker {
-    private:
-        OvertakerTestling();
-    
-    public:
-        OvertakerTestling(const int32_t &argc, char **argv) :
+private:
+    OvertakerTestling();
+
+public:
+    OvertakerTestling(const int32_t &argc, char **argv) :
             Overtaker(argc, argv) {}
 
-        // Here, you need to add all methods which are protected in Overtaker and which are needed for the test cases.
+    // Here, you need to add all methods which are protected in Overtaker and which are needed for the test cases.
 };
 
 /**
  * The actual testsuite starts here.
  */
 class OvertakerTest : public CxxTest::TestSuite {
-    private:
-        OvertakerTestling *dt;
+private:
+    OvertakerTestling *dt;
 
-    public:
-        /**
-         * This method will be called before each testXYZ-method.
-         */
-        void setUp() {
-            // Prepare the data that would be available from commandline.
-            string argv0("overtaker");
-            string argv1("--cid=100");
-            int32_t argc = 2;
-            char **argv;
-            argv = new char*[2];
-            argv[0] = const_cast<char*>(argv0.c_str());
-            argv[1] = const_cast<char*>(argv1.c_str());
+public:
+    /**
+     * This method will be called before each testXYZ-method.
+     */
+    void setUp() {
+        // Prepare the data that would be available from commandline.
+        string argv0("overtaker");
+        string argv1("--cid=100");
+        int32_t argc = 2;
+        char **argv;
+        argv = new char*[2];
+        argv[0] = const_cast<char*>(argv0.c_str());
+        argv[1] = const_cast<char*>(argv1.c_str());
 
-            // Create an instance of sensorboard through SensorBoardTestling which will be deleted in tearDown().
-            dt = new OvertakerTestling(argc, argv);
-        }
+        // Create an instance of sensorboard through SensorBoardTestling which will be deleted in tearDown().
+        dt = new OvertakerTestling(argc, argv);
+    }
 
-        /**
-         * This method will be called after each testXYZ-method.
-         */
-        void tearDown() {
-            delete dt;
-            dt = NULL;
-        }
+    /**
+     * This method will be called after each testXYZ-method.
+     */
+    void tearDown() {
+        delete dt;
+        dt = NULL;
+    }
 
-        ////////////////////////////////////////////////////////////////////////////////////
-        // Below this line the actual testcases are defined.
-        ////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////
+    // Below this line the actual testcases are defined.
+    ////////////////////////////////////////////////////////////////////////////////////
 
-        void testOvertakerSuccessfullyCreated() {
-            TS_ASSERT(dt != NULL);
-        }
+    void testOvertakerSuccessfullyCreated() {
+        TS_ASSERT(dt != NULL);
+    }
 
-        ////////////////////////////////////////////////////////////////////////////////////
-        // Below this line the necessary constructor for initializing the pointer variables,
-        // and the forbidden copy constructor and assignment operator are declared.
-        //
-        // These functions are normally not changed.
-        ////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////
+    // Below this line the necessary constructor for initializing the pointer variables,
+    // and the forbidden copy constructor and assignment operator are declared.
+    //
+    // These functions are normally not changed.
+    ////////////////////////////////////////////////////////////////////////////////////
 
-    public:
-        /**
-         * This constructor is only necessary to initialize the pointer variable.
-         */
-        OvertakerTest() : dt(NULL) {}
+public:
+    /**
+     * This constructor is only necessary to initialize the pointer variable.
+     */
+    OvertakerTest() : dt(NULL) {}
 
-    private:
-        /**
-         * "Forbidden" copy constructor. Goal: The compiler should warn
-         * already at compile time for unwanted bugs caused by any misuse
-         * of the copy constructor.
-         *
-         * @param obj Reference to an object of this class.
-         */
-        OvertakerTest(const OvertakerTest &/*obj*/);
+private:
+    /**
+     * "Forbidden" copy constructor. Goal: The compiler should warn
+     * already at compile time for unwanted bugs caused by any misuse
+     * of the copy constructor.
+     *
+     * @param obj Reference to an object of this class.
+     */
+    OvertakerTest(const OvertakerTest &/*obj*/);
 
-        /**
-         * "Forbidden" assignment operator. Goal: The compiler should warn
-         * already at compile time for unwanted bugs caused by any misuse
-         * of the assignment operator.
-         *
-         * @param obj Reference to an object of this class.
-         * @return Reference to this instance.
-         */
-        OvertakerTest& operator=(const OvertakerTest &/*obj*/);
+    /**
+     * "Forbidden" assignment operator. Goal: The compiler should warn
+     * already at compile time for unwanted bugs caused by any misuse
+     * of the assignment operator.
+     *
+     * @param obj Reference to an object of this class.
+     * @return Reference to this instance.
+     */
+    OvertakerTest& operator=(const OvertakerTest &/*obj*/);
 
 };
 
 #endif /*OVERTAKERTESTSUITE_H_*/
-

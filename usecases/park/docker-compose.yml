@@ -46,24 +46,6 @@ services:
         restart: on-failure
         command: "/opt/od4/bin/odsimvehicle --cid=${CID} --freq=20"
 
-    #Micro-service for camera
-#    odsimcamera:
- #       build: .
-  #     network_mode: host
-   #     ipc: host
-   #     group_add:
-    #    - video
-     #   environment:
-      #  - DISPLAY=$DISPLAY
-       # volumes:
-        #- ./DIT-168:/opt/configuration
-#        - /tmp/.X11-unix:/tmp/.X11-unix
- #       depends_on:
-  #          - odsupercomponent
-   #     privileged: true
-    #    restart: on-failure
-     #   command: "/opt/opendlv.scaledcars/bin/scaledcars-control-proxy --cid=${CID} --rm=true --freq=20"
-
     #serial
     serialsendhandler:
         build: .
@@ -88,7 +70,7 @@ services:
             - odsupercomponent
         restart: on-failure
         privileged: true
-        command: bash -c "sleep 10; /opt/opendlv.scaledcars/bin/scaledcars-control-serialreceivehandler --verbose=1 --cid=${CID} --rm=true --freq=25"
+        command: bash -c "sleep 10; /opt/opendlv.scaledcars/bin/scaledcars-control-serialreceivehandler --verbose=1 --cid=${CID} --rm=true --freq=30"
 
     #communicationlink
     communicationlink:
@@ -142,23 +124,6 @@ services:
         privileged: true
         command: "/opt/od4/bin/odcockpit --cid=${CID} --freq=20 --configuration=/opt/configuration/configuration"
 
-   #Micro-service for lanefollower.
-    lanefollower:
-        build: .
-        network_mode: host
-        ipc: host
-        environment:
-        - DISPLAY=$DISPLAY
-        volumes:
-        - ./DIT-168:/opt/configuration
-        depends_on:
-           - odsupercomponent
-           - odsimvehicle
-           - odsimcamera
-           - communicationlink
-        restart: on-failure
-        privileged: true
-        command: bash -c "sleep 5; /opt/opendlv.scaledcars/bin/scaledcars-control-lanefollwer --verbose=1  --cid=${CID} --freq=20 --configuration=/opt/configuration/configuration"
     park:
         build: .
         network_mode: host

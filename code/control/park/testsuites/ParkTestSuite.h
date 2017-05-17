@@ -41,6 +41,26 @@ class ParkTestling : public Park {
             Park(argc, argv) {}
 
         // Here, you need to add all methods which are protected in ParallelParker and which are needed for the test cases.
+        void parkingFinder();
+
+        void setParkingState(int state);
+
+        double adjDistCalculation(double start);
+
+        bool obstacleDetection(int i, int id);
+
+        void park();
+
+        void unpark();
+
+        void sendParkerMSG();
+            
+        bool isOkay(CommunicationLinkMSG c);
+            
+        void sensorSetup(CommunicationLinkMSG c);
+            
+        void obstacleSetup();
+
 };
 
 /**

@@ -37,12 +37,13 @@ namespace scaledcars {
         using namespace group5;
 
         // Class variables
+        int _stop = 0;
         Mat m_image_mat, m_image_new;
         bool stop = false;
         double stopCounter = 0, counter = 0;
         String state = "moving", prevState = "moving";
         bool inRightLane = true;   //Flip this value to indicate lane change
-
+        int currentDistance = 0;
         // Constructor
         LaneFollower::LaneFollower(const int32_t &argc, char **argv) :
                 TimeTriggeredConferenceClientModule(argc, argv, "lanefollower"),
@@ -273,7 +274,7 @@ namespace scaledcars {
 
             int left_dist = 0;
             // Set the column/ row at which to search
-            stop_left.x = (m_image_new.cols / 2) - 30;
+            stop_left.x = (m_image_new.cols / 2) - 25;
             stop_left.y = m_control_scanline;
 
             // Find first grey pixel in the front of the car left side
@@ -288,7 +289,7 @@ namespace scaledcars {
 
             int right_dist = 0;
             // Set the column/ row at which to search
-            stop_right.x = (m_image_new.cols / 2) + 20;
+            stop_right.x = (m_image_new.cols / 2) + 15 ;
             stop_right.y = m_control_scanline;
 
             // Find first grey pixel in front of the car right side
@@ -346,6 +347,7 @@ namespace scaledcars {
                 if (right.x > 0) {
                     line(m_image_new, cvPoint(m_image.cols / 2, y), right, Scalar(255, 0, 0), 1, 8);
                     std::string right_reading = std::to_string((right.x - m_image_new.cols / 2));
+                    currentDistance = (right.x - m_image_new.cols / 2);
 
                     putText(m_image_new, right_reading, Point(m_image_new.cols / 2 + 100, y - 2), FONT_HERSHEY_PLAIN, 1,
                             CV_RGB(255, 255, 255));
@@ -370,7 +372,7 @@ namespace scaledcars {
             // Checks whether the detected stopline is at a similar distance on both sides
             if (counter < 3 && (left_dist - right_dist) > -10 && (left_dist - right_dist) < 10 && left_dist != 0 &&
                 right_dist != 0) {
-                if(left_dist > 40 || right_dist > 40){
+                if(left_dist > 35 || right_dist > 35){
 
                 }else {
                     counter++;
@@ -442,8 +444,10 @@ namespace scaledcars {
                     const CommunicationLinkMSG communicationLinkMSG = communicationLinkContainer.getData<CommunicationLinkMSG>();
                     _state = communicationLinkMSG.getStateLaneFollower();
                 }
+
                 cerr << "STATE IS : " << _state << endl;
                 if (_state == 1) {
+                    _stop = 0;
                     bool has_next_frame = false;
 
                     // Get the most recent available container for a SharedImage.
@@ -505,19 +509,20 @@ namespace scaledcars {
                         }
                     }
                     if (state == "resume"){
-
+                        m_vehicleControl.setBrakeLights(false);
                             if (Sim) {
                                 m_vehicleControl.setSpeed(1);
                             } else {
-                                if (stopCounter > 25.9999) {
+                                if (stopCounter < 45.9999) {
                                     stopCounter += 0.5;
                                     m_vehicleControl.setSpeed(96);
                                     m_vehicleControl.setSteeringWheelAngle(0);
 
+                                }else{
+                                    state = "moving";
+                                   // m_vehicleControl.setBrakeLights(false);
+                                    m_vehicleControl.setSpeed(96);
                                 }
-                                state = "moving";
-                                m_vehicleControl.setBrakeLights(false);
-                                m_vehicleControl.setSpeed(96);
                             }
                     }
                     if (state == "danger") {
@@ -535,10 +540,22 @@ namespace scaledcars {
                             m_vehicleControl.setBrakeLights(true);
                         }
                     }
+
+                    laneFollowerMSG.setDistanceToRightLane(currentDistance);
+                    laneFollowerMSG.setStateLane(inRightLane);
+
+                    Container lfMessage(laneFollowerMSG);
+                    getConference().send(lfMessage);
                     // Create container for finally sending the set values for the control algorithm.
                     Container c2(m_vehicleControl);
                     // Send container.
                     getConference().send(c2);
+                } else if(!_state && !_stop){
+                    _stop = 1;
+                    m_vehicleControl.setBrakeLights(true);
+                    Container c3(m_vehicleControl);
+                    // Send container.
+                    getConference().send(c3);
                 }
             }
             return ModuleExitCodeMessage::OKAY;

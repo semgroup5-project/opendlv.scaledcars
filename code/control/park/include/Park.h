@@ -45,7 +45,7 @@
 #define LEFT_TURN 2
 #define INGAP_RIGHT_TURN 3
 #define END 4
-#define INTHEMIDD 5
+
 //MS
 //#define WAITFORWHEELANGLECHANGE 100
 //MS
@@ -106,8 +106,6 @@ namespace scaledcars {
 
             void parkingFinder();
 
-            void parallelPark();
-
             void setParkingState(int state);
 
             double adjDistCalculation(double start);
@@ -141,6 +139,8 @@ namespace scaledcars {
             double odometer;
 
             double usFront;
+
+            double usFrontRight;
 
             double irFrontRight;
 
