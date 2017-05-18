@@ -508,9 +508,12 @@ namespace scaledcars {
                     if (state == "stop") {
                         m_vehicleControl.setSteeringWheelAngle(0);
                         if (Sim) {
-                            m_vehicleControl.setSpeed(0);
-                            stopCounter += 0.5;
-
+                            if (stopCounter < 5.9999) {
+                                stopCounter += 0.5;
+                            }else{
+                                stopCounter += 0.5;
+                                m_vehicleControl.setSpeed(0);
+                            }
                             if (stopCounter > 40.9999) {
                                 state = "resume";
                                 prevState = "stopLine";
