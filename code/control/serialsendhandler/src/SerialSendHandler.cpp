@@ -56,9 +56,7 @@ namespace scaledcars {
                 const char *_port = SERIAL_PORTS[port].c_str();
                 serial_open(this->serial, _port, BAUD_RATE);
 
-                cerr << "serial open" << endl;
                 serial_handshake(this->serial, '\n');
-                cerr << "serial handshake" << endl;
 
                 odcore::base::Thread::usleepFor(5 * ONE_SECOND);
 
@@ -75,7 +73,6 @@ namespace scaledcars {
                 odcore::base::Thread::usleepFor(2 * ONE_SECOND);
 
                 serial_start(this->serial);
-                cerr << "serial start" << endl;
 
                 serial_ = this->serial;
             } catch (const char *msg) {
@@ -84,7 +81,6 @@ namespace scaledcars {
         }
 
         void SerialSendHandler::tearDown() {
-            cerr << "Shutting down serial handler" << endl;
 
             protocol_data d_motor;
             d_motor.id = ID_OUT_MOTOR;
@@ -110,10 +106,8 @@ namespace scaledcars {
                     const automotive::VehicleControl vc =
                             vehicleControlContainer.getData<automotive::VehicleControl>();
 
-                    cerr << "BRAKE LIGHTS " << vc.getBrakeLights() << endl;
                     if (!vc.getBrakeLights()) {
                         double angle = vc.getSteeringWheelAngle();
-                        cerr << "angle radius : " << angle << endl;
 
                         arduinoAngle = 90 + (angle * (180 / PI));
                         if (arduinoAngle < 0) {
@@ -124,14 +118,10 @@ namespace scaledcars {
 
                         speed = vc.getSpeed();
 
-                        cerr << "angle degree " << arduinoAngle << endl;
-                        cerr << "speed to arduino : " << speed << endl;
-
                         this->motor = speed;
                         this->servo = arduinoAngle;
 
                     } else {
-                        cerr << "Brake signal sent..." << endl;
                         this->motor = arduinoBrake;
                         this->servo = arduinoStopAngle;
                     }

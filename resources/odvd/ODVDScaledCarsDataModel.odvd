@@ -33,16 +33,19 @@ message group5.CommunicationLinkMSG [id = 555 ] {
     uint8 drivingLane [id = 10];
     uint8 unpark [id = 11];
     uint16 distanceToRightLane [id = 12];
+    uint8 stop [id = 13];
 }
 
 message group5.LaneFollowerMSG [id = 556 ] {
     uint8 stateLane [id = 1];
     uint16 distanceToRightLane [id = 2];
+    uint8 danger [id = 3];
 }
 
 message group5.OvertakerMSG [id = 557 ] {
     uint8 stateStop [id = 1];
     uint8 stateLane [id = 2];
+    uint8 state [id = 3];
 }
 
 message group5.ParkerMSG [id = 558 ] {

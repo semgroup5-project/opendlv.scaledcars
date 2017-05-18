@@ -16,8 +16,6 @@ void UltrasonicSensor::attach(unsigned short address) {
     Wire.begin();
     _address = constrain(address, FIRST_ADDRESS, LAST_ADDRESS); //allow only valid values, between 112 and 127
     _delay = DEFAULT_PING_DELAY;
-    setGain(24);
-    setRange(18);
 }
 
 void UltrasonicSensor::setGain(unsigned short gainValue) {
@@ -41,6 +39,8 @@ void UltrasonicSensor::setPingDelay(unsigned short milliseconds) {
 }
 
 unsigned int UltrasonicSensor::getDistance() {
+    setGain(2);
+    setRange(20);
     int reading = 0;
     Wire.beginTransmission(_address);
     Wire.write(byte(0x00));

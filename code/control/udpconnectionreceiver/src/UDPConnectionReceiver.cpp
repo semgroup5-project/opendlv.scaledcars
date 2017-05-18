@@ -48,7 +48,6 @@ namespace scaledcars {
 
             if (!(notValid = received.compare("move"))) {
                 _udpmsg.setStateStop(0);
-                _udpmsg.setUnpark(0);
             } else if (!(notValid = received.compare("stop"))) {
                 _udpmsg.setStateStop(1);
                 _udpmsg.setStateFunctionOvertaker(0);
@@ -61,7 +60,6 @@ namespace scaledcars {
                 _udpmsg.setStateFunctionParker(1);
                 _udpmsg.setUnpark(0);
             } else if (!(notValid = received.compare("unpark"))) {
-                _udpmsg.setStateFunctionParker(0);
                 _udpmsg.setUnpark(1);
             }
 
@@ -119,7 +117,7 @@ namespace scaledcars {
                     udp_receiver->start();
 
                     const uint32_t ONE_SECOND = 1000 * 1000;
-                    odcore::base::Thread::usleepFor(10*ONE_SECOND);
+                    odcore::base::Thread::usleepFor(30*ONE_SECOND);
 
                     // Stop receiving bytes and unregister our handler.
                     udp_receiver->stop();
@@ -134,4 +132,3 @@ namespace scaledcars {
         }
     }
 } // scaledcars::control
-

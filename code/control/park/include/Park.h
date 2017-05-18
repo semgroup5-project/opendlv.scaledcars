@@ -31,11 +31,10 @@
 #include "opendavinci/GeneratedHeaders_OpenDaVINCI.h"
 #include "automotivedata/GeneratedHeaders_AutomotiveData.h"
 
-#include "opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h"
+#include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
 #include "odvdscaledcarsdatamodel/generated/group5/CommunicationLinkMSG.h"
 #include "odvdscaledcarsdatamodel/generated/group5/ParkerMSG.h"
 #include <automotivedata/GeneratedHeaders_AutomotiveData.h>
-#include "odvdscaledcarsdatamodel/generated/group5/UdpMSG.h"
 #include <opendavinci/GeneratedHeaders_OpenDaVINCI.h>
 
 #define IR 0
@@ -55,6 +54,7 @@ namespace scaledcars {
 
         using namespace std;
         using namespace odcore::base;
+        using namespace odcore::base::module;
         using namespace odcore::data;
         using namespace automotive;
         using namespace automotive::miniature;
@@ -64,7 +64,7 @@ namespace scaledcars {
         /**
          * This class is a skeleton to send driving commands to Hesperia-light's vehicle driving dynamics simulation.
          */
-        class Park : public odcore::base::module::TimeTriggeredConferenceClientModule {
+        class Park : public DataTriggeredConferenceClientModule {
         private:
             /**
              * "Forbidden" copy constructor. Goal: The compiler should warn
@@ -96,7 +96,7 @@ namespace scaledcars {
 
             virtual ~Park();
 
-            odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
+            virtual void nextContainer(Container &c);
 
             // Methods
         private:

@@ -480,6 +480,7 @@ namespace scaledcars {
 
                     // State control algorithm, attempts to stop briefly at each intersection and stops the car if danger zone (image processing could not find a lane to follow)
                     if (state == "moving") {
+                        laneFollowerMSG.setDanger(0);
                         if (Sim) {
                             if (stop) {
                                 state = "stop";
@@ -515,6 +516,7 @@ namespace scaledcars {
                                 prevState = "stopLine";
                             }
                         } else {
+                            laneFollowerMSG.setDanger(1);
                             m_vehicleControl.setBrakeLights(true);
                             stopCounter += 0.5;
 
@@ -527,6 +529,7 @@ namespace scaledcars {
 
                     }
                     if (state == "resume") {
+                        laneFollowerMSG.setDanger(0);
                         m_vehicleControl.setBrakeLights(false);
                         if (Sim) {
                             if (stopCounter < 65.9999) {
@@ -555,6 +558,7 @@ namespace scaledcars {
                         // After a stop line, go forward and don't steer at all, it is expected to not find any reference lane markings for a stretch of road following an intersection
                         if (prevState ==
                             "stopLine") {
+                            laneFollowerMSG.setDanger(0);
                             m_vehicleControl.setBrakeLights(false);
                             m_vehicleControl.setSpeed(96);
                             m_vehicleControl.setSteeringWheelAngle(0);
@@ -564,6 +568,7 @@ namespace scaledcars {
                             "moving") {
                             prevState = "danger";
                             m_vehicleControl.setBrakeLights(true);
+                            laneFollowerMSG.setDanger(1);
                         }
                     }
 

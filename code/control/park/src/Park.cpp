@@ -44,7 +44,7 @@ namespace scaledcars {
         int _stop = 0;
 
         Park::Park(const int32_t &argc, char **argv) :
-                TimeTriggeredConferenceClientModule(argc, argv, "Park"),
+                DataTriggeredConferenceClientModule(argc, argv, "Park"),
                 vc(),
                 parkingSpace(0),
                 IRRObstacle(false),
@@ -79,302 +79,298 @@ namespace scaledcars {
 
 
         // This method will do the main data processing job.
-        odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Park::body() {
+        void Park::nextContainer(Container &c) {
+            if (c.getDataType() == CommunicationLinkMSG::ID()) {
 
-            while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
-                   odcore::data::dmcp::ModuleStateMessage::RUNNING) {
+                Container communicationLinkContainer = c.getData<CommunicationLinkMSG>();
 
-                Container communicationLinkContainer = getKeyValueDataStore().get(CommunicationLinkMSG::ID());
-                if (communicationLinkContainer.getDataType() == CommunicationLinkMSG::ID()) {
-                    communicationLinkMSG = communicationLinkContainer.getData<CommunicationLinkMSG>();
-                    _state = communicationLinkMSG.getStateParker();
+                communicationLinkMSG = communicationLinkContainer.getData<CommunicationLinkMSG>();
+                _state = communicationLinkMSG.getStateParker();
 
 
-                    if (_state == 1) {
-                        _stop = 0;
-                        //     setParkingType(communicationLinkMSG.getParkingType());
-                        irRear = communicationLinkMSG.getInfraredBack();
-                        usFront = communicationLinkMSG.getUltraSonicFrontCenter();
-                        usFrontRight = communicationLinkMSG.getUltraSonicFrontRight();
-                        irFrontRight = communicationLinkMSG.getInfraredSideFront();
-                        irRearRight = communicationLinkMSG.getInfraredSideBack();
-                        odometer = communicationLinkMSG.getWheelEncoder();
+                if (_state) {
+                    _stop = 0;
+                    //     setParkingType(communicationLinkMSG.getParkingType());
+                    irRear = communicationLinkMSG.getInfraredBack();
+                    usFront = communicationLinkMSG.getUltraSonicFrontCenter();
+                    usFrontRight = communicationLinkMSG.getUltraSonicFrontRight();
+                    irFrontRight = communicationLinkMSG.getInfraredSideFront();
+                    irRearRight = communicationLinkMSG.getInfraredSideBack();
+                    odometer = communicationLinkMSG.getWheelEncoder();
 
-                        IRRObstacle = obstacleDetection(irRear, IR);
-                        IRFRObstacle = obstacleDetection(irFrontRight, IR);
-                        IRRRObstacle = obstacleDetection(irRearRight, IR);
-                        USFObstacle = obstacleDetection(usFront, US);
+                    IRRObstacle = obstacleDetection(irRear, IR);
+                    IRFRObstacle = obstacleDetection(irFrontRight, IR);
+                    IRRRObstacle = obstacleDetection(irRearRight, IR);
+                    USFObstacle = obstacleDetection(usFront, US);
 
-                        if (isParking) {
-                            parallelPark();
-                            cout << "PARKING : Now I'm parking" << endl;
-                        } else if (!isParking) {
-                            parkingFinder();
-                            cout << "PARKING : Finding values" << endl;
-                        } else if (parked) {
-                            vc.setBrakeLights(true);
-                            cout << "Car Parked!" << endl;
-                        }
-
-                        Container c(vc);
-                        getConference().send(c);
-                    } else if (!_state && !_stop) {
-                        _stop = 1;
-                        parkingSpace = 0;
-                        IRRObstacle = false;
-                        USFObstacle = false;
-                        IRFRObstacle = false;
-                        IRRRObstacle = false;
-                        odometer = 0;
-                        parkingState = 0;
-                        parkingType = 0;
-                        parkingCounter = 0;
-                        parkingStart = 0;
-                        backDist = 0;
-                        backStart = 0;
-                        backEnd = 0;
-                        adjDist = 0;
-                        isParking = false;
+                    if (isParking) {
+                        parallelPark();
+                        cout << "PARKING : Now I'm parking" << endl;
+                    } else if (!isParking) {
+                        parkingFinder();
+                        cout << "PARKING : Finding values" << endl;
+                    } else if (parked) {
                         vc.setBrakeLights(true);
-                        Container c3(vc);
-                        // Send container.
-                        getConference().send(c3);
+                        cout << "Car Parked!" << endl;
                     }
 
-                }
-            }
-            return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
-        }
-
-        //going forwards till finds a gap
-        void Park::parkingFinder() {
-            // Parking space starting point
-            vc.setBrakeLights(false);
-            vc.setSpeed(96);
-            double angle = (irRearRight - irFrontRight) / 10;
-            if (irFrontRight < 10 && irFrontRight > 0 && (int) (irRearRight - irFrontRight) != 0) {
-
-                vc.setSteeringWheelAngle(angle);
-
-            } else if (irFrontRight < 0 && (int) (irRearRight - irFrontRight) == 0) {
-                if (usFrontRight < 20 && usFrontRight > 0) {
-                    vc.setSteeringWheelAngle(-0.26
-                    );
-
-                } else {
-                    vc.setSteeringWheelAngle(angle);
-                }
-
-            }
-
-
-            if (!IRRRObstacle) {
-                counterS++;
-                if (counterS > 3) {
-                    counterO = 0;
-                    parkingSpace = odometer - parkingStart;
-                    cout << "ParkingSpace : " << parkingSpace << endl;
-
-                }
-
-            } else if (IRRRObstacle) {
-                counterO++;
-                if (counterO > 3) {
-                    parkingStart = odometer;
+                    Container c1(vc);
+                    getConference().send(c1);
+                } else if (!_state && !_stop) {
+                    _stop = 1;
                     parkingSpace = 0;
-                    counterS = 0;
-
+                    IRRObstacle = false;
+                    USFObstacle = false;
+                    IRFRObstacle = false;
+                    IRRRObstacle = false;
+                    odometer = 0;
+                    parkingState = 0;
+                    parkingType = 0;
+                    parkingCounter = 0;
+                    parkingStart = 0;
+                    backDist = 0;
+                    backStart = 0;
+                    backEnd = 0;
+                    adjDist = 0;
+                    isParking = false;
+                    vc.setBrakeLights(true);
+                    Container c3(vc);
+                    // Send container.
+                    getConference().send(c3);
                 }
             }
-            if (parkingSpace >= GAP) {
-                cout << "parking Space  : " << parkingSpace << endl;
-                backStart = odometer;
-                //timer += 0.5;
+    }
 
-                //if (timer >= 4) {
-                //  vc.setBrakeLights(true);
+    //going forwards till finds a gap
+    void Park::parkingFinder() {
+        // Parking space starting point
+        vc.setBrakeLights(false);
+        vc.setSpeed(96);
+        double angle = (irRearRight - irFrontRight) / 10;
+        if (irFrontRight < 10 && irFrontRight > 0 && (int) (irRearRight - irFrontRight) != 0) {
 
-                //             if (IRRObstacle && IRFRObstacle && (int) (irRearRight - irFrontRight) == 0) {
-                isParking = true;
-                parkingState = RIGHT_TURN;
-                //           }
+            vc.setSteeringWheelAngle(angle);
 
-                //}
+        } else if (irFrontRight < 0 && (int) (irRearRight - irFrontRight) == 0) {
+            if (usFrontRight < 20 && usFrontRight > 0) {
+                vc.setSteeringWheelAngle(-0.26
+                );
+
+            } else {
+                vc.setSteeringWheelAngle(angle);
+            }
+
+        }
+
+
+        if (!IRRRObstacle) {
+            counterS++;
+            if (counterS > 3) {
+                counterO = 0;
+                parkingSpace = odometer - parkingStart;
+                cout << "ParkingSpace : " << parkingSpace << endl;
+
+            }
+
+        } else if (IRRRObstacle) {
+            counterO++;
+            if (counterO > 3) {
+                parkingStart = odometer;
+                parkingSpace = 0;
+                counterS = 0;
+
             }
         }
+        if (parkingSpace >= GAP) {
+            cout << "parking Space  : " << parkingSpace << endl;
+            backStart = odometer;
+            //timer += 0.5;
 
-        void Park::setParkingType(int type) {
-            parkingType = type;
+            //if (timer >= 4) {
+            //  vc.setBrakeLights(true);
+
+            //             if (IRRObstacle && IRFRObstacle && (int) (irRearRight - irFrontRight) == 0) {
+            isParking = true;
+            parkingState = RIGHT_TURN;
+            //           }
+
+            //}
         }
+    }
+
+    void Park::setParkingType(int type) {
+        parkingType = type;
+    }
 
 
-        void Park::parallelPark() {
-            //  backEnd = odometer;
-            adjDist = adjDistCalculation(parkingSpace);
-            cout << "adjDist:   " << adjDist << endl;
+    void Park::parallelPark() {
+        //  backEnd = odometer;
+        adjDist = adjDistCalculation(parkingSpace);
+        cout << "adjDist:   " << adjDist << endl;
 
-            switch (parkingState) {
-                //  case START: {
+        switch (parkingState) {
+            //  case START: {
 
-                //    cout << "start and parkingSpace is " << parkingSpace << endl;
-                //    vc.setBrakeLights(false);
-                //     vc.setSpeed(96);
-                // timer+=0.5;
+            //    cout << "start and parkingSpace is " << parkingSpace << endl;
+            //    vc.setBrakeLights(false);
+            //     vc.setSpeed(96);
+            // timer+=0.5;
 
 //                        vc.setBrakeLights(true);
-                // vc.setSpeed(96);
+            // vc.setSpeed(96);
 
 
-                //    }
+            //    }
 //                break;
-                case RIGHT_TURN: {
+            case RIGHT_TURN: {
 
-                    //  vc.setBrakeLights(false);
+                //  vc.setBrakeLights(false);
 
-                    /*//MS change angle before moving the car to allow for a tighter turn
-                     ChangeWheelAngleCounter++;
-                     if(ChangeWheelAngleCounter >= 50){
-                         vc.setSpeed(54);
-                         ChangeWheelAngleCounter = 0;
-                     }
-                     //MS END*/
-                    vc.setBrakeLights(false);
-                    if (odometer - backStart >= 4) {
-                        vc.setSpeed(60);
-                        vc.setSteeringWheelAngle(1.5);
-                        cout << "PARKING : Turning right" << endl;
-                        cout << "calc " << (odometer - backStart) << endl;
-                        if (odometer - backStart >= (adjDist * 0.60)) {
-                            // vc.setBrakeLights(true);
-                            setParkingState(LEFT_TURN);
-                        }
-                    }
-
-                    //if (adjDist >= GAP / 1.1  /*&& parkingCounter >= 40*/) {
-
-                    //  setParkingState(LEFT_TURN);
-                    //}
-
-                    break;
-                }
-
-                case LEFT_TURN: {
-
-                    //   vc.setBrakeLights(false);
-                    vc.setSteeringWheelAngle(-1.5);
-                    //MS change angle before moving the car to allow for a tighter turn
-                    /*ChangeWheelAngleCounter++;
-                    if(ChangeWheelAngleCounter >= WAITFORWHEELANGLECHANGE){
-                        vc.setSpeed(54);
-                        ChangeWheelAngleCounter = 0;
-                    }
-                    //MS END*/
+                /*//MS change angle before moving the car to allow for a tighter turn
+                 ChangeWheelAngleCounter++;
+                 if(ChangeWheelAngleCounter >= 50){
+                     vc.setSpeed(54);
+                     ChangeWheelAngleCounter = 0;
+                 }
+                 //MS END*/
+                vc.setBrakeLights(false);
+                if (odometer - backStart >= 4) {
                     vc.setSpeed(60);
-                    cout << "PARKING : Turning left" << endl;
-                    cout << "adjDist" << adjDist << endl;
-                    //if (adjDist >= (GAP / 1.5)/*&& parkingCounter < 0 */ ) {
-
-                    //     if (odometer - backStart >= (adjDist * 1.1)) {
-                    if (obstacleDetection(irRear, 3) || (odometer - backStart >= (adjDist * 1.125))) {
-                        //  vc.setBrakeLights(true);
-
-                        setParkingState(INGAP_RIGHT_TURN);
-                        backEnd = odometer;
-
+                    vc.setSteeringWheelAngle(1.5);
+                    cout << "PARKING : Turning right" << endl;
+                    cout << "calc " << (odometer - backStart) << endl;
+                    if (odometer - backStart >= (adjDist * 0.60)) {
+                        // vc.setBrakeLights(true);
+                        setParkingState(LEFT_TURN);
                     }
-
-                    break;
                 }
-                case INGAP_RIGHT_TURN: {
-                    //     vc.setBrakeLights(false);
 
-                    //MS change angle before moving the car to allow for a tighter turn
-                    /*ChangeWheelAngleCounter++;
-                    if(ChangeWheelAngleCounter >= WAITFORWHEELANGLECHANGE){
-                        vc.setSpeed(96);
-                        ChangeWheelAngleCounter = 0;
-                    }*/
-                    //MS END
-                    cout << "odo - backEnd" << (odometer - backEnd) << endl;
-                    if ((abs(odometer - backEnd) <= 3) || (obstacleDetection(usFront, 4))) {
-                        vc.setSpeed(96);
-                        vc.setSteeringWheelAngle(0.24);
+                //if (adjDist >= GAP / 1.1  /*&& parkingCounter >= 40*/) {
 
-                    } else {
-                        vc.setBrakeLights(true);
-                        parked = true;
-                    }
+                //  setParkingState(LEFT_TURN);
+                //}
+
+                break;
+            }
+
+            case LEFT_TURN: {
+
+                //   vc.setBrakeLights(false);
+                vc.setSteeringWheelAngle(-1.5);
+                //MS change angle before moving the car to allow for a tighter turn
+                /*ChangeWheelAngleCounter++;
+                if(ChangeWheelAngleCounter >= WAITFORWHEELANGLECHANGE){
+                    vc.setSpeed(54);
+                    ChangeWheelAngleCounter = 0;
+                }
+                //MS END*/
+                vc.setSpeed(60);
+                cout << "PARKING : Turning left" << endl;
+                cout << "adjDist" << adjDist << endl;
+                //if (adjDist >= (GAP / 1.5)/*&& parkingCounter < 0 */ ) {
+
+                //     if (odometer - backStart >= (adjDist * 1.1)) {
+                if (obstacleDetection(irRear, 3) || (odometer - backStart >= (adjDist * 1.125))) {
+                    //  vc.setBrakeLights(true);
+
+                    setParkingState(INGAP_RIGHT_TURN);
+                    backEnd = odometer;
 
                 }
+
+                break;
+            }
+            case INGAP_RIGHT_TURN: {
+                //     vc.setBrakeLights(false);
+
+                //MS change angle before moving the car to allow for a tighter turn
+                /*ChangeWheelAngleCounter++;
+                if(ChangeWheelAngleCounter >= WAITFORWHEELANGLECHANGE){
+                    vc.setSpeed(96);
+                    ChangeWheelAngleCounter = 0;
+                }*/
+                //MS END
+                cout << "odo - backEnd" << (odometer - backEnd) << endl;
+                if ((obstacleDetection(usFront, 4))) {
+                    vc.setSpeed(96);
+                    vc.setSteeringWheelAngle(0.24);
+
+                } else {
+                    vc.setBrakeLights(true);
+                    parked = true;
+                    _state = 0;
+                }
+
+            }
 //                case END: {
 //                    vc.setBrakeLights(true);
 //                    parked = true;
 //                    cout << "PARKING : I'm parked" << endl;
 //                }
-            }
-        }
-
-        void Park::setParkingState(int state) {
-            parkingState = state;
-        }
-
-        bool Park::obstacleDetection(int i, int id) {
-            bool ifObstacle;
-            switch (id) {
-                case (US) : {
-                    if (i > 70 || i < 0) {
-                        ifObstacle = false;
-                    } else if (i <= 70 && i > 0) {
-                        ifObstacle = true;
-                    }
-                }
-                    break;
-                case (IR) : {
-                    if (i > 28 || i < 0) {
-                        ifObstacle = false;
-                    } else if (i <= 28 && i > 0) {
-                        ifObstacle = true;
-                    }
-                }
-                    break;
-                case (3) : {
-                    if ((i > 2) && (i < 29)) {
-                        ifObstacle = true;
-                    } else {
-                        ifObstacle = false;
-                    }
-                }
-                    break;
-                case (4) : {
-                    if ((i > 1) && (i < 30)) {
-                        ifObstacle = true;
-                    } else if (i < 1) {
-                        ifObstacle = false;
-                    }
-                }
-                    break;
-            }
-            return ifObstacle;
-        }
-
-        double Park::adjDistCalculation(double start) {
-            /*     backDist = end - start;
-                 //turn degrees toradians
-                 double cosVal = cos(backDist / (GAP / 2)); // cos value with the proximity angle
-                 adjDist = abs(cosVal) * backDist;   // proximity value of the car traveled distance (paralleled to the road)
-
-            */
-            adjDist = start / cos(40);
-            return abs(adjDist);
-        }
-
-        void Park::sendParkerMSG() {
-            ParkerMSG p;
-            p.setStateStop(0);
-            Container c(p);
-            getConference().send(c);
         }
     }
+
+    void Park::setParkingState(int state) {
+        parkingState = state;
+    }
+
+    bool Park::obstacleDetection(int i, int id) {
+        bool ifObstacle;
+        switch (id) {
+            case (US) : {
+                if (i > 70 || i < 0) {
+                    ifObstacle = false;
+                } else if (i <= 70 && i > 0) {
+                    ifObstacle = true;
+                }
+            }
+                break;
+            case (IR) : {
+                if (i > 28 || i < 0) {
+                    ifObstacle = false;
+                } else if (i <= 28 && i > 0) {
+                    ifObstacle = true;
+                }
+            }
+                break;
+            case (3) : {
+                if ((i > 2) && (i < 29)) {
+                    ifObstacle = true;
+                } else {
+                    ifObstacle = false;
+                }
+            }
+                break;
+            case (4) : {
+                if (i < 0 || i > 30) {
+                    ifObstacle = true;
+                } else if ((i > 1) && (i < 30)) {
+                    ifObstacle = false;
+                }
+            }
+                break;
+        }
+        return ifObstacle;
+    }
+
+    double Park::adjDistCalculation(double start) {
+        /*     backDist = end - start;
+             //turn degrees toradians
+             double cosVal = cos(backDist / (GAP / 2)); // cos value with the proximity angle
+             adjDist = abs(cosVal) * backDist;   // proximity value of the car traveled distance (paralleled to the road)
+
+        */
+        adjDist = start / cos(40);
+        return abs(adjDist);
+    }
+
+    void Park::sendParkerMSG() {
+        ParkerMSG p;
+        p.setStateStop(0);
+        Container c(p);
+        getConference().send(c);
+    }
+}
 }
 // automotive::miniature
 

@@ -80,21 +80,15 @@ namespace scaledcars {
 
                 //ODOMETER [ID 6] with value between 0 - 255
             } else if (id == ID_IN_ENCODER) {
-                cout << "ODOMETER VALUE IS : " << value << endl;
                 realOdometer += value;
-                cout << "ODOMETER REAL IS : " << realOdometer << endl;
 
                 if (realOdometer >= KM_IN_CM) {
                     realOdometer -= KM_IN_CM;
                     counter++;
-                    cout << "LOOPED +1 KM! " << endl;
                 }
 
-                cout << "[VehicleData to conference] VALUE: " << realOdometer << endl;
                 sbd.setTravelledDistance(realOdometer);
                 sbd.setTravelledKm(counter);
-            } else {
-                cerr << "[Filter no sensor] ID: " << id << " VALUE: " << value << endl;
             }
         }
 
@@ -127,18 +121,15 @@ namespace scaledcars {
                 const char *_port = SERIAL_PORTS[port].c_str();
                 serial_open(this->serial, _port, BAUD_RATE);
 
-                cerr << "serial open" << endl;
                 serial_handshake(this->serial, '\n');
                 protocol_data d;
                 d.id = 0;
                 d.value = 90;
                 serial_send(this->serial, d);
-                cerr << "serial handshake" << endl;
 
                 odcore::base::Thread::usleepFor(5 * ONE_SECOND);
 
                 serial_start(this->serial);
-                cerr << "serial start" << endl;
 
                 serial_ = this->serial;
             } catch (const char *msg) {
@@ -164,7 +155,6 @@ namespace scaledcars {
                 ir_back_list_values.clear();
                 for (int i = 0; i < pending; i++) {
                     if (serial_receive(serial_, &incoming)) {
-                        cerr << "RECEIVED : id=" << incoming.id << " value=" << incoming.value << endl;
                         filterData(incoming.id, incoming.value);
                     }
 
@@ -173,42 +163,30 @@ namespace scaledcars {
                         int med = (int) ur_list_values.size() / 2;
                         sensors[ID_IN_ULTRASONIC_CENTER] = ur_list_values[med];
                     }
-                    cout << "[SensorBoardData to conference] ID: " << ID_IN_ULTRASONIC_CENTER << " VALUE: "
-                         << sensors[ID_IN_ULTRASONIC_CENTER] << endl;
 
                     if (ur2_list_values.size() > 0) {
                         sort(ur2_list_values.begin(), ur2_list_values.end());
                         int med = (int) ur2_list_values.size() / 2;
                         sensors[ID_IN_ULTRASONIC_SIDE_FRONT] = ur2_list_values[med];
                     }
-                    cout << "[SensorBoardData to conference] ID: " << ID_IN_ULTRASONIC_SIDE_FRONT << " VALUE: "
-                         << sensors[ID_IN_ULTRASONIC_SIDE_FRONT] << endl;
-
 
                     if (ir_side_front_list_values.size() > 0) {
                         sort(ir_side_front_list_values.begin(), ir_side_front_list_values.end());
                         int med = (int) ir_side_front_list_values.size() / 2;
                         sensors[ID_IN_INFRARED_SIDE_FRONT] = ir_side_front_list_values[med];
                     }
-                    cout << "[SensorBoardData to conference] ID: " << ID_IN_INFRARED_SIDE_FRONT << " VALUE: "
-                         << sensors[ID_IN_INFRARED_SIDE_FRONT] << endl;
 
                     if (ir_side_back_list_values.size() > 0) {
                         sort(ir_side_back_list_values.begin(), ir_side_back_list_values.end());
                         int med = (int) ir_side_back_list_values.size() / 2;
                         sensors[ID_IN_INFRARED_SIDE_BACK] = ir_side_back_list_values[med];
                     }
-                    cout << "[SensorBoardData to conference] ID: " << ID_IN_INFRARED_SIDE_BACK << " VALUE: "
-                         << sensors[ID_IN_INFRARED_SIDE_BACK] << endl;
-
 
                     if (ir_back_list_values.size() > 0) {
                         sort(ir_back_list_values.begin(), ir_back_list_values.end());
                         int med = (int) ir_back_list_values.size() / 2;
                         sensors[ID_IN_INFRARED_BACK] = ir_back_list_values[med];
                     }
-                    cout << "[SensorBoardData to conference] ID: " << ID_IN_INFRARED_BACK << " VALUE: "
-                         << sensors[ID_IN_INFRARED_BACK] << endl;
 
                     isSensorValues = true;
                 }

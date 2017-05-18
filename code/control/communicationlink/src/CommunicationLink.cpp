@@ -15,13 +15,14 @@ namespace scaledcars {
         using namespace group5;
 
         CommunicationLink::CommunicationLink(const int32_t &argc, char **argv) :
-                TimeTriggeredConferenceClientModule(argc, argv, "CommunicationLink"),
+                DataTriggeredConferenceClientModule(argc, argv, "CommunicationLink"),
                 communicationLinkMSG(),
                 laneFollowerMSG(),
                 overtakerMSG(),
                 parkerMSG(),
                 sensorsMSG(),
-                UDPMSG() {}
+                UDPMSG(),
+                udp_stop(0){}
 
         CommunicationLink::~CommunicationLink() {}
 
@@ -37,7 +38,7 @@ namespace scaledcars {
             if (func2 == 1) {
                 communicationLinkMSG.setStateOvertaker(0);
                 communicationLinkMSG.setStateParker(1);
-            } else if (func2 == 0){
+            } else if (func2 == 0) {
                 communicationLinkMSG.setStateOvertaker(1);
                 communicationLinkMSG.setStateParker(0);
             } else {
@@ -50,94 +51,115 @@ namespace scaledcars {
             cout << "Shutting down CommunicationLink" << endl;
         }
 
-        odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode CommunicationLink::body() {
-            while (getModuleStateAndWaitForRemainingTimeInTimeslice() == ModuleStateMessage::RUNNING) {
-                Container sensorBoardDataContainer = getKeyValueDataStore().get(SensorsMSG::ID());
-                if (sensorBoardDataContainer.getDataType() == SensorsMSG::ID()) {
-                    sensorsMSG = sensorBoardDataContainer.getData<SensorsMSG>();
+        void CommunicationLink::nextContainer(Container &c) {
 
-                    communicationLinkMSG.setWheelEncoder(sensorsMSG.getTravelledDistance());
-                    cout << "ID: 6 VALUE: " << sensorsMSG.getTravelledDistance() << endl;
+            if (c.getDataType() == SensorsMSG::ID()) {
+                Container sensorBoardDataContainer = c.getData<SensorsMSG>();
 
-                    communicationLinkMSG.setUltraSonicFrontCenter(
-                            sensorsMSG.getValueForKey_MapOfDistances(ID_IN_ULTRASONIC_CENTER));
-                    cout << "ID:  " << ID_IN_ULTRASONIC_CENTER << " VALUE: "
-                         << sensorsMSG.getValueForKey_MapOfDistances(ID_IN_ULTRASONIC_CENTER) << endl;
+                sensorsMSG = sensorBoardDataContainer.getData<SensorsMSG>();
 
-                    communicationLinkMSG.setUltraSonicFrontRight(
-                            sensorsMSG.getValueForKey_MapOfDistances(ID_IN_ULTRASONIC_SIDE_FRONT));
-                    cout << "ID:  " << ID_IN_ULTRASONIC_SIDE_FRONT << " VALUE: "
-                         << sensorsMSG.getValueForKey_MapOfDistances(ID_IN_ULTRASONIC_SIDE_FRONT) << endl;
+                communicationLinkMSG.setWheelEncoder(sensorsMSG.getTravelledDistance());
+                cout << "ID: 6 VALUE: " << sensorsMSG.getTravelledDistance() << endl;
 
-                    communicationLinkMSG.setInfraredSideFront(
-                            sensorsMSG.getValueForKey_MapOfDistances(ID_IN_INFRARED_SIDE_FRONT));
-                    cout << "ID:  " << ID_IN_INFRARED_SIDE_FRONT << " VALUE: "
-                         << sensorsMSG.getValueForKey_MapOfDistances(ID_IN_INFRARED_SIDE_FRONT) << endl;
+                communicationLinkMSG.setUltraSonicFrontCenter(
+                        sensorsMSG.getValueForKey_MapOfDistances(ID_IN_ULTRASONIC_CENTER));
+                cout << "ID:  " << ID_IN_ULTRASONIC_CENTER << " VALUE: "
+                     << sensorsMSG.getValueForKey_MapOfDistances(ID_IN_ULTRASONIC_CENTER) << endl;
 
-                    communicationLinkMSG.setInfraredSideBack(
-                            sensorsMSG.getValueForKey_MapOfDistances(ID_IN_INFRARED_SIDE_BACK));
-                    cout << "ID:  " << ID_IN_INFRARED_SIDE_BACK << " VALUE: "
-                         << sensorsMSG.getValueForKey_MapOfDistances(ID_IN_INFRARED_SIDE_BACK) << endl;
+                communicationLinkMSG.setUltraSonicFrontRight(
+                        sensorsMSG.getValueForKey_MapOfDistances(ID_IN_ULTRASONIC_SIDE_FRONT));
+                cout << "ID:  " << ID_IN_ULTRASONIC_SIDE_FRONT << " VALUE: "
+                     << sensorsMSG.getValueForKey_MapOfDistances(ID_IN_ULTRASONIC_SIDE_FRONT) << endl;
 
-                    communicationLinkMSG.setInfraredBack(sensorsMSG.getValueForKey_MapOfDistances(ID_IN_INFRARED_BACK));
-                    cout << "ID:  " << ID_IN_INFRARED_BACK << " VALUE: "
-                         << sensorsMSG.getValueForKey_MapOfDistances(ID_IN_INFRARED_BACK) << endl;
-                }
+                communicationLinkMSG.setInfraredSideFront(
+                        sensorsMSG.getValueForKey_MapOfDistances(ID_IN_INFRARED_SIDE_FRONT));
+                cout << "ID:  " << ID_IN_INFRARED_SIDE_FRONT << " VALUE: "
+                     << sensorsMSG.getValueForKey_MapOfDistances(ID_IN_INFRARED_SIDE_FRONT) << endl;
 
-                Container overtakerMSGContainer = getKeyValueDataStore().get(OvertakerMSG::ID());
-                if (overtakerMSGContainer.getDataType() == OvertakerMSG::ID()) {
-                    overtakerMSG = overtakerMSGContainer.getData<OvertakerMSG>();
+                communicationLinkMSG.setInfraredSideBack(
+                        sensorsMSG.getValueForKey_MapOfDistances(ID_IN_INFRARED_SIDE_BACK));
+                cout << "ID:  " << ID_IN_INFRARED_SIDE_BACK << " VALUE: "
+                     << sensorsMSG.getValueForKey_MapOfDistances(ID_IN_INFRARED_SIDE_BACK) << endl;
 
+                communicationLinkMSG.setInfraredBack(sensorsMSG.getValueForKey_MapOfDistances(ID_IN_INFRARED_BACK));
+                cout << "ID:  " << ID_IN_INFRARED_BACK << " VALUE: "
+                     << sensorsMSG.getValueForKey_MapOfDistances(ID_IN_INFRARED_BACK) << endl;
+            }
+
+            if (c.getDataType() == OvertakerMSG::ID()) {
+                Container overtakerMSGContainer = c.getData<OvertakerMSG>();
+                overtakerMSG = overtakerMSGContainer.getData<OvertakerMSG>();
+
+                if (udp_stop) {
+                    communicationLinkMSG.setStateLaneFollower(0);
+                } else {
                     communicationLinkMSG.setStateLaneFollower(overtakerMSG.getStateStop());
-                    communicationLinkMSG.setDrivingLane(overtakerMSG.getStateLane());
                 }
+                communicationLinkMSG.setDrivingLane(overtakerMSG.getStateLane());
 
-                Container parkerMSGContainer = getKeyValueDataStore().get(ParkerMSG::ID());
-                if (parkerMSGContainer.getDataType() == ParkerMSG::ID()) {
-                    parkerMSG = parkerMSGContainer.getData<ParkerMSG>();
+                if (overtakerMSG.getState()) {
+                    communicationLinkMSG.setStateLaneFollower(1);
+                    communicationLinkMSG.setStateOvertaker(0);
+                    udp_stop = 0;
+                }
+            }
 
+            if (c.getDataType() == ParkerMSG::ID()) {
+                Container parkerMSGContainer = c.getData<ParkerMSG>();
+                parkerMSG = parkerMSGContainer.getData<ParkerMSG>();
+
+                if (udp_stop) {
+                    communicationLinkMSG.setStateLaneFollower(0);
+                } else {
                     communicationLinkMSG.setStateLaneFollower(parkerMSG.getStateStop());
                 }
+            }
 
-                Container laneFollowerMSGContainer = getKeyValueDataStore().get(LaneFollowerMSG::ID());
-                if (laneFollowerMSGContainer.getDataType() == LaneFollowerMSG::ID()) {
-                    laneFollowerMSG = laneFollowerMSGContainer.getData<LaneFollowerMSG>();
+            if (c.getDataType() == LaneFollowerMSG::ID()) {
+                Container laneFollowerMSGContainer = c.getData<LaneFollowerMSG>();
+                laneFollowerMSG = laneFollowerMSGContainer.getData<LaneFollowerMSG>();
 
-                    communicationLinkMSG.setDrivingLane(laneFollowerMSG.getStateLane());
-                    communicationLinkMSG.setDistanceToRightLane(laneFollowerMSG.getDistanceToRightLane());
-                }
+                communicationLinkMSG.setDrivingLane(laneFollowerMSG.getStateLane());
+                communicationLinkMSG.setDistanceToRightLane(laneFollowerMSG.getDistanceToRightLane());
+                communicationLinkMSG.setStop(laneFollowerMSG.getDanger());
+            }
 
-                Container UDPMSGContainer = getKeyValueDataStore().get(UdpMSG::ID());
-                if (UDPMSGContainer.getDataType() == UdpMSG::ID()) {
-                    UDPMSG = UDPMSGContainer.getData<UdpMSG>();
+            if (c.getDataType() == UdpMSG::ID()) {
+                Container UDPMSGContainer = c.getData<UdpMSG>();
+                UDPMSG = UDPMSGContainer.getData<UdpMSG>();
 
-                    if (UDPMSG.getStateStop()) {
+                udp_stop = UDPMSG.getStateStop();
+
+                if (udp_stop) {
+                    communicationLinkMSG.setStateLaneFollower(0);
+                    communicationLinkMSG.setStateOvertaker(0);
+                    communicationLinkMSG.setStateParker(0);
+                } else {
+                    if (UDPMSG.getStateFunctionOvertaker()) {
+                        udp_stop = UDPMSG.getStateFunctionOvertaker();
+                        communicationLinkMSG.setStateOvertaker(1);
                         communicationLinkMSG.setStateLaneFollower(0);
-                        communicationLinkMSG.setStateOvertaker(0);
                         communicationLinkMSG.setStateParker(0);
+
+                    } else if (UDPMSG.getStateFunctionParker()) {
+                        udp_stop = UDPMSG.getStateFunctionParker();
+                        communicationLinkMSG.setStateOvertaker(0);
+                        communicationLinkMSG.setStateLaneFollower(0);
+                        communicationLinkMSG.setStateParker(1);
+                        communicationLinkMSG.setUnpark(UDPMSG.getUnpark());
+
                     } else {
-                        if (UDPMSG.getStateFunctionOvertaker()) {
-                            communicationLinkMSG.setStateOvertaker(1);
-                            communicationLinkMSG.setStateLaneFollower(0);
-                            communicationLinkMSG.setStateParker(0);
-                        } else if (UDPMSG.getStateFunctionParker()) {
-                            communicationLinkMSG.setStateOvertaker(0);
-                            communicationLinkMSG.setStateLaneFollower(0);
-                            communicationLinkMSG.setStateParker(1);
-                            communicationLinkMSG.setUnpark(UDPMSG.getUnpark());
-                        } else {
-                            communicationLinkMSG.setStateOvertaker(0);
-                            communicationLinkMSG.setStateLaneFollower(1);
-                            communicationLinkMSG.setStateParker(0);
-                        }
+                        udp_stop = 0;
+                        communicationLinkMSG.setStateOvertaker(0);
+                        communicationLinkMSG.setStateLaneFollower(1);
+                        communicationLinkMSG.setStateParker(0);
                     }
                 }
-
-                Container container(communicationLinkMSG);
-                // Send container.
-                getConference().send(container);
             }
-            return ModuleExitCodeMessage::OKAY;
+
+            Container container(communicationLinkMSG);
+            // Send container.
+            getConference().send(container);
         }
     }
 }

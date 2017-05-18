@@ -2,21 +2,21 @@
 #define COMMUNICATIONLINK_H_
 
 
-#include <opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h>
+#include <opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h>
 #include <opendavinci/odcore/data/Container.h>
 #include <opendavinci/odcore/data/TimeStamp.h>
 
 #include <opendavinci/odcore/wrapper/SharedMemory.h>
 #include <opendavinci/odcore/wrapper/SharedMemoryFactory.h>
 
-#include <automotivedata/GeneratedHeaders_AutomotiveData.h>
 #include <opendavinci/GeneratedHeaders_OpenDaVINCI.h>
+#include <automotivedata/GeneratedHeaders_AutomotiveData.h>
 #include "odvdscaledcarsdatamodel/generated/group5/CommunicationLinkMSG.h"
 #include "odvdscaledcarsdatamodel/generated/group5/LaneFollowerMSG.h"
 #include "odvdscaledcarsdatamodel/generated/group5/OvertakerMSG.h"
 #include "odvdscaledcarsdatamodel/generated/group5/ParkerMSG.h"
-#include "odvdscaledcarsdatamodel/generated/group5/UdpMSG.h"
 #include "odvdscaledcarsdatamodel/generated/group5/SensorsMSG.h"
+#include "odvdscaledcarsdatamodel/generated/group5/UdpMSG.h"
 
 #include <iostream>
 #include <memory>
@@ -38,7 +38,7 @@ namespace scaledcars {
         using namespace odcore::wrapper;
 
         class CommunicationLink :
-                public odcore::base::module::TimeTriggeredConferenceClientModule {
+                public DataTriggeredConferenceClientModule {
 
         private:
             /**
@@ -83,11 +83,13 @@ namespace scaledcars {
             group5::SensorsMSG sensorsMSG;
             group5::UdpMSG UDPMSG;
 
+            int udp_stop;
+
             virtual void setUp();
 
             virtual void tearDown();
 
-            odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
+            virtual void nextContainer(Container &c);
 
         };
     }//control

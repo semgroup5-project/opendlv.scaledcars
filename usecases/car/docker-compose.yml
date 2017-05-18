@@ -1,0 +1,157 @@
+
+# docker-compose.yml - Micro-services to record one documentation camera.
+# Copyright (C) 2016 Hang Yin, Christian Berger
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+version: '2'
+
+services:
+     # Micro-service for odsupercomponent.
+    odsupercomponent:
+        build: .
+        network_mode: host
+        ipc : host
+        restart: on-failure
+        volumes:
+            - ./DIT-168:/opt/configuration
+        privileged: true
+        restart: on-failure
+        command: "/opt/od4/bin/odsupercomponent --cid=${CID} --configuration=/opt/configuration/configuration --freq=20"
+
+    #Micro-service for camera
+    proxy:
+        build: .
+        network_mode: host
+        ipc: host
+        group_add:
+        - video
+        environment:
+        - DISPLAY=$DISPLAY
+        volumes:
+        - ./DIT-168:/opt/configuration
+        - /tmp/.X11-unix:/tmp/.X11-unix
+        depends_on:
+            - odsupercomponent
+        privileged: true
+        restart: on-failure
+        command: "/opt/opendlv.scaledcars/bin/scaledcars-control-proxy --cid=${CID} --rm=true --freq=20 --configuration=/opt/configuration/configuration"
+
+    #serial
+    serialsendhandler:
+        build: .
+        network_mode: host
+        ipc : host
+        group_add:
+        - dialout
+        depends_on:
+            - odsupercomponent
+        restart: on-failure
+        privileged: true
+        command: bash -c "sleep 10; /opt/opendlv.scaledcars/bin/scaledcars-control-serialsendhandler --verbose=1 --cid=${CID} --rm=true --freq=10"
+
+    #serial
+    serialreceivehandler:
+        build: .
+        network_mode: host
+        ipc : host
+        group_add:
+        - dialout
+        depends_on:
+            - odsupercomponent
+        restart: on-failure
+        privileged: true
+        command: bash -c "sleep 10; /opt/opendlv.scaledcars/bin/scaledcars-control-serialreceivehandler --verbose=1 --cid=${CID} --rm=true --freq=25"
+
+    #communicationlink
+    communicationlink:
+        build: .
+        network_mode: host
+        ipc : host
+        depends_on:
+            - odsupercomponent
+        restart: on-failure
+        privileged: true
+        command: bash -c "sleep 5; /opt/opendlv.scaledcars/bin/scaledcars-control-communicationlink --verbose=1 --cid=${CID} --rm=true --freq=20"
+
+    #udpconnectionreceiver
+    udpconnectionreceiver:
+        build: .
+        network_mode: host
+        ipc : host
+        depends_on:
+            - odsupercomponent
+        restart: on-failure
+        privileged: true
+        command: bash -c "sleep 5; /opt/opendlv.scaledcars/bin/scaledcars-control-udpconnectionreceiver --verbose=1 --cid=${CID} --rm=true --freq=25"
+
+    #udpconnectionstreamer
+    udpconnectionstreamer:
+        build: .
+        network_mode: host
+        ipc : host
+        depends_on:
+            - odsupercomponent
+        volumes:
+        - ./DIT-168:/opt/configuration
+        restart: on-failure
+        privileged: true
+        command: bash -c "sleep 5; /opt/opendlv.scaledcars/bin/scaledcars-control-udpconnectionstreamer --verbose=1 --cid=${CID} --rm=true --freq=25"
+
+   #Micro-service for lanedtecter scenario.
+    lanefollower:
+        build: .
+        network_mode: host
+        ipc: host
+        environment:
+        - DISPLAY=$DISPLAY
+        volumes:
+        - ./DIT-168:/opt/configuration
+        depends_on:
+            - odsupercomponent
+            - proxy
+            - communicationlink
+        restart: on-failure
+        privileged: true
+        command: bash -c "sleep 5; /opt/opendlv.scaledcars/bin/scaledcars-control-lanefollwer --verbose=1  --cid=${CID} --freq=20"
+
+    #Micro-service for Overtaker.
+    overtaker:
+        build: .
+        network_mode: host
+        ipc: host
+        volumes:
+        - ./DIT-168:/opt/configuration
+        depends_on:
+             - odsupercomponent
+             - communicationlink
+        restart: on-failure
+        privileged: true
+        command: bash -c "sleep 5; /opt/opendlv.scaledcars/bin/scaledcars-control-overtaker --verbose=1  --cid=${CID} --freq=20 --configuration=/opt/configuration/configuration"
+
+    #Micro-service for Park.
+    park:
+        build: .
+        network_mode: host
+        ipc: host
+        volumes:
+        - ./DIT-168:/opt/configuration
+        depends_on:
+            - odsupercomponent
+            - communicationlink
+        restart: on-failure
+        privileged: true
+        command: bash -c "sleep 5; /opt/opendlv.scaledcars/bin/scaledcars-control-park --verbose=1  --cid=${CID} --freq=20"
+
