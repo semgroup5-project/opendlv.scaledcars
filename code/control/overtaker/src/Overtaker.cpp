@@ -337,6 +337,10 @@ namespace scaledcars {
                     odo = 0;
                     overtakerMSG.setState(0);
                 }
+            } else if (stage == DISABLE) {
+                m_vehicleControl.setBrakeLights(true);
+                Container dis(m_vehicleControl);
+                getConference().send(dis);
             }
         }
     }

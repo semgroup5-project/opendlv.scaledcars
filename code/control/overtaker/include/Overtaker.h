@@ -57,7 +57,8 @@ namespace scaledcars {
                 HAVE_NO_READING,
                 KEEP_TURN_RIGHT,
                 KEEP_TURN_RIGHT_END,
-                ADJUST_TO_STRAIGHT
+                ADJUST_TO_STRAIGHT,
+                DISABLE
             };
 
             automotive::VehicleControl m_vehicleControl;
