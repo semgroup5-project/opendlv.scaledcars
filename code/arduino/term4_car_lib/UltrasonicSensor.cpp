@@ -2,7 +2,7 @@
 
 #include "term4_car_lib.h"
 
-const unsigned short UltrasonicSensor::DEFAULT_PING_DELAY = 70;
+const unsigned short UltrasonicSensor::DEFAULT_PING_DELAY = 20;
 const unsigned short UltrasonicSensor::DEFAULT_SRF08_ADDRESS = 112;
 
 static unsigned short FIRST_ADDRESS = 112; //please refer to: http://www.robot-electronics.co.uk/htm/srf08tech.html
@@ -39,8 +39,8 @@ void UltrasonicSensor::setPingDelay(unsigned short milliseconds) {
 }
 
 unsigned int UltrasonicSensor::getDistance() {
-    setGain(2);
-    setRange(20);
+    setGain(0);
+    setRange(23);
     int reading = 0;
     Wire.beginTransmission(_address);
     Wire.write(byte(0x00));

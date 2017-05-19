@@ -134,6 +134,8 @@ namespace scaledcars {
 
             int isApplied;
 
+            int p_count;
+
         };
     }
 }

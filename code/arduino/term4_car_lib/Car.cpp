@@ -37,12 +37,7 @@ void Car::setUp() {
 }
 
 void Car::run() {
-//    if (!isRCControllerOn()) {
     automatedDrive();
-//    } else {
-//        rcControl();
-//    }
-//    provideSensorsData();
 }
 
 void Car::provideSensorsData() {
@@ -52,10 +47,8 @@ void Car::provideSensorsData() {
         infraredSideFront.encodeAndWrite(ID_IN_INFRARED_SIDE_FRONT, infraredSideFront.getDistance2());
         infraredSideBack.encodeAndWrite(ID_IN_INFRARED_SIDE_BACK, infraredSideBack.getDistance());
 
-
         ultrasonicFront.encodeAndWrite(ID_IN_ULTRASONIC_CENTER, ultrasonicFront.getDistance());
         ultrasonicRight.encodeAndWrite(ID_IN_ULTRASONIC_SIDE_FRONT, ultrasonicRight.getDistance());
-
         odometer = wheelEncoder.getDistance() - encoderPos;
         if (odometer <= 255) {
             wheelEncoder.encodeAndWrite(ID_IN_ENCODER, odometer);
@@ -92,12 +85,6 @@ void Car::rcControl() {
 }
 
 void Car::automatedDrive() {
-//    if (isFunctionChanged()) {
-//        escMotor.brake();
-//    }
-//
-//    func_is_changed = 0;
-
     readSerial();
 }
 
@@ -105,30 +92,29 @@ void Car::readSerial() {
     oldMillis = millis();
 
     int value = 90, serial_size = 0, count = 0;
-    while ((serial_size = Serial.available()) <= 0) {
+    dataMotor.id = 0;
+    dataMotor.value = 0;
+    dataServo.id = 0;
+    dataServo.value = 0;
+    while (!Serial.available()) {
         if ((millis() - oldMillis) > timer) {
             noData = 1;
             break;
         }
     }
-    dataMotor.id = 0;
-    dataMotor.value = 0;
-    dataServo.id = 0;
-    dataServo.value = 0;
-    if (!noData) {
-        while (count++ < serial_size) {
-            protocol_frame frame;
-            frame.a = Serial.read();
-            protocol_data data = protocol_decode_t1(frame);
+    while (Serial.available() && !dataMotor.id && !dataServo.id && !noData) {
+        protocol_frame frame;
+        frame.a = Serial.read();
+        protocol_data data = protocol_decode_t1(frame);
 
-            if (data.id == ID_OUT_SERVO) {
-                dataServo = data;
-            } else if (data.id == ID_OUT_MOTOR) {
-                dataMotor = data;
-            }
+        if (data.id == ID_OUT_SERVO) {
+            dataServo = data;
+        } else if (data.id == ID_OUT_MOTOR) {
+            dataMotor = data;
         }
+    }
 
-
+    if (!noData) {
         if (dataServo.id == ID_OUT_SERVO) {
             value = dataServo.value * 3;
             if (value >= 0 && value <= 180) {
@@ -146,7 +132,7 @@ void Car::readSerial() {
                 }
             }
         }
-    } else {
+    } else if (noData) {
         escMotor.brake();
         steeringMotor.setAngle(90, 0);
     }
