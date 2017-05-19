@@ -64,9 +64,7 @@ namespace scaledcars {
                 enoughTurn(0),
                 _stop(0),
                 valid_us(0),
-                park_state(0),
-                isApplied(0),
-                p_count(0){}
+                park_state(0) {}
 
         Overtaker::~Overtaker() {}
 
@@ -155,14 +153,11 @@ namespace scaledcars {
             if (stage == FIND_OBJECT) {
                 cerr << "FIND_OBJECT" << endl;
 
-                if (!isApplied) {
-                    m_vehicleControl.setBrakeLights(false);
-                    m_vehicleControl.setSpeed(TURN_SPEED_CAR);
-                    m_vehicleControl.setSteeringWheelAngle(0.23);
-                    Container cfo(m_vehicleControl);
-                    getConference().send(cfo);
-                    isApplied = 1;
-                }
+                m_vehicleControl.setBrakeLights(false);
+                m_vehicleControl.setSpeed(TURN_SPEED_CAR);
+                m_vehicleControl.setSteeringWheelAngle(0.23);
+                Container cfo(m_vehicleControl);
+                getConference().send(cfo);
 
                 distanceToObstacle = US_C;
                 us_c_old = US_C;
@@ -179,7 +174,6 @@ namespace scaledcars {
                     getConference().send(cfo2);
 
                     objectPlausibleCount = 0;
-                    isApplied = 0;
                 }
 
                 distanceToObstacleOld = distanceToObstacle;
@@ -193,7 +187,6 @@ namespace scaledcars {
 
                 if ((us <= 5) && (distance > 0 && distance <= OVERTAKING_DISTANCE)) {
                     objectPlausibleCount++;
-                    p_count = 0;
                     if (objectPlausibleCount >= OBJECT_PLAUSIBLE_COUNT) {
 
                         stage = HAVE_BOTH_IR;
@@ -203,16 +196,12 @@ namespace scaledcars {
                         Container cfo_p(m_vehicleControl);
                         getConference().send(cfo_p);
                         us_c_old = 0;
-                        p_count = 0;
                     }
                 } else {
-                    p_count++;
+                    stage = FIND_OBJECT;
+                    us_c_old = 0;
                 }
 
-                if (p_count >= OBJECT_PLAUSIBLE_COUNT) {
-                    stage = FIND_OBJECT;
-                    p_count = 0;
-                }
             } else if (stage == HAVE_BOTH_IR) {
                 cerr << "HAVE_BOTH_IR" << endl;
                 odo += odometerReal;
@@ -247,7 +236,7 @@ namespace scaledcars {
                         odo = 0;
                         enoughTurn = 0;
                     }
-                } else if (enoughTurn == 1){
+                } else if (enoughTurn == 1) {
                     if (odo > 4) {
                         m_vehicleControl.setBrakeLights(false);
                         m_vehicleControl.setSpeed(TURN_SPEED_CAR);

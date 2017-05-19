@@ -130,11 +130,6 @@ namespace scaledcars {
             int valid_us;
 
             int park_state;
-
-            int isApplied;
-
-            int p_count;
-
         };
     }
 }
