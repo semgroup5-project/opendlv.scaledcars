@@ -76,7 +76,6 @@ namespace scaledcars {
             const int32_t WHEEL_ENCODER;
 
             const double OVERTAKING_DISTANCE;
-            const double OVERTAKING_DISTANCE_DISPLACED;
             const double HEADING_PARALLEL;
 
             const double TURN_SPEED_SIM;
@@ -103,7 +102,6 @@ namespace scaledcars {
 
             int us_c_old;
             int _us_c_old;
-            int us_r_count;
 
             StateMachine stage;
 
@@ -124,7 +122,7 @@ namespace scaledcars {
 
             const int OBJECT_PLAUSIBLE_COUNT;
             int objectPlausibleCount;
-            int objectDisplacedPlausibleCount;
+            int objectDangerCount;
 
             int enoughTurn;
 
@@ -134,7 +132,8 @@ namespace scaledcars {
 
             int park_state;
 
-            int danger_state;
+            int isApplied;
+
         };
     }
 }

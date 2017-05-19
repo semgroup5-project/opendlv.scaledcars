@@ -25,9 +25,8 @@ namespace scaledcars {
                 INFRARED_REAR_RIGHT(2),
                 INFRARED_BACK(1),
                 WHEEL_ENCODER(5),
-                OVERTAKING_DISTANCE(54.0),
-                OVERTAKING_DISTANCE_DISPLACED(65.0),
-                HEADING_PARALLEL(1),
+                OVERTAKING_DISTANCE(67.0),
+                HEADING_PARALLEL(4),
                 TURN_SPEED_SIM(0.7),
                 TURN_ANGLE_SIM_LEFT(-25),
                 TURN_ANGLE_SIM_RIGHT(25),
@@ -48,7 +47,6 @@ namespace scaledcars {
                 odo(0),
                 us_c_old(0),
                 _us_c_old(0),
-                us_r_count(0),
                 stage(FIND_OBJECT),
                 distanceOUTtoL_0(0),
                 distanceOUTtoL_1(0),
@@ -62,12 +60,12 @@ namespace scaledcars {
                 distanceToObstacleOld(0),
                 OBJECT_PLAUSIBLE_COUNT(3),
                 objectPlausibleCount(0),
-                objectDisplacedPlausibleCount(0),
+                objectDangerCount(0),
                 enoughTurn(0),
                 _stop(0),
                 valid_us(0),
                 park_state(0),
-                danger_state(0) {}
+                isApplied(0){}
 
         Overtaker::~Overtaker() {}
 
@@ -84,7 +82,6 @@ namespace scaledcars {
                 Container communicationLinkContainer = c.getData<CommunicationLinkMSG>();
                 const CommunicationLinkMSG communicationLinkMSG = communicationLinkContainer.getData<CommunicationLinkMSG>();
                 _state = communicationLinkMSG.getStateOvertaker();
-                danger_state = communicationLinkMSG.getStop();
                 park_state = communicationLinkMSG.getStateParker();
 
                 if (_state) {
@@ -118,10 +115,11 @@ namespace scaledcars {
                     double distance = US_C;
                     double us = abs(distance - _us_c_old);
                     _us_c_old = distance;
-                    if ((us <= 5) && (distance > 0 && distance < 18)) {
-                        objectPlausibleCount++;
-                        if (objectPlausibleCount >= OBJECT_PLAUSIBLE_COUNT) {
-                            objectPlausibleCount = 0;
+                    if ((us <= 5) && (distance > 0 && distance < 36)) {
+                        objectDangerCount++;
+                        if (objectDangerCount >= OBJECT_PLAUSIBLE_COUNT) {
+                            cerr << "DANGER OBJECT" << endl;
+                            objectDangerCount = 0;
                             _us_c_old = 0;
 
                             overtakerMSG.setStateStop(0);
@@ -134,11 +132,12 @@ namespace scaledcars {
                             valid_us = 0;
                         }
                     } else {
-                        objectPlausibleCount = 0;
-                        if ((us > -1 && us < 1) && (distance < 0 || distance > 18)) {
+                        objectDangerCount = 0;
+                        if ((us > -1 && us < 1) && (distance < 0 || distance > 35)) {
                             valid_us++;
                         }
-                        if (!danger_state && valid_us > 3) {
+                        if (valid_us > 3) {
+                            cerr << "OBJECT CLEAR" << endl;
                             valid_us = 0;
                             overtakerMSG.setStateStop(1);
                             Container co(overtakerMSG);
@@ -154,20 +153,27 @@ namespace scaledcars {
             if (stage == FIND_OBJECT) {
                 cerr << "FIND_OBJECT" << endl;
 
-                m_vehicleControl.setBrakeLights(false);
-                m_vehicleControl.setSpeed(TURN_SPEED_CAR);
-                m_vehicleControl.setSteeringWheelAngle(0.3);
+                if (!isApplied) {
+                    m_vehicleControl.setBrakeLights(false);
+                    m_vehicleControl.setSpeed(TURN_SPEED_CAR);
+                    m_vehicleControl.setSteeringWheelAngle(0);
+                    isApplied = 1;
+                }
 
                 distanceToObstacle = US_C;
                 us_c_old = US_C;
 
                 // Approaching an obstacle (stationary or driving slower than us).
-                if ((distanceToObstacle >= 1) && (((distanceToObstacleOld - distanceToObstacle) > 0) ||
-                                                  (fabs(distanceToObstacleOld - distanceToObstacle) < 1e-2))) {
+                if ((distanceToObstacle > 0) && (((distanceToObstacleOld - distanceToObstacle) > 0) ||
+                                                 (fabs(distanceToObstacleOld - distanceToObstacle) < 1e-2))) {
                     // Check if overtaking shall be started.
                     stage = FIND_OBJECT_PLAUSIBLE;
+                    m_vehicleControl.setBrakeLights(false);
+                    m_vehicleControl.setSpeed(TURN_SPEED_CAR);
+                    m_vehicleControl.setSteeringWheelAngle(0);
 
                     objectPlausibleCount = 0;
+                    isApplied = 0;
                 }
 
                 distanceToObstacleOld = distanceToObstacle;
@@ -175,48 +181,74 @@ namespace scaledcars {
             } else if (stage == FIND_OBJECT_PLAUSIBLE) {
                 cerr << "FIND_OBJECT_PLAUSIBLE" << endl;
 
-                m_vehicleControl.setBrakeLights(false);
-                m_vehicleControl.setSpeed(TURN_SPEED_CAR);
-                m_vehicleControl.setSteeringWheelAngle(0.3);
-
                 double distance;
-
-                if (US_R < 0) {
-                    us_r_count++;
-                }
 
                 distance = US_C;
                 double us = abs(distance - us_c_old);
                 us_c_old = distance;
 
-                if ((us <= 5) && distance <= OVERTAKING_DISTANCE) {
+                if ((us <= 5) && (distance > 0 && distance <= OVERTAKING_DISTANCE)) {
                     objectPlausibleCount++;
                     if (objectPlausibleCount >= OBJECT_PLAUSIBLE_COUNT) {
 
                         stage = HAVE_BOTH_IR;
-                        us_r_count = 0;
-                        us_c_old = 0;
-                    }
-                } else if ((us <= 5) && distance <= OVERTAKING_DISTANCE_DISPLACED && us_r_count > 3) {
-                    objectDisplacedPlausibleCount++;
-                    if (objectDisplacedPlausibleCount >= OBJECT_PLAUSIBLE_COUNT) {
-
-                        stage = HAVE_BOTH_IR;
-                        us_r_count = 0;
+                        m_vehicleControl.setBrakeLights(false);
+                        m_vehicleControl.setSpeed(TURN_SPEED_CAR);
+                        m_vehicleControl.setSteeringWheelAngle(-1.30);
                         us_c_old = 0;
                     }
                 } else {
                     stage = FIND_OBJECT;
                 }
+            } else if (stage == HAVE_BOTH_IR) {
+                cerr << "HAVE_BOTH_IR" << endl;
+                odo += odometerReal;
+
+//                if ((IR_FR - IR_RR <= HEADING_PARALLEL) && !(IR_FR < 1) && !(IR_RR < 1)) {
+                if ((IR_FR > 0 && IR_RR > 0) && odo > 3) {
+                    if (IR_FR > 13) {
+                        enoughTurn = 1;
+                    }
+                    stage = KEEP_TURN_RIGHT;
+                    m_vehicleControl.setSpeed(TURN_SPEED_CAR);
+                    m_vehicleControl.setSteeringWheelAngle(1.5);
+                    odo = 0;
+                }
+
+            } else if (stage == KEEP_TURN_RIGHT) {
+                cerr << "KEEP_TURN_RIGHT" << endl;
+
+                odo += odometerReal;
+
+                if (!enoughTurn) {
+                    if (odo > 6) {
+                        m_vehicleControl.setBrakeLights(false);
+                        m_vehicleControl.setSpeed(TURN_SPEED_CAR);
+                        m_vehicleControl.setSteeringWheelAngle(0.5);
+                        stage = HAVE_NO_READING;
+                        odo = 0;
+                    }
+                } else {
+                    if (odo > 6 && IR_FR > 8) {
+                        m_vehicleControl.setBrakeLights(false);
+                        m_vehicleControl.setSpeed(TURN_SPEED_CAR);
+                        m_vehicleControl.setSteeringWheelAngle(0.5);
+                        stage = HAVE_NO_READING;
+                        odo = 0;
+                    }
+                }
             } else if (stage == HAVE_NO_READING) {
                 cerr << "HAVE_NO_READING" << endl;
                 if (IR_FR < 0 && US_R < 0) {
                     stage = KEEP_TURN_RIGHT_END;
-                } else if (IR_FR > IR_RR && IR_FR > 8) {
+                    m_vehicleControl.setBrakeLights(false);
+                    m_vehicleControl.setSpeed(TURN_SPEED_CAR);
+                    m_vehicleControl.setSteeringWheelAngle(1.2);
+                } else if (IR_FR > IR_RR && IR_FR > 7) {
                     m_vehicleControl.setBrakeLights(false);
                     m_vehicleControl.setSpeed(TURN_SPEED_CAR);
                     m_vehicleControl.setSteeringWheelAngle(0.7);
-                } else if (IR_RR > IR_FR && IR_RR > 8) {
+                } else if (IR_RR > IR_FR && IR_RR > 7) {
                     m_vehicleControl.setBrakeLights(false);
                     m_vehicleControl.setSpeed(TURN_SPEED_CAR);
                     m_vehicleControl.setSteeringWheelAngle(-0.6);
@@ -225,47 +257,15 @@ namespace scaledcars {
                     m_vehicleControl.setSpeed(TURN_SPEED_CAR);
                     m_vehicleControl.setSteeringWheelAngle(0);
                 }
-            } else if (stage == HAVE_BOTH_IR) {
-                cerr << "HAVE_BOTH_IR" << endl;
-
-                m_vehicleControl.setBrakeLights(false);
-                m_vehicleControl.setSpeed(TURN_SPEED_CAR);
-                m_vehicleControl.setSteeringWheelAngle(-1.30);
-
-                if (IR_FR > 13) {
-                    enoughTurn = 1;
-                }
-
-                if (enoughTurn && (IR_FR - IR_RR <= HEADING_PARALLEL) && !(IR_FR < 1) && !(IR_RR < 1)) {
-                    stage = KEEP_TURN_RIGHT;
-                    odo = 0;
-                    enoughTurn = 0;
-                }
-
-            } else if (stage == KEEP_TURN_RIGHT) {
-                cerr << "KEEP_TURN_RIGHT" << endl;
-
-                odo += odometerReal;
-                m_vehicleControl.setSpeed(TURN_SPEED_CAR);
-                m_vehicleControl.setSteeringWheelAngle(1.5);
-
-                if (odo > 4 || IR_FR < 8) {
-                    m_vehicleControl.setBrakeLights(false);
-                    m_vehicleControl.setSpeed(TURN_SPEED_CAR);
-                    m_vehicleControl.setSteeringWheelAngle(0.5);
-                    stage = HAVE_NO_READING;
-                    odo = 0;
-                }
             } else if (stage == KEEP_TURN_RIGHT_END) {
                 cerr << "KEEP_TURN_RIGHT_END" << endl;
                 odo += odometerReal;
-                m_vehicleControl.setBrakeLights(false);
-                m_vehicleControl.setSpeed(TURN_SPEED_CAR);
-                m_vehicleControl.setSteeringWheelAngle(TURN_ANGLE_CAR_RIGHT);
 
-
-                if (odo > 8 && (IR_RR < 0 || IR_RR > 13)) {
+                if (odo > 6) {
                     stage = ADJUST_TO_STRAIGHT;
+                    m_vehicleControl.setBrakeLights(false);
+                    m_vehicleControl.setSpeed(TURN_SPEED_CAR);
+                    m_vehicleControl.setSteeringWheelAngle(TURN_ANGLE_CAR_LEFT);
                     odo = 0;
                 }
 
@@ -273,11 +273,7 @@ namespace scaledcars {
                 cerr << "ADJUST_TO_STRAIGHT" << endl;
                 odo += odometerReal;
 
-                m_vehicleControl.setBrakeLights(false);
-                m_vehicleControl.setSpeed(TURN_SPEED_CAR);
-                m_vehicleControl.setSteeringWheelAngle(TURN_ANGLE_CAR_LEFT);
-
-                if (odo > 3 && IR_BACK > 15) {
+                if (odo > 3 && (IR_BACK < 0 || IR_BACK > 10)) {
                     _state = 0;
 
                     m_vehicleControl.setBrakeLights(false);

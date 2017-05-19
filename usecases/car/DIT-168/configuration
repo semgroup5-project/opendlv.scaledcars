@@ -368,8 +368,8 @@ lanedetector.threshBaseParameter=48
 #
 # CONFIGURATION FOR CommunicationLink
 #
-communicationlink.functionlane = 1
-communicationlink.function2 = 2
+communicationlink.functionlane = 0
+communicationlink.function2 = 0
 
 ###############################################################################
 ###############################################################################
@@ -384,4 +384,4 @@ global.sim = 0    # Set simulation true or false
 #
 # CLIENT IP
 #
-udpconnectionstreamer.ip = 100.80.28.192
+udpconnectionstreamer.ip = 192.168.1.246

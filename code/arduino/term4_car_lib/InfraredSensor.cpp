@@ -5,8 +5,8 @@
 InfraredSensor::InfraredSensor() {
     _sensorMedianDelay = 15; //median delay for all the sharp infrared sensors
     _pin = 99; //give it an initial (likely invalid) value
-    _minDistance = 3; //GP2D120's minimum distance
-    _maxDistance = 30; //GP2D120's maximum distance
+    _minDistance = 5; //GP2D120's minimum distance
+    _maxDistance = 40; //GP2D120's maximum distance
 }
 
 void InfraredSensor::attach(unsigned short pin) {
