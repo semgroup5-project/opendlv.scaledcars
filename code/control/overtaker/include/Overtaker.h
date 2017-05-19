@@ -1,8 +1,6 @@
 #ifndef OVERTAKER_H_
 #define OVERTAKER_H_
 
-#include "opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h"
-
 #include <iostream>
 #include <stdint.h>
 #include <memory>

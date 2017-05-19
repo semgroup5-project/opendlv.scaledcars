@@ -30,7 +30,7 @@ namespace scaledcars {
         }
 
         SerialSendHandler::SerialSendHandler(const int32_t &argc, char **argv) :
-                TimeTriggeredConferenceClientModule(argc, argv, "SerialSendHandler"),
+                DataTriggeredConferenceClientModule(argc, argv, "SerialSendHandler"),
                 serial(),
                 motor(90),
                 servo(90),
@@ -98,50 +98,45 @@ namespace scaledcars {
             serial_free(this->serial);
         }
 
-        odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode SerialSendHandler::body() {
-            while (getModuleStateAndWaitForRemainingTimeInTimeslice() == ModuleStateMessage::RUNNING) {
+        void SerialSendHandler::nextContainer(Container &c) {
+            if (c.getDataType() == automotive::VehicleControl::ID()) {
+                const automotive::VehicleControl vc =
+                        c.getData<automotive::VehicleControl>();
 
-                Container vehicleControlContainer = getKeyValueDataStore().get(automotive::VehicleControl::ID());
-                if (vehicleControlContainer.getDataType() == automotive::VehicleControl::ID()) {
-                    const automotive::VehicleControl vc =
-                            vehicleControlContainer.getData<automotive::VehicleControl>();
+                if (!vc.getBrakeLights()) {
+                    double angle = vc.getSteeringWheelAngle();
 
-                    if (!vc.getBrakeLights()) {
-                        double angle = vc.getSteeringWheelAngle();
-
-                        arduinoAngle = 90 + (angle * (180 / PI));
-                        if (arduinoAngle < 0) {
-                            arduinoAngle = 0;
-                        } else if (arduinoAngle > 180) {
-                            arduinoAngle = 180;
-                        }
-
-                        speed = vc.getSpeed();
-
-                        this->motor = speed;
-                        this->servo = arduinoAngle;
-
-                    } else {
-                        this->motor = arduinoBrake;
-                        this->servo = arduinoStopAngle;
+                    arduinoAngle = 90 + (angle * (180 / PI));
+                    if (arduinoAngle < 0) {
+                        arduinoAngle = 0;
+                    } else if (arduinoAngle > 180) {
+                        arduinoAngle = 180;
                     }
+
+                    speed = vc.getSpeed();
+
+                    this->motor = speed;
+                    this->servo = arduinoAngle;
+
+                } else {
+                    this->motor = arduinoBrake;
+                    this->servo = arduinoStopAngle;
                 }
-
-
-                protocol_data d_motor;
-                d_motor.id = ID_OUT_MOTOR;
-                d_motor.value = this->motor / 3;
-
-                serial_send(this->serial, d_motor);
-
-                protocol_data d_servo;
-                d_servo.id = ID_OUT_SERVO;
-                d_servo.value = this->servo / 3;
-
-                serial_send(this->serial, d_servo);
             }
 
-            return ModuleExitCodeMessage::OKAY;
+
+            protocol_data d_motor;
+            d_motor.id = ID_OUT_MOTOR;
+            d_motor.value = this->motor / 3;
+
+            serial_send(this->serial, d_motor);
+
+            protocol_data d_servo;
+            d_servo.id = ID_OUT_SERVO;
+            d_servo.value = this->servo / 3;
+
+            serial_send(this->serial, d_servo);
+
         }
     }
 }
