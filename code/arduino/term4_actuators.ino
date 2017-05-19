@@ -7,5 +7,5 @@ void setup() {
 }
 
 void loop() {
-  myCar.run();
+  myCar.automatedDrive();
 }

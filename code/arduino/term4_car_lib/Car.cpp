@@ -37,7 +37,12 @@ void Car::setUp() {
 }
 
 void Car::run() {
-    automatedDrive();
+    if (!isRCControllerOn()) {
+        automatedDrive();
+    } else {
+        rcControl();
+    }
+    provideSensorsData();
 }
 
 void Car::provideSensorsData() {
