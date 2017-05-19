@@ -25,7 +25,7 @@ namespace scaledcars {
                 INFRARED_REAR_RIGHT(2),
                 INFRARED_BACK(1),
                 WHEEL_ENCODER(5),
-                OVERTAKING_DISTANCE(70.0),
+                OVERTAKING_DISTANCE(71.0),
                 HEADING_PARALLEL(10),
                 TURN_SPEED_SIM(0.7),
                 TURN_ANGLE_SIM_LEFT(-25),
@@ -217,8 +217,8 @@ namespace scaledcars {
                 cerr << "HAVE_BOTH_IR" << endl;
                 odo += odometerReal;
 
-                if ((IR_FR > 0 && IR_RR > 0) || odo > 3) {
-                    if (IR_FR > 13) {
+                if ((IR_FR > 0 && IR_RR > 0) && odo > 2) {
+                    if (IR_FR > 13 && IR_FR < 28) {
                         enoughTurn = 1;
                     } else if (IR_FR > 28) {
                         enoughTurn = 2;
@@ -237,7 +237,7 @@ namespace scaledcars {
                 odo += odometerReal;
 
                 if (!enoughTurn) {
-                    if (odo > 4 && IR_FR > 10) {
+                    if (odo > 4 && IR_FR > 8) {
                         m_vehicleControl.setBrakeLights(false);
                         m_vehicleControl.setSpeed(TURN_SPEED_CAR);
                         m_vehicleControl.setSteeringWheelAngle(0.5);
@@ -248,7 +248,7 @@ namespace scaledcars {
                         enoughTurn = 0;
                     }
                 } else if (enoughTurn == 1){
-                    if (odo > 3) {
+                    if (odo > 4) {
                         m_vehicleControl.setBrakeLights(false);
                         m_vehicleControl.setSpeed(TURN_SPEED_CAR);
                         m_vehicleControl.setSteeringWheelAngle(0.5);
