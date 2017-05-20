@@ -155,18 +155,21 @@ void updateCounter2() {
 }
 
 void Odometer::encodeAndWrite(int id, int value) {
-    protocol_data outdata1;
-    outdata1.id = id;
-    outdata1.value = value;
+    if (value == 1) {
+        value = 3;
+    } else if (value == 2) {
+        value = 6;
+    } else if (value == 3) {
+        value = 9;
+    }else if (value == 4) {
+        value = 12;
+    }else if (value == 5) {
+        value = 15;
+    }
+    protocol_data outdata;
+    outdata.id = id;
+    outdata.value = value / 3;
 
-    protocol_frame outframe1 = protocol_encode_t2(outdata1);
-    Serial.write(outframe1.a);
-    Serial.write(outframe1.b);
-
-//    protocol_data data = protocol_decode_t2(outframe1);
-//
-//    Serial.print("THIS IS ODO ID after decoding: ");
-//    Serial.println(data.id);
-//    Serial.print("THIS IS ODO VALUE after decoding: ");
-//    Serial.println(data.value);
+    protocol_frame outframe = protocol_encode_t2(outdata);
+    Serial.write(outframe.a);
 }

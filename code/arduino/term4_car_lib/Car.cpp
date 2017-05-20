@@ -55,11 +55,11 @@ void Car::provideSensorsData() {
         ultrasonicFront.encodeAndWrite(ID_IN_ULTRASONIC_CENTER, ultrasonicFront.getDistance());
         ultrasonicRight.encodeAndWrite(ID_IN_ULTRASONIC_SIDE_FRONT, ultrasonicRight.getDistance());
         odometer = wheelEncoder.getDistance() - encoderPos;
-        if (odometer <= 255) {
+        if (odometer <= 5) {
             wheelEncoder.encodeAndWrite(ID_IN_ENCODER, odometer);
             encoderPos = wheelEncoder.getDistance();
         } else {
-            wheelEncoder.encodeAndWrite(ID_IN_ENCODER, 255);
+            wheelEncoder.encodeAndWrite(ID_IN_ENCODER, 0);
             encoderPos = wheelEncoder.getDistance();
         }
     }

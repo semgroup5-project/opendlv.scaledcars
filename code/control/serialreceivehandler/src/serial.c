@@ -13,8 +13,6 @@ serial_state *serial_new()
 {
     serial_state *state = (serial_state *) malloc(sizeof(serial_state));
 
-    protocol_state_init(&state->protocol);
-
     state->fd = -1;
 
     state->run = false;
@@ -83,18 +81,29 @@ void *serial_incoming_thread_routine(void *_state)
 
             if (state->incoming_frame_t == FRAME_T2) {
 
-                protocol_receive_t2(&state->protocol, b);
+                protocol_frame _frame;
+                _frame.a = b;
 
-                if (state->protocol.valid) {
-                    protocol_data *_data = (protocol_data *) malloc(sizeof(protocol_data));
+                protocol_data data = protocol_decode_t2(_frame);
+                protocol_data *_data = (protocol_data *) malloc(sizeof(protocol_data));
 
-                    _data->id = state->protocol.data.id;
-                    _data->value = state->protocol.data.value;
-
-                    g_async_queue_push(state->incoming_queue, _data);
-
-                    state->protocol.valid = false;
+                _data->id = data.id;
+                _data->value = data.value * 3;
+                if (data.id == 6) {
+                    if (data.value == 3) {
+                        _data->value = 1;
+                    } else if (data.value == 6) {
+                        _data->value = 2;
+                    } else if (data.value == 9) {
+                        _data->value = 3;
+                    } else if (data.value == 12) {
+                        _data->value = 4;
+                    }else if (data.value == 15) {
+                        _data->value = 5;
+                    }
                 }
+
+                g_async_queue_push(state->incoming_queue, _data);
             }
         }
 
@@ -131,10 +140,8 @@ void *serial_outgoing_thread_routine(void *_state)
             protocol_frame frame = protocol_encode_t2(*data);
 
             serialport_writebyte(state->fd, frame.a);
-            serialport_writebyte(state->fd, frame.b);
 
             state->on_write(frame.a);
-            state->on_write(frame.b);
         }
 
         g_mutex_unlock(&state->write_mutex);

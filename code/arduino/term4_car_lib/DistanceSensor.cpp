@@ -39,13 +39,12 @@ unsigned int DistanceSensor::getMedianDistance(short iterations) { //adopted fro
 }
 
 void DistanceSensor::encodeAndWrite(int id, int value) {
-    protocol_data outdata1;
-    outdata1.id = id;
-    outdata1.value = value;
+    protocol_data outdata;
+    outdata.id = id;
+    outdata.value = value / 3;
 
-    protocol_frame outframe1 = protocol_encode_t2(outdata1);
-    Serial.write(outframe1.a);
-    Serial.write(outframe1.b);
+    protocol_frame outframe = protocol_encode_t2(outdata);
+    Serial.write(outframe.a);
 }
 
 void DistanceSensor::wait(long milliseconds) {
