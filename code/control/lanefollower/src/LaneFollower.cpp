@@ -548,7 +548,7 @@ namespace scaledcars {
                             if (stopCounter < 45.9999) {
                                 stopCounter += 0.5;
                                 m_vehicleControl.setSpeed(96);
-                                m_vehicleControl.setSteeringWheelAngle(0);
+                                m_vehicleControl.setSteeringWheelAngle(0.24);
 
                             } else {
                                 state = "moving";
