@@ -86,7 +86,7 @@ namespace scaledcars {
                      << sensorsMSG.getValueForKey_MapOfDistances(ID_IN_INFRARED_BACK) << endl;
             }
 
-            if (c.getDataType() == OvertakerMSG::ID()) {
+          else  if (c.getDataType() == OvertakerMSG::ID()) {
                 Container overtakerMSGContainer = c.getData<OvertakerMSG>();
                 overtakerMSG = overtakerMSGContainer.getData<OvertakerMSG>();
 
@@ -104,7 +104,7 @@ namespace scaledcars {
                 }
             }
 
-            if (c.getDataType() == ParkerMSG::ID()) {
+         else   if (c.getDataType() == ParkerMSG::ID()) {
                 Container parkerMSGContainer = c.getData<ParkerMSG>();
                 parkerMSG = parkerMSGContainer.getData<ParkerMSG>();
 
@@ -115,7 +115,7 @@ namespace scaledcars {
                 }
             }
 
-            if (c.getDataType() == LaneFollowerMSG::ID()) {
+        else    if (c.getDataType() == LaneFollowerMSG::ID()) {
                 Container laneFollowerMSGContainer = c.getData<LaneFollowerMSG>();
                 laneFollowerMSG = laneFollowerMSGContainer.getData<LaneFollowerMSG>();
 
@@ -124,7 +124,7 @@ namespace scaledcars {
                 communicationLinkMSG.setStop(laneFollowerMSG.getDanger());
             }
 
-            if (c.getDataType() == UdpMSG::ID()) {
+          else  if (c.getDataType() == UdpMSG::ID()) {
                 Container UDPMSGContainer = c.getData<UdpMSG>();
                 UDPMSG = UDPMSGContainer.getData<UdpMSG>();
 
