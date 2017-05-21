@@ -101,7 +101,7 @@ namespace scaledcars {
         }
 
         SerialReceiveHandler::SerialReceiveHandler(const int32_t &argc, char **argv) :
-                TimeTriggeredConferenceClientModule(argc, argv, "SerialReceiveHandler"),
+                DataTriggeredConferenceClientModule(argc, argv, "SerialReceiveHandler"),
                 serial(){}
 
         SerialReceiveHandler::~SerialReceiveHandler() {}
@@ -144,8 +144,8 @@ namespace scaledcars {
             serial_free(this->serial);
         }
 
-        odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode SerialReceiveHandler::body() {
-            while (getModuleStateAndWaitForRemainingTimeInTimeslice() == ModuleStateMessage::RUNNING) {
+        void SerialSendHandler::nextContainer(Container &c) {
+
                 int pending = g_async_queue_length(serial_->incoming_queue);
                 protocol_data incoming;
                 ur_list_values.clear();
@@ -194,9 +194,6 @@ namespace scaledcars {
                 if (isSensorValues) {
                     sendSensorBoardData(sensors);
                 }
-            }
-
-            return ModuleExitCodeMessage::OKAY;
         }
 
         /**

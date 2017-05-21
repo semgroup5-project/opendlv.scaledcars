@@ -5,7 +5,7 @@
 #include "odvdscaledcarsdatamodel/generated/group5/SensorsMSG.h"
 
 #include <opendavinci/GeneratedHeaders_OpenDaVINCI.h>
-#include <opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h>
+#include <opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h>
 #include <opendavinci/odcore/data/Container.h>
 #include <opendavinci/odcore/data/TimeStamp.h>
 #include <opendavinci/odcore/base/Thread.h>
@@ -45,7 +45,7 @@ namespace scaledcars {
         void __on_write(uint8_t b);
 
         class SerialReceiveHandler :
-                public odcore::base::module::TimeTriggeredConferenceClientModule {
+                public DataTriggeredConferenceClientModule {
 
         private:
             /**
@@ -84,7 +84,7 @@ namespace scaledcars {
 
             virtual ~SerialReceiveHandler();
 
-            odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
+            virtual void nextContainer(Container &c);
 
         private:
 
