@@ -144,7 +144,8 @@ namespace scaledcars {
             serial_free(this->serial);
         }
 
-        void SerialSendHandler::nextContainer(Container &c) {
+        void SerialReceiveHandler::nextContainer(Container &c) {
+                c = c;
 
                 int pending = g_async_queue_length(serial_->incoming_queue);
                 protocol_data incoming;
