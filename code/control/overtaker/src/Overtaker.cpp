@@ -25,7 +25,7 @@ namespace scaledcars {
                 INFRARED_REAR_RIGHT(2),
                 INFRARED_BACK(1),
                 WHEEL_ENCODER(5),
-                OVERTAKING_DISTANCE(71.0),
+                OVERTAKING_DISTANCE(50.0),
                 HEADING_PARALLEL(10),
                 TURN_SPEED_SIM(0.7),
                 TURN_ANGLE_SIM_LEFT(-25),
@@ -192,7 +192,7 @@ namespace scaledcars {
                         stage = HAVE_BOTH_IR;
                         m_vehicleControl.setBrakeLights(false);
                         m_vehicleControl.setSpeed(TURN_SPEED_CAR);
-                        m_vehicleControl.setSteeringWheelAngle(-1.35);
+                        m_vehicleControl.setSteeringWheelAngle(-1.38);
                         Container cfo_p(m_vehicleControl);
                         getConference().send(cfo_p);
                         us_c_old = 0;
@@ -206,12 +206,14 @@ namespace scaledcars {
                 cerr << "HAVE_BOTH_IR" << endl;
                 odo += odometerReal;
 
-                if ((IR_FR > 0 && IR_RR > 0) && odo > 2) {
-                    if (IR_FR > 13 && IR_FR < 28) {
-                        enoughTurn = 1;
-                    } else if (IR_FR > 28) {
-                        enoughTurn = 2;
-                    }
+                if ((IR_FR > 0 && IR_RR > 0) && odo > 6) {
+                    stage = KEEP_TURN_RIGHT;
+                    m_vehicleControl.setSpeed(TURN_SPEED_CAR);
+                    m_vehicleControl.setSteeringWheelAngle(1.5);
+                    Container chb_i(m_vehicleControl);
+                    getConference().send(chb_i);
+                    odo = 0;
+                } else if (odo > 7){
                     stage = KEEP_TURN_RIGHT;
                     m_vehicleControl.setSpeed(TURN_SPEED_CAR);
                     m_vehicleControl.setSteeringWheelAngle(1.5);
@@ -225,8 +227,7 @@ namespace scaledcars {
 
                 odo += odometerReal;
 
-                if (!enoughTurn) {
-                    if (odo > 4 && IR_FR > 8) {
+                    if (odo > 7 && IR_FR < 8) {
                         m_vehicleControl.setBrakeLights(false);
                         m_vehicleControl.setSpeed(TURN_SPEED_CAR);
                         m_vehicleControl.setSteeringWheelAngle(0.5);
@@ -236,32 +237,10 @@ namespace scaledcars {
                         odo = 0;
                         enoughTurn = 0;
                     }
-                } else if (enoughTurn == 1) {
-                    if (odo > 4) {
-                        m_vehicleControl.setBrakeLights(false);
-                        m_vehicleControl.setSpeed(TURN_SPEED_CAR);
-                        m_vehicleControl.setSteeringWheelAngle(0.5);
-                        Container ktr2(m_vehicleControl);
-                        getConference().send(ktr2);
-                        stage = HAVE_NO_READING;
-                        odo = 0;
-                        enoughTurn = 0;
-                    }
-                } else if (enoughTurn == 2) {
-                    if (odo > 7) {
-                        m_vehicleControl.setBrakeLights(false);
-                        m_vehicleControl.setSpeed(TURN_SPEED_CAR);
-                        m_vehicleControl.setSteeringWheelAngle(0.5);
-                        Container ktr3(m_vehicleControl);
-                        getConference().send(ktr3);
-                        stage = HAVE_NO_READING;
-                        odo = 0;
-                        enoughTurn = 0;
-                    }
-                }
+
             } else if (stage == HAVE_NO_READING) {
                 cerr << "HAVE_NO_READING" << endl;
-                if ((IR_FR < 0 || IR_FR > 30) && (US_R < 0 || US_R > 25)) {
+                if ((IR_FR < 0) && (US_R <0)){
                     stage = KEEP_TURN_RIGHT_END;
                     m_vehicleControl.setBrakeLights(false);
                     m_vehicleControl.setSpeed(TURN_SPEED_CAR);
@@ -269,19 +248,22 @@ namespace scaledcars {
                     Container hnr(m_vehicleControl);
                     getConference().send(hnr);
                     odo = 0;
-                } else if (IR_FR > IR_RR && IR_FR > 7) {
+                } else if (IR_FR > IR_RR && IR_FR > 10) {
+                    cerr << "Turn RIGHT"<< endl;
                     m_vehicleControl.setBrakeLights(false);
                     m_vehicleControl.setSpeed(TURN_SPEED_CAR);
                     m_vehicleControl.setSteeringWheelAngle(0.7);
                     Container hnr2(m_vehicleControl);
                     getConference().send(hnr2);
                 } else if (IR_RR > IR_FR && IR_RR > 7) {
+                    cerr<< "Turn LEFT" <<endl;
                     m_vehicleControl.setBrakeLights(false);
                     m_vehicleControl.setSpeed(TURN_SPEED_CAR);
-                    m_vehicleControl.setSteeringWheelAngle(-0.6);
+                    m_vehicleControl.setSteeringWheelAngle(-0.4);//-0.6
                     Container hnr3(m_vehicleControl);
                     getConference().send(hnr3);
                 } else if ((IR_FR - IR_RR <= HEADING_PARALLEL) && !(IR_FR < 1) && !(IR_RR < 1)) {
+                    cerr<<"GO STRAIGHT "<< endl;
                     m_vehicleControl.setBrakeLights(false);
                     m_vehicleControl.setSpeed(TURN_SPEED_CAR);
                     m_vehicleControl.setSteeringWheelAngle(0);
@@ -292,7 +274,7 @@ namespace scaledcars {
                 cerr << "KEEP_TURN_RIGHT_END" << endl;
                 odo += odometerReal;
 
-                if (odo > 8) {
+                if (odo > 7 && IR_RR < 0) {
                     stage = ADJUST_TO_STRAIGHT;
                     m_vehicleControl.setBrakeLights(false);
                     m_vehicleControl.setSpeed(TURN_SPEED_CAR);
@@ -306,7 +288,7 @@ namespace scaledcars {
                 cerr << "ADJUST_TO_STRAIGHT" << endl;
                 odo += odometerReal;
 
-                if (odo > 3 && (IR_BACK < 0 || IR_BACK > 8)) {
+                if (odo > 5 && (IR_BACK < 0 || IR_BACK > 8)) {
                     _state = 0;
 
                     m_vehicleControl.setBrakeLights(false);
@@ -327,6 +309,7 @@ namespace scaledcars {
                     overtakerMSG.setState(0);
                 }
             } else if (stage == DISABLE) {
+                cerr << "DISABLE" << endl;
                 m_vehicleControl.setBrakeLights(true);
                 Container dis(m_vehicleControl);
                 getConference().send(dis);

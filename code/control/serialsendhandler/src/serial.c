@@ -90,15 +90,15 @@ void *serial_incoming_thread_routine(void *_state)
                 _data->id = data.id;
                 _data->value = data.value * 3;
                 if (data.id == 6) {
-                    if (data.value == 3) {
+                    if (_data->value == 3) {
                         _data->value = 1;
-                    } else if (data.value == 6) {
+                    } else if (_data->value == 6) {
                         _data->value = 2;
-                    } else if (data.value == 9) {
+                    } else if (_data->value == 9) {
                         _data->value = 3;
-                    } else if (data.value == 12) {
+                    } else if (_data->value == 12) {
                         _data->value = 4;
-                    }else if (data.value == 15) {
+                    }else if (_data->value == 15) {
                         _data->value = 5;
                     }
                 }
