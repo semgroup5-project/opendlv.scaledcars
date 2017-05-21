@@ -164,7 +164,6 @@ public:
     InfraredSensor getInfraredSideBack();
     InfraredSensor getInfraredBack();
     Odometer getWheelEncoder();
-    protocol_state getProtocolState();
     void wait(double seconds);
 
 private:
@@ -178,7 +177,6 @@ private:
     UltrasonicSensor ultrasonicFront, ultrasonicRight;
     InfraredSensor infraredSideFront, infraredSideBack, infraredBack;
     Odometer wheelEncoder;
-    protocol_state state;
     int red, green, blue;
     int encoderPos, odometerStart, odometer;
     unsigned long currentMillis;

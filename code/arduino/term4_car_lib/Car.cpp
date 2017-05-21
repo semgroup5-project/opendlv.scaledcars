@@ -46,12 +46,12 @@ void Car::run() {
 }
 
 void Car::provideSensorsData() {
-    infraredBack.encodeAndWrite(ID_IN_INFRARED_BACK, 9);
-    infraredSideFront.encodeAndWrite(ID_IN_INFRARED_SIDE_FRONT, 9);
-    infraredSideBack.encodeAndWrite(ID_IN_INFRARED_SIDE_BACK, 9);
+    infraredBack.encodeAndWrite(ID_IN_INFRARED_BACK, infraredBack.getDistance());
+    infraredSideFront.encodeAndWrite(ID_IN_INFRARED_SIDE_FRONT, infraredSideFront.getDistance2());
+    infraredSideBack.encodeAndWrite(ID_IN_INFRARED_SIDE_BACK, infraredSideBack.getDistance());
 
-    ultrasonicFront.encodeAndWrite(ID_IN_ULTRASONIC_CENTER, 15);
-    ultrasonicRight.encodeAndWrite(ID_IN_ULTRASONIC_SIDE_FRONT, 15);
+    ultrasonicFront.encodeAndWrite(ID_IN_ULTRASONIC_CENTER, ultrasonicFront.getDistance());
+    ultrasonicRight.encodeAndWrite(ID_IN_ULTRASONIC_SIDE_FRONT, ultrasonicRight.getDistance());
     odometer = wheelEncoder.getDistance() - encoderPos;
     if (odometer <= 5) {
         wheelEncoder.encodeAndWrite(ID_IN_ENCODER, odometer);
@@ -223,10 +223,6 @@ InfraredSensor Car::getInfraredBack() {
 
 Odometer Car::getWheelEncoder() {
     return wheelEncoder;
-}
-
-protocol_state Car::getProtocolState() {
-    return state;
 }
 
 void Car::wait(double seconds) {
