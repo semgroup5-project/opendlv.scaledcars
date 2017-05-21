@@ -84,6 +84,10 @@ namespace scaledcars {
                 communicationLinkMSG.setInfraredBack(sensorsMSG.getValueForKey_MapOfDistances(ID_IN_INFRARED_BACK));
                 cout << "ID:  " << ID_IN_INFRARED_BACK << " VALUE: "
                      << sensorsMSG.getValueForKey_MapOfDistances(ID_IN_INFRARED_BACK) << endl;
+                
+                Container container(communicationLinkMSG);
+            // Send container.
+            getConference().send(container);
             }
 
           else  if (c.getDataType() == OvertakerMSG::ID()) {
@@ -102,6 +106,9 @@ namespace scaledcars {
                     communicationLinkMSG.setStateOvertaker(0);
                     udp_stop = 0;
                 }
+              Container container(communicationLinkMSG);
+            // Send container.
+            getConference().send(container);
             }
 
          else   if (c.getDataType() == ParkerMSG::ID()) {
@@ -113,6 +120,9 @@ namespace scaledcars {
                 } else {
                     communicationLinkMSG.setStateLaneFollower(parkerMSG.getStateStop());
                 }
+             Container container(communicationLinkMSG);
+            // Send container.
+            getConference().send(container);
             }
 
         else    if (c.getDataType() == LaneFollowerMSG::ID()) {
@@ -122,6 +132,9 @@ namespace scaledcars {
                 communicationLinkMSG.setDrivingLane(laneFollowerMSG.getStateLane());
                 communicationLinkMSG.setDistanceToRightLane(laneFollowerMSG.getDistanceToRightLane());
                 communicationLinkMSG.setStop(laneFollowerMSG.getDanger());
+            Container container(communicationLinkMSG);
+            // Send container.
+            getConference().send(container);
             }
 
           else  if (c.getDataType() == UdpMSG::ID()) {
@@ -155,11 +168,12 @@ namespace scaledcars {
                         communicationLinkMSG.setStateParker(0);
                     }
                 }
-            }
-
-            Container container(communicationLinkMSG);
+              Container container(communicationLinkMSG);
             // Send container.
             getConference().send(container);
+            }
+
+            
         }
     }
 }
