@@ -103,7 +103,43 @@ class ParkTest : public CxxTest::TestSuite {
         void testParkSuccessfullyCreated() {
             TS_ASSERT(dt != NULL);
         }
+        
+		  void testParkingFinder(){}
 
+        void testSetParkingState(){}
+
+        void testAdjDistCalculation(){}
+
+        void testObstacleDetection(){}
+
+        void testPark(){}
+
+        void testUnpark(){}
+
+        void testSendParkerMSG(){}
+            
+        void testIsOkayTrue(){
+        		CommunicationLinkMSG c;
+        		c.setStateParker(1);
+        		c.setStateLaneFollower(0);
+        		c.setStateOvertaker(0);
+        		bool b = dt->isOkay(c);
+        		TS_ASSERT(b == true);
+        }
+        
+        void testIsOkayFalse(){
+        		CommunicationLinkMSG c;
+        		c.setStateParker(1);
+        		c.setStateLaneFollower(1);
+        		c.setStateOvertaker(0);
+        		bool b = dt->isOkay(c);
+        		TS_ASSERT(b == false);
+        }
+            
+        void testSensorSetup(){}
+            
+        void testObstacleSetup(){}      
+ 
         ////////////////////////////////////////////////////////////////////////////////////
         // Below this line the necessary constructor for initializing the pointer variables,
         // and the forbidden copy constructor and assignment operator are declared.
