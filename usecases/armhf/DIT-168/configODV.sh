@@ -8,6 +8,105 @@ I=$4
 D=$5
 FUNCTION1=$6
 FUNCTION2=$7
+ANS2=$8
+COUNTER=0
+MAX=2
+
+case $ANS2 in
+    y|Y) 
+        if [ -c /dev/ttyACM0 ] && [ "$COUNTER" -lt "$MAX" ];
+        then
+            some_var=$(udevadm info --query=property -n /dev/ttyACM0 | grep ID_SERIAL_SHORT=)
+            if [ ${some_var} == "ID_SERIAL_SHORT=754353530353515061D1" ];
+            then
+                ACTUATORS=$"/dev/ttyACM0"
+                COUNTER=$((COUNTER+1))
+            else
+                if [ ${some_var} == "ID_SERIAL_SHORT=556393031353515190A0" ];
+                then
+                    SENSORS=$"/dev/ttyACM0"
+                    COUNTER=$((COUNTER+1))
+                fi      
+            fi
+        else
+            echo "/dev/ttyACM0 NOT FOUND" >&2
+        fi
+
+        if [ -c /dev/ttyACM1 ] && [ "$COUNTER" -lt "$MAX" ];
+        then
+            some_var=$(udevadm info --query=property -n /dev/ttyACM1 | grep ID_SERIAL_SHORT=)
+            if [ ${some_var} == "ID_SERIAL_SHORT=754353530353515061D1" ];
+            then
+                ACTUATORS=$"/dev/ttyACM1"
+                COUNTER=$((COUNTER+1))
+            else
+                if [ ${some_var} == "ID_SERIAL_SHORT=556393031353515190A0" ];
+                then
+                    SENSORS=$"/dev/ttyACM1"
+                    COUNTER=$((COUNTER+1))
+                fi      
+            fi
+        else
+            echo "/dev/ttyACM1 NOT FOUND" >&2
+        fi
+
+        if [ -c /dev/ttyACM2 ] && [ "$COUNTER" -lt "$MAX" ];
+        then
+            some_var=$(udevadm info --query=property -n /dev/ttyACM2 | grep ID_SERIAL_SHORT=)
+            if [ ${some_var} == "ID_SERIAL_SHORT=754353530353515061D1" ];
+            then
+                ACTUATORS=$"/dev/ttyACM2"
+                COUNTER=$((COUNTER+1))
+            else
+                if [ ${some_var} == "ID_SERIAL_SHORT=556393031353515190A0" ];
+                then
+                    SENSORS=$"/dev/ttyACM2"
+                    COUNTER=$((COUNTER+1))
+                fi      
+            fi
+        else
+            echo "/dev/ttyACM2 NOT FOUND" >&2
+        fi
+
+        if [ -c /dev/ttyACM3 ] && [ "$COUNTER" -lt "$MAX" ];
+        then
+            some_var=$(udevadm info --query=property -n /dev/ttyACM3 | grep ID_SERIAL_SHORT=)
+            if [ ${some_var} == "ID_SERIAL_SHORT=754353530353515061D1" ];
+            then
+                ACTUATORS=$"/dev/ttyACM3"
+                COUNTER=$((COUNTER+1))
+            else
+                if [ ${some_var} == "ID_SERIAL_SHORT=556393031353515190A0" ];
+            then
+                SENSORS=$"/dev/ttyACM3"
+                COUNTER=$((COUNTER+1))
+            fi      
+        fi
+        else
+            echo "/dev/ttyACM3 NOT FOUND" >&2
+        fi
+
+        if [ -c /dev/ttyACM4 ] && [ "$COUNTER" -lt "$MAX" ];
+        then
+            some_var=$(udevadm info --query=property -n /dev/ttyACM4 | grep ID_SERIAL_SHORT=)
+            if [ ${some_var} == "ID_SERIAL_SHORT=754353530353515061D1" ];
+            then
+                ACTUATORS=$"/dev/ttyACM4"
+                COUNTER=$((COUNTER+1))
+            else
+                if [ ${some_var} == "ID_SERIAL_SHORT=556393031353515190A0" ];
+                then
+                SENSORS=$"/dev/ttyACM4"
+                COUNTER=$((COUNTER+1))
+                fi      
+            fi
+        else
+            echo "/dev/ttyACM4 NOT FOUND" >&2
+        fi
+        ;;
+    *) 
+        ;;
+esac
 
 case $ANS in
     y|Y) 
@@ -420,5 +519,13 @@ global.sim = 0    # Set simulation true or false
 # CLIENT IP
 #
 udpconnectionstreamer.ip = $IP
+
+###############################################################################
+###############################################################################
+#
+# SERIALS
+#
+serialreceivehandler.sensors = $SENSORS
+serialsendhandler.actuators = $ACTUATORS
 EOF
 
