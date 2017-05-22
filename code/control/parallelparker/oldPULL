@@ -1,0 +1,245 @@
+/**
+ * Parallelparker - Sample application for realizing a Parallel parking car.
+ * Copyright (C) 2012 - 2015 Christian Berger
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
+
+#include <cstdio>
+#include <cmath>
+#include <iostream>
+#include <math.h>
+
+#include "opendavinci/odcore/io/conference/ContainerConference.h"
+#include "opendavinci/odcore/data/Container.h"
+
+#include "opendavinci/GeneratedHeaders_OpenDaVINCI.h"
+#include "automotivedata/GeneratedHeaders_AutomotiveData.h"
+
+#include "ParallelParker.h"
+
+#define PI 3.14159265359
+namespace scaledcars {
+    namespace control {
+
+        using namespace std;
+        using namespace odcore::base;
+        using namespace odcore::data;
+        using namespace automotive;
+        using namespace automotive::miniature;
+
+        ParallelParker::ParallelParker(const int32_t &argc, char **argv) :
+                sim(false),
+                TimeTriggeredConferenceClientModule(argc, argv, "ParallelParker") {
+        }
+
+        ParallelParker::~ParallelParker() {}
+
+        void ParallelParker::setUp() {
+            // This method will be call automatically _before_ running body().
+            sim = kv.getValue<int32_t>("parallelParking.sim") == 1;
+        }
+
+        void ParallelParker::tearDown() {
+            // This method will be call automatically _after_ return from body().
+        }
+
+        bool ParallelParker::obstacleDetect(int i) {
+            bool ifObstacle;
+            if (i < 0) {
+                ifObstacle = false;
+            } else if (i >= 0) {
+                ifObstacle = true;
+            }
+            return ifObstacle;
+        }
+
+        // This method will do the main data processing job.
+        odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode ParallelParker::body() {
+
+            bool IFFRObstacle;
+            //bool IFRRObstacle;
+            const double INFRARED_FRONT_RIGHT = 0;
+            const double INFRARED_REAR = 1;
+            const double INFRARED_REAR_RIGHT = 2;
+            const double ULTRASONIC_FRONT = 3;
+
+            double GAP_SIZE = 0;
+            double distance = 0;
+            double absPathStart = 0;
+            double absPathEnd = 0;
+            double backDist = 0;
+            double parkStart = 0;
+            double parkEnd = 0;
+            double parkingGap = 0;
+            double counter = 1;
+
+            //double irFrontRight = 0;
+            double usFront = 0;
+            double irRear = 0;
+            double irRearRight = 0;
+            int gap = 0;
+            int stageMeasuring = 0;
+            int stageMoving = 0;
+
+            while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
+                   odcore::data::dmcp::ModuleStateMessage::RUNNING) {
+                // 1. Get most recent vehicle data:
+                Container containerVehicleData = getKeyValueDataStore().get(automotive::VehicleData::ID());
+                VehicleData vd = containerVehicleData.getData<VehicleData>();
+
+                // 2. Get most recent sensor board data:
+                Container containerSensorBoardData = getKeyValueDataStore().get(
+                        automotive::miniature::SensorBoardData::ID());
+                SensorBoardData sbd = containerSensorBoardData.getData<SensorBoardData>();
+
+                // Create vehicle control data.
+                VehicleControl vc;
+                //irFrontRight = sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT);
+                irRear = sbd.getValueForKey_MapOfDistances(INFRARED_REAR);
+                irRearRight = sbd.getValueForKey_MapOfDistances(INFRARED_REAR_RIGHT);
+                usFront = sbd.getValueForKey_MapOfDistances(ULTRASONIC_FRONT);
+                IFFRObstacle = obstacleDetect(sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT));
+                ////
+
+                if (stageMoving == 4) {
+                    vc.setSpeed(1);
+                    vc.setSteeringWheelAngle(.2);
+                    cerr << "usFront :" << usFront << endl;
+                    if (usFront < 7 && usFront > 0) {
+                        stageMoving = 5;
+                    }
+                }
+                if (stageMoving == 5) {
+                    vc.setSpeed(0);
+                    vc.setSteeringWheelAngle(0);
+                }
+
+                if (irRear > 0 && irRear < 4) {
+                    //Emergency stop
+                    cerr << "stopping the car: " << endl;
+                    vc.setSpeed(0);
+                }
+            if (stageMoving == 3 && (irRear < 0)) {
+                //Parking
+                parkEnd = vd.getAbsTraveledPath();
+                backDist = parkEnd - parkStart;
+                double cosVal = cos(30 * PI / 180.0);
+                double adjDist = cosVal * backDist;
+                if (gap == 1) {
+                    if (irRear < 0 && adjDist < parkingGap / 2) {
+                        cerr << “parking turning right gap 1” << endl;
+                        vc.setSpeed(-1);
+                        vc.setSteeringWheelAngle(2);
+                        counter++;
+                    }
+                    if (irRear < 0 && adjDist > parkingGap / 2 && counter > 1) {                            vc.setSpeed(-1);
+                        vc.setSteeringWheelAngle(-2);
+                        cerr << “angle” << vc.getSteeringWheelAngle() << endl;
+                        counter -= 1.5;
+                    }
+                }
+                if (gap == 2) {
+                    if (irRear < 0 && adjDist < parkingGap / 3) {
+                        cerr << “parking turning right gap 2” << endl;
+                        vc.setSpeed(-1);
+                        vc.setSteeringWheelAngle(.3);
+                        counter++;
+                    }
+                    if (irRear < 0 && adjDist > parkingGap / 3 && counter > 1) {                            vc.setSpeed(-1);
+                        cerr << “gap: ” << gap << endl;
+                        vc.setSteeringWheelAngle(-.3);
+                        cerr << “angle” << vc.getSteeringWheelAngle() << endl;
+                        counter -= 1.5;
+                    }
+                }
+            }
+
+            else if (!sim) {
+                cerr << "This is not sim" << endl;
+            }
+
+            if (stageMoving == 0 && sim == true) {
+                switch (stageMeasuring) {
+                    case 0: {
+
+                        // Initialize measurement.
+
+                        distance = sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT);
+                        if ((IFFRObstacle)) {
+                            stageMeasuring++;
+                        }
+                    }
+                        break;
+                    case 1: {
+
+                        // Checking for sequence +, -.
+                        if ((distance > 0) && (sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT) < 0)) {
+                            // Found sequence +, -.
+                            stageMeasuring = 2;
+                            absPathStart = vd.getAbsTraveledPath();
+                        }
+                        distance = sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT);
+                    }
+                        break;
+                    case 2: {
+                        // Checking for sequence -, +.
+                        if (sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT) > 0) {
+                            absPathEnd = vd.getAbsTraveledPath();
+                            GAP_SIZE = (absPathEnd - absPathStart);
+                            cerr << "Size = " << GAP_SIZE << endl;
+                            if (GAP_SIZE < 15) {
+                                gap = 1;
+                            } else if (GAP_SIZE > 15) {
+                                gap = 2;
+                            }
+                            cerr << "gap: " << gap << endl;
+                            stageMeasuring = 1;
+                            if ((stageMoving < 1) &&
+                                (sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT) > 0) && (GAP_SIZE > 7)) {
+                                stageMeasuring = 1;
+                                parkingGap = GAP_SIZE;
+                                //parkingGap = 15;
+                                stageMoving = 1;
+                                cerr << "Size = " << GAP_SIZE << endl;
+                            }
+                            //Extra, when there is only one box on the track
+//                                if ((stageMoving < 1) &&
+//                                    (sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT) < 0) && (GAP_SIZE > 7)) {
+//                                    cerr << "case 2 if 2" << endl;
+//                                    stageMeasuring = 1;
+//                                    parkingGap = GAP_SIZE;
+//                                    cerr << "set stage moving to 1 gapSize" << endl;
+//                                    stageMoving = 1;
+//                                    cerr << "Size = " << GAP_SIZE << endl;
+//                                }
+                        }
+                        distance = sbd.getValueForKey_MapOfDistances(INFRARED_FRONT_RIGHT);
+                    }
+                        break;
+                }
+            }
+
+
+            // Create container for finally sending the data.
+            Container c(vc);
+            // Send container.
+            getConference().send(c);
+        }
+        return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
+    }
+}
+ // automotive::miniature
+
