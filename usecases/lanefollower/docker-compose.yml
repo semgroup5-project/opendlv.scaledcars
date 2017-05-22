@@ -24,8 +24,11 @@ services:
         build: .
         network_mode: host
         ipc : host
+        restart: on-failure
         volumes:
             - ./DIT-168:/opt/configuration
+        privileged: true
+        restart: on-failure
         command: "/opt/od4/bin/odsupercomponent --cid=${CID} --configuration=/opt/configuration/configuration --freq=20"
 
     # Micro-service for odsimvehicle.
@@ -35,26 +38,30 @@ services:
         ipc : host
         depends_on:
             - odsupercomponent
-        logging: 
+        logging:
             driver: "none"
+        privileged: true
+        restart: on-failure
         command: "/opt/od4/bin/odsimvehicle --cid=${CID} --freq=20"
 
-
-    #Micro-service for odsimcamera
+    #Micro-service for camera
     odsimcamera:
         build: .
         network_mode: host
         ipc: host
+        group_add:
+        - video
         environment:
         - DISPLAY=$DISPLAY
         volumes:
         - ./DIT-168:/opt/configuration
         - /tmp/.X11-unix:/tmp/.X11-unix
-        - /dev/shm:/dev/shm 
         depends_on:
             - odsupercomponent
             - odsimvehicle
-        command: "/opt/od4/bin/odsimcamera --cid=${CID} --rm=true --privileged=true --freq=20 --configuration=/opt/configuration/configuration"
+        privileged: true
+        restart: on-failure
+        command: "/opt/od4/bin/odsimcamera --cid=${CID} --rm=true --freq=20"
 
     #odcockpit
     odcockpit:
@@ -66,9 +73,12 @@ services:
         - ./DIT-168:/opt/configuration
         - /tmp/.X11-unix:/tmp/.X11-unix
         - ~/CsvData/Overtaking:/opt/Datacsv
+        - ~/recordings:/opt/recordings
         ipc: host
         depends_on:
             - odsupercomponent
+        restart: on-failure
+        privileged: true
         command: "/opt/od4/bin/odcockpit --cid=${CID} --configuration=/opt/configuration/configuration --freq=20"
 
    #odsimirus
@@ -78,9 +88,10 @@ services:
         ipc: host
         volumes:
         - ./DIT-168:/opt/configuration
-        depends_on: 
+        depends_on:
              - odsupercomponent
         command: "/opt/od4/bin/odsimirus --cid=${CID} --configuration=/opt/configuration/configuration --freq=20"
+
 
    #Micro-service for lanedtecter scenario.
     lanefollower:
@@ -93,9 +104,21 @@ services:
         - ./DIT-168:/opt/configuration
         depends_on:
             - odsupercomponent
-            - odsimirus
             - odsimvehicle
             - odsimcamera
-        command: bash -c "sleep 5; /opt/opendlv.scaledcars/bin/scaledcars-control-lanefollwer --verbose=1  --cid=${CID} --freq=20 -e DISPLAY=$DISPLAY"
+        restart: on-failure
+        privileged: true
+        command: bash -c "sleep 5; /opt/opendlv.scaledcars/bin/scaledcars-control-lanefollwer --verbose=1  --cid=${CID} --freq=20"
 
-
+    # Micro-service for odrecorderh264.
+    odrecorderh264:
+        build: .
+        depends_on:
+           - odsupercomponent
+           - odsimcamera
+        volumes:
+        - ~/recordings:/opt/recordings
+        network_mode: host
+        ipc: host
+        working_dir: "/opt/recordings"
+        command: "/opt/od4/bin/odrecorderh264 --cid=${CID}"

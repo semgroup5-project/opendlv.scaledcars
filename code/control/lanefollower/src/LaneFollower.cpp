@@ -361,7 +361,7 @@ namespace scaledcars {
             //const int32_t INFRARED_BACK = 1;
             //const int32_t WHEEL_ENCODER = 5;
 
-            const double OVERTAKING_DISTANCE = 5.0;
+            const double OVERTAKING_DISTANCE = 6.0;
             const double HEADING_PARALLEL = 0.04;
             //Get most recent vehicle data:
             Container containerVehicleData = getKeyValueDataStore().get(VehicleData::ID());
@@ -510,9 +510,9 @@ namespace scaledcars {
                     distanceRtoL_0 = vd.getAbsTraveledPath();
                 }
             } else if (stageMoving == TO_RIGHT_LANE_LEFT_TURN) {
-                // Move to the left lane: Turn left part.
+                // Move to the right lane: Turn left part.
                 cout<< "Reached here , start to turn "<< endl;
-                m_vehicleControl.setSpeed(0.7);
+                m_vehicleControl.setSpeed(0.5);
                 m_vehicleControl.setSteeringWheelAngle(-15);
 
                 double traveledSoFar = vd.getAbsTraveledPath() - distanceRtoL_0;
