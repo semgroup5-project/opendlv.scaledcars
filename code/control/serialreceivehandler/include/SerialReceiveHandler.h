@@ -16,6 +16,8 @@
 
 #include <opendavinci/odcore/base/Service.h>
 
+#include <opendavinci/odcore/base/KeyValueConfiguration.h>
+
 #include <iostream>
 #include <memory>
 #include <stdint.h>

@@ -25,7 +25,7 @@ namespace scaledcars {
                 INFRARED_REAR_RIGHT(2),
                 INFRARED_BACK(1),
                 WHEEL_ENCODER(5),
-                OVERTAKING_DISTANCE(50.0),
+                OVERTAKING_DISTANCE(53.0),
                 HEADING_PARALLEL(10),
                 TURN_SPEED_SIM(0.7),
                 TURN_ANGLE_SIM_LEFT(-25),

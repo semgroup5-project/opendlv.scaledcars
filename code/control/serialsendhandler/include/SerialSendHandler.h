@@ -14,6 +14,8 @@
 #include <opendavinci/odcore/wrapper/SharedMemory.h>
 #include <opendavinci/odcore/wrapper/SharedMemoryFactory.h>
 
+#include <opendavinci/odcore/base/KeyValueConfiguration.h>
+
 #include <iostream>
 #include <memory>
 #include <stdint.h>

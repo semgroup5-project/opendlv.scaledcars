@@ -117,33 +117,31 @@ void updateDtAndCounter(
     unsigned long currentPulse = micros();
     unsigned long dt = currentPulse -
                        _previousPulse[odometerID]; //calculate the difference in time between the two pulses in microseconds
-//    if (dt >
-//        MINIMUM_PULSE_GAP) { //if the pulses have not arrived too fast, which is a sign of unstable signal (too much jitter) in microseconds
-        _dt[odometerID] = dt; //update the _dt value
-        _previousPulse[odometerID] = currentPulse; //update when the last pulse arrived (if it didn't arrive too fast)
 
-        // look for a low-to-high on channel A
-        if (digitalRead(_encoder0PinA) == HIGH) {
-            // check channel B to see which way encoder is turning
-            if (digitalRead(_encoder0PinB) == LOW) {
-                _pulseCounter[odometerID]++; //updates the pulse counter of odometer 0
-            } else {
-                _pulseCounter[odometerID]++; //updates the pulse counter of odometer 0
-                if (directionPinAttached(odometerID))
-                    _negativePulseCounter[odometerID]++; //update the pulse counter that measures how much backwards we are going
-            }
-        } else   // must be a high-to-low edge on channel A
-        {
-            // check channel B to see which way encoder is turning
-            if (digitalRead(_encoder0PinB) == HIGH) {
-                _pulseCounter[odometerID]++; //updates the pulse counter of odometer 0
-            } else {
-                _pulseCounter[odometerID]++; //updates the pulse counter of odometer 0
-                if (directionPinAttached(odometerID))
-                    _negativePulseCounter[odometerID]++; //update the pulse counter that measures how much backwards we are going
-            }
+    _dt[odometerID] = dt; //update the _dt value
+    _previousPulse[odometerID] = currentPulse; //update when the last pulse arrived (if it didn't arrive too fast)
+
+    // look for a low-to-high on channel A
+    if (digitalRead(_encoder0PinA) == HIGH) {
+        // check channel B to see which way encoder is turning
+        if (digitalRead(_encoder0PinB) == LOW) {
+            _pulseCounter[odometerID]++; //updates the pulse counter of odometer 0
+        } else {
+            _pulseCounter[odometerID]++; //updates the pulse counter of odometer 0
+            if (directionPinAttached(odometerID))
+                _negativePulseCounter[odometerID]++; //update the pulse counter that measures how much backwards we are going
         }
-//    }
+    } else   // must be a high-to-low edge on channel A
+    {
+        // check channel B to see which way encoder is turning
+        if (digitalRead(_encoder0PinB) == HIGH) {
+            _pulseCounter[odometerID]++; //updates the pulse counter of odometer 0
+        } else {
+            _pulseCounter[odometerID]++; //updates the pulse counter of odometer 0
+            if (directionPinAttached(odometerID))
+                _negativePulseCounter[odometerID]++; //update the pulse counter that measures how much backwards we are going
+        }
+    }
 }
 
 void updateCounter1() {
@@ -161,9 +159,9 @@ void Odometer::encodeAndWrite(int id, int value) {
         value = 6;
     } else if (value == 3) {
         value = 9;
-    }else if (value == 4) {
+    } else if (value == 4) {
         value = 12;
-    }else if (value == 5) {
+    } else if (value == 5) {
         value = 15;
     }
     protocol_data outdata;

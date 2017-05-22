@@ -14,9 +14,9 @@ namespace scaledcars {
         using namespace odcore::data::dmcp;
         using namespace automotive;
         using namespace automotive::miniature;
+        using namespace odcore::base;
 
-        int port = 0;
-        const string SERIAL_PORTS[] = {"/dev/ttyACM0"};
+        string SERIAL_PORT = "";
         int BAUD_RATE = 115200;
         serial_state *serial_;
         const uint32_t ONE_SECOND = 1000 * 1000;
@@ -43,7 +43,13 @@ namespace scaledcars {
 
         void SerialSendHandler::setUp() {
             try {
-                cerr << "Setting up serial handler to port " << SERIAL_PORTS[port] << endl;
+                KeyValueConfiguration kv = getKeyValueConfiguration();
+
+                SERIAL_PORT =  kv.getValue<string>("serialsendhandler.actuators");
+
+                const string _S_PORT = SERIAL_PORT;
+
+                cerr << "Setting up serial handler to port " << SERIAL_PORT << endl;
 
                 this->serial = serial_new();
 
@@ -53,7 +59,7 @@ namespace scaledcars {
                 this->serial->on_write = &__on_write;
                 this->serial->on_read = &__on_read;
 
-                const char *_port = SERIAL_PORTS[port].c_str();
+                const char *_port = _S_PORT.c_str();
                 serial_open(this->serial, _port, BAUD_RATE);
 
                 serial_handshake(this->serial, '\n');

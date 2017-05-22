@@ -7,5 +7,8 @@ void setup() {
 }
 
 void loop() {
+  int count = 0;
+  while(count++ < 5) {
   myCar.provideSensorsData();
+  }
 }

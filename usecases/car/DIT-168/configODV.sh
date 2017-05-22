@@ -1,38 +1,115 @@
 #!/bin/bash
 
 #define parameters which are passed in.
-#CAMID=$1
-#MDEBUG=$2
-#SIM=$3
-#P=$4
-#I=$5
-#D=$6
-#FUNCTION=$7
+ANS=$1
+IP=$2
+P=$3
+I=$4
+D=$5
+FUNCTION1=$6
+FUNCTION2=$7
+ANS2=$8
+COUNTER=0
+MAX=2
 
-#or read parameters
-echo "Please provide client IP>" >&2
-read IP
-echo "Please provide camera ID>" >&2
-read CAMID
-echo "Please provide m_debug>" >&2
-read MDEBUG
-echo "Please provide SIM>" >&2
-read SIM
-echo "Please provide if function lanefollower will be running [0 | 1]>" >&2
-read FUNCTION1
-echo "Please provide wich other function will the decision maker run [0 for overtaker | 1 for parker]>" >&2
-read FUNCTION2
-
-echo "Do you wish to modify the PID [y,n]?>" >&2
-read ANSWER
-case $ANSWER in
+case $ANS2 in
     y|Y) 
-        echo "Please provide P (of PID)>" >&2
-        read P
-        echo "Please provide I (of PID)>" >&2
-        read I
-        echo "Please provide D (of PID)>" >&2
-        read D
+        if [ -c /dev/ttyACM0 ] && [ "$COUNTER" -lt "$MAX" ];
+        then
+            some_var=$(udevadm info --query=property -n /dev/ttyACM0 | grep ID_SERIAL_SHORT=)
+            if [ ${some_var} == "ID_SERIAL_SHORT=754353530353515061D1" ];
+            then
+                ACTUATORS=$"/dev/ttyACM0"
+                COUNTER=$((COUNTER+1))
+            else
+                if [ ${some_var} == "ID_SERIAL_SHORT=556393031353515190A0" ];
+                then
+                    SENSORS=$"/dev/ttyACM0"
+                    COUNTER=$((COUNTER+1))
+                fi      
+            fi
+        else
+            echo "/dev/ttyACM0 NOT FOUND" >&2
+        fi
+
+        if [ -c /dev/ttyACM1 ] && [ "$COUNTER" -lt "$MAX" ];
+        then
+            some_var=$(udevadm info --query=property -n /dev/ttyACM1 | grep ID_SERIAL_SHORT=)
+            if [ ${some_var} == "ID_SERIAL_SHORT=754353530353515061D1" ];
+            then
+                ACTUATORS=$"/dev/ttyACM1"
+                COUNTER=$((COUNTER+1))
+            else
+                if [ ${some_var} == "ID_SERIAL_SHORT=556393031353515190A0" ];
+                then
+                    SENSORS=$"/dev/ttyACM1"
+                    COUNTER=$((COUNTER+1))
+                fi      
+            fi
+        else
+            echo "/dev/ttyACM1 NOT FOUND" >&2
+        fi
+
+        if [ -c /dev/ttyACM2 ] && [ "$COUNTER" -lt "$MAX" ];
+        then
+            some_var=$(udevadm info --query=property -n /dev/ttyACM2 | grep ID_SERIAL_SHORT=)
+            if [ ${some_var} == "ID_SERIAL_SHORT=754353530353515061D1" ];
+            then
+                ACTUATORS=$"/dev/ttyACM2"
+                COUNTER=$((COUNTER+1))
+            else
+                if [ ${some_var} == "ID_SERIAL_SHORT=556393031353515190A0" ];
+                then
+                    SENSORS=$"/dev/ttyACM2"
+                    COUNTER=$((COUNTER+1))
+                fi      
+            fi
+        else
+            echo "/dev/ttyACM2 NOT FOUND" >&2
+        fi
+
+        if [ -c /dev/ttyACM3 ] && [ "$COUNTER" -lt "$MAX" ];
+        then
+            some_var=$(udevadm info --query=property -n /dev/ttyACM3 | grep ID_SERIAL_SHORT=)
+            if [ ${some_var} == "ID_SERIAL_SHORT=754353530353515061D1" ];
+            then
+                ACTUATORS=$"/dev/ttyACM3"
+                COUNTER=$((COUNTER+1))
+            else
+                if [ ${some_var} == "ID_SERIAL_SHORT=556393031353515190A0" ];
+            then
+                SENSORS=$"/dev/ttyACM3"
+                COUNTER=$((COUNTER+1))
+            fi      
+        fi
+        else
+            echo "/dev/ttyACM3 NOT FOUND" >&2
+        fi
+
+        if [ -c /dev/ttyACM4 ] && [ "$COUNTER" -lt "$MAX" ];
+        then
+            some_var=$(udevadm info --query=property -n /dev/ttyACM4 | grep ID_SERIAL_SHORT=)
+            if [ ${some_var} == "ID_SERIAL_SHORT=754353530353515061D1" ];
+            then
+                ACTUATORS=$"/dev/ttyACM4"
+                COUNTER=$((COUNTER+1))
+            else
+                if [ ${some_var} == "ID_SERIAL_SHORT=556393031353515190A0" ];
+                then
+                SENSORS=$"/dev/ttyACM4"
+                COUNTER=$((COUNTER+1))
+                fi      
+            fi
+        else
+            echo "/dev/ttyACM4 NOT FOUND" >&2
+        fi
+        ;;
+    *) 
+        ;;
+esac
+
+case $ANS in
+    y|Y) 
         if [ -f oldpid.txt ];
         then
             echo "Replacing old PID values..." >&2
@@ -336,7 +413,7 @@ proxy.useRecorder = 0 # 1 = record all captured data directly, 0 otherwise.
 proxy.recorder.output = file://recs/
 proxy.camera.name = WebCam
 proxy.camera.type = OpenCV # OpenCV or UEYE
-proxy.camera.id = $CAMID # Select here the proper ID for OpenCV
+proxy.camera.id = 1 # Select here the proper ID for OpenCV
 proxy.camera.width = 640 #752-UEYE, 640-OpenCV 
 proxy.camera.height = 480
 proxy.camera.bpp = 3 #3- openCV, 1-UEYE
@@ -433,8 +510,8 @@ communicationlink.function2 = $FUNCTION2
 #
 # GLOBAL CONFIGURATION
 #
-global.debug = $MDEBUG      # set to 0 to disable any windows and further output
-global.sim = $SIM    # Set simulation true or false
+global.debug = 0      # set to 0 to disable any windows and further output
+global.sim = 0    # Set simulation true or false
 
 ###############################################################################
 ###############################################################################
@@ -442,5 +519,13 @@ global.sim = $SIM    # Set simulation true or false
 # CLIENT IP
 #
 udpconnectionstreamer.ip = $IP
+
+###############################################################################
+###############################################################################
+#
+# SERIALS
+#
+serialreceivehandler.sensors = $SENSORS
+serialsendhandler.actuators = $ACTUATORS
 EOF
 
