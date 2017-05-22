@@ -76,9 +76,12 @@ namespace scaledcars {
         void Park::tearDown() {
             // This method will be call automatically _after_ return from body().
         }
+    /* This method will do the main data processing job,
+        * @
+        *
+    */
 
 
-        // This method will do the main data processing job.
         void Park::nextContainer(Container &c) {
             if (c.getDataType() == CommunicationLinkMSG::ID()) {
 
@@ -140,24 +143,25 @@ namespace scaledcars {
                 }
             }
     }
-
+    /*
+     *
+     * */
     //going forwards till finds a gap
     void Park::parkingFinder() {
-        // Parking space starting point
+        // Parking space starting poin
         vc.setBrakeLights(false);
         vc.setSpeed(96);
         double angle = (irRearRight - irFrontRight) / 10;
         if (irFrontRight < 10 && irFrontRight > 0 && (int) (irRearRight - irFrontRight) != 0) {
 
-            vc.setSteeringWheelAngle(angle);
+            vc.setSteeringWheelAngle(0);
 
         } else if (irFrontRight < 0 && (int) (irRearRight - irFrontRight) == 0) {
             if (usFrontRight < 20 && usFrontRight > 0) {
-                vc.setSteeringWheelAngle(-0.26
-                );
+                vc.setSteeringWheelAngle(-0.26);
 
             } else {
-                vc.setSteeringWheelAngle(angle);
+                vc.setSteeringWheelAngle(0);
             }
 
         }
@@ -202,7 +206,8 @@ namespace scaledcars {
         parkingType = type;
     }
 
-
+        /*
+         * */
     void Park::parallelPark() {
         //  backEnd = odometer;
         adjDist = adjDistCalculation(parkingSpace);
@@ -239,7 +244,7 @@ namespace scaledcars {
                     vc.setSteeringWheelAngle(1.5);
                     cout << "PARKING : Turning right" << endl;
                     cout << "calc " << (odometer - backStart) << endl;
-                    if (odometer - backStart >= (adjDist * 0.60)) {
+                    if (odometer - backStart >= (adjDist * 0.8)) {
                         // vc.setBrakeLights(true);
                         setParkingState(LEFT_TURN);
                     }
@@ -270,7 +275,7 @@ namespace scaledcars {
                 //if (adjDist >= (GAP / 1.5)/*&& parkingCounter < 0 */ ) {
 
                 //     if (odometer - backStart >= (adjDist * 1.1)) {
-                if (obstacleDetection(irRear, 3) || (odometer - backStart >= (adjDist * 1.125))) {
+                if (obstacleDetection(irRear, 3) || (odometer - backStart >= (adjDist * 1.25))) {
                     //  vc.setBrakeLights(true);
 
                     setParkingState(INGAP_RIGHT_TURN);
@@ -313,7 +318,9 @@ namespace scaledcars {
     void Park::setParkingState(int state) {
         parkingState = state;
     }
-
+    /*
+     *
+     * */
     bool Park::obstacleDetection(int i, int id) {
         bool ifObstacle;
         switch (id) {
@@ -352,10 +359,12 @@ namespace scaledcars {
         }
         return ifObstacle;
     }
-
+        /*
+         *
+         * */
     double Park::adjDistCalculation(double start) {
         /*     backDist = end - start;
-             //turn degrees toradians
+             //turn degrees to radians
              double cosVal = cos(backDist / (GAP / 2)); // cos value with the proximity angle
              adjDist = abs(cosVal) * backDist;   // proximity value of the car traveled distance (paralleled to the road)
 
@@ -363,7 +372,9 @@ namespace scaledcars {
         adjDist = start / cos(40);
         return abs(adjDist);
     }
-
+    /*
+     *
+     * */
     void Park::sendParkerMSG() {
         ParkerMSG p;
         p.setStateStop(0);
