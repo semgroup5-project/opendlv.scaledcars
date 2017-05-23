@@ -290,7 +290,7 @@ proxy.camera.id = 1 # Select here the proper ID for OpenCV
 proxy.camera.width = 640 #752-UEYE, 640-OpenCV 
 proxy.camera.height = 480
 proxy.camera.bpp = 3 #3- openCV, 1-UEYE
-proxy.camera.flipped = 1 #1 = flipped image, 0 =notflipped image.
+proxy.camera.flipped = 0 #1 = flipped image, 0 =notflipped image.
 #proxy.camera.dumpSharedData = 1
 
 

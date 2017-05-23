@@ -361,7 +361,7 @@ namespace scaledcars {
             //const int32_t INFRARED_BACK = 1;
             //const int32_t WHEEL_ENCODER = 5;
 
-            const double OVERTAKING_DISTANCE = 6.0;
+            const double OVERTAKING_DISTANCE = 5.0;
             const double HEADING_PARALLEL = 0.04;
             //Get most recent vehicle data:
             Container containerVehicleData = getKeyValueDataStore().get(VehicleData::ID());
@@ -494,7 +494,7 @@ namespace scaledcars {
                 stageMeasuring = END_OF_OBJECT;
             } else if (stageMoving == TO_RIGHT_LANE_RIGHT_TURN) {
                 // Move to the right lane: Turn right part.
-                m_vehicleControl.setSpeed(0.7);
+                m_vehicleControl.setSpeed(0.6);
                 m_vehicleControl.setSteeringWheelAngle(15);
 
                 traveled_distance--;
