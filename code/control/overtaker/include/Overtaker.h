@@ -67,22 +67,10 @@ namespace scaledcars {
 
             OvertakerMSG overtakerMSG;
 
-            const int32_t ULTRASONIC_FRONT_CENTER;
-            const int32_t ULTRASONIC_FRONT_RIGHT;
-            const int32_t INFRARED_FRONT_RIGHT;
-            const int32_t INFRARED_REAR_RIGHT;
-            const int32_t INFRARED_BACK;
-            const int32_t WHEEL_ENCODER;
-
             const double OVERTAKING_DISTANCE;
             const double HEADING_PARALLEL;
 
-            const double TURN_SPEED_SIM;
-            const double TURN_ANGLE_SIM_LEFT;
-            const double TURN_ANGLE_SIM_RIGHT;
-            const double STRAIGHT_ANGLE_SIM;
-
-            const double TURN_SPEED_CAR;
+            const double SPEED_CAR;
             const double TURN_ANGLE_CAR_LEFT;
             const double TURN_ANGLE_CAR_RIGHT;
             const double STRAIGHT_ANGLE_CAR;
@@ -93,8 +81,6 @@ namespace scaledcars {
             double US_C;
             double US_R;
 
-            long cycles;
-            const bool USE_CYCLES;
             int odometerReal;
             int oldOdometer;
             int odo;
@@ -104,18 +90,6 @@ namespace scaledcars {
 
             StateMachine stage;
 
-            double distanceOUTtoL_0;
-            double distanceOUTtoL_1;
-
-            double distanceOUTtoR_0;
-            double distanceOUTtoR_1;
-
-            double distanceINtoR_0;
-            double distanceINtoR_1;
-
-            double distanceINtoL_0;
-            double distanceINtoL_1;
-
             double distanceToObstacle;
             double distanceToObstacleOld;
 
@@ -123,13 +97,13 @@ namespace scaledcars {
             int objectPlausibleCount;
             int objectDangerCount;
 
-            int enoughTurn;
-
             int _stop;
 
             int valid_us;
 
             int park_state;
+
+            int flag;
         };
     }
 }

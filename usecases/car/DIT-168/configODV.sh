@@ -510,7 +510,7 @@ communicationlink.function2 = $FUNCTION2
 #
 # GLOBAL CONFIGURATION
 #
-global.debug = 0      # set to 0 to disable any windows and further output
+global.debug = 1      # set to 0 to disable any windows and further output
 global.sim = 0    # Set simulation true or false
 
 ###############################################################################
