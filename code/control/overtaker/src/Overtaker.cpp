@@ -113,6 +113,7 @@ namespace scaledcars {
         void Overtaker::tearDown() {}
 
         void Overtaker::nextContainer(Container &c) {
+            // getting latest sensors' data
             if (c.getDataType() == CommunicationLinkMSG::ID()) {
                 Container communicationLinkContainer = c.getData<CommunicationLinkMSG>();
                 const CommunicationLinkMSG communicationLinkMSG = c.getData<CommunicationLinkMSG>();
@@ -134,7 +135,7 @@ namespace scaledcars {
         }
 
         void Overtaker::movingMachine(CommunicationLinkMSG clm) {
-
+            //move forward
             if (stageMoving == FORWARD) {
                 cerr << "FORWARD" << endl;
 
@@ -146,6 +147,7 @@ namespace scaledcars {
                     m_vehicleControl.setSteeringWheelAngle(0.3);
                 }
 
+                //car start to move the left
             } else if (stageMoving == OUT_TO_LEFT) {
                 cerr << "OUT_TO_LEFT" << endl;
                 cerr << "ODO> " << odometerReal << endl;
@@ -272,7 +274,7 @@ namespace scaledcars {
                     m_vehicleControl.setSpeed(96);
                     m_vehicleControl.setSteeringWheelAngle(0.3);
                 }
-
+                //checking the readins from both IR sensors and adjust car's manuoeuvre accordingly
             } else if (stageMeasuring == HAVE_BOTH_IR_SAME_DISTANCE) {
                 cerr << "HAVE_BOTH_IR_SAME_DISTANCE" << endl;
 
@@ -291,6 +293,7 @@ namespace scaledcars {
                     m_vehicleControl.setSteeringWheelAngle(TURN_ANGLE_CAR_RIGHT);
                 }
 
+                //
             } else if (stageMeasuring == END_OF_OBJECT) {
                 cerr << "END_OF_OBJECT" << endl;
 
