@@ -460,7 +460,6 @@ namespace scaledcars {
                     _state = communicationLinkMSG.getStateLaneFollower();
                 }
 
-                cerr << "STATE IS : " << _state << endl;
                 if (_state == 1) {
                     bool has_next_frame = false;
                     _stop = 0;

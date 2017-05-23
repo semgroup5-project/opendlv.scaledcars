@@ -223,7 +223,6 @@ namespace scaledcars {
                 }
 
             } else if (stage == ADJUST_TO_STRAIGHT) {
-                cerr << "ADJUST_TO_STRAIGHT" << endl;
                 odo += odometerReal;
 
                 if (flag) {
@@ -251,7 +250,6 @@ namespace scaledcars {
                     }
                 }
             } else if (stage == DISABLE) {
-                cerr << "DISABLE" << endl;
                 m_vehicleControl.setBrakeLights(true);
             }
 

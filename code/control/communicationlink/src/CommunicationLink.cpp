@@ -59,31 +59,20 @@ namespace scaledcars {
                 sensorsMSG = sensorBoardDataContainer.getData<SensorsMSG>();
 
                 communicationLinkMSG.setWheelEncoder(sensorsMSG.getTravelledDistance());
-                cout << "ID: 6 VALUE: " << sensorsMSG.getTravelledDistance() << endl;
 
                 communicationLinkMSG.setUltraSonicFrontCenter(
                         sensorsMSG.getValueForKey_MapOfDistances(ID_IN_ULTRASONIC_CENTER));
-                cout << "ID:  " << ID_IN_ULTRASONIC_CENTER << " VALUE: "
-                     << sensorsMSG.getValueForKey_MapOfDistances(ID_IN_ULTRASONIC_CENTER) << endl;
 
                 communicationLinkMSG.setUltraSonicFrontRight(
                         sensorsMSG.getValueForKey_MapOfDistances(ID_IN_ULTRASONIC_SIDE_FRONT));
-                cout << "ID:  " << ID_IN_ULTRASONIC_SIDE_FRONT << " VALUE: "
-                     << sensorsMSG.getValueForKey_MapOfDistances(ID_IN_ULTRASONIC_SIDE_FRONT) << endl;
 
                 communicationLinkMSG.setInfraredSideFront(
                         sensorsMSG.getValueForKey_MapOfDistances(ID_IN_INFRARED_SIDE_FRONT));
-                cout << "ID:  " << ID_IN_INFRARED_SIDE_FRONT << " VALUE: "
-                     << sensorsMSG.getValueForKey_MapOfDistances(ID_IN_INFRARED_SIDE_FRONT) << endl;
 
                 communicationLinkMSG.setInfraredSideBack(
                         sensorsMSG.getValueForKey_MapOfDistances(ID_IN_INFRARED_SIDE_BACK));
-                cout << "ID:  " << ID_IN_INFRARED_SIDE_BACK << " VALUE: "
-                     << sensorsMSG.getValueForKey_MapOfDistances(ID_IN_INFRARED_SIDE_BACK) << endl;
 
                 communicationLinkMSG.setInfraredBack(sensorsMSG.getValueForKey_MapOfDistances(ID_IN_INFRARED_BACK));
-                cout << "ID:  " << ID_IN_INFRARED_BACK << " VALUE: "
-                     << sensorsMSG.getValueForKey_MapOfDistances(ID_IN_INFRARED_BACK) << endl;
                 
                 Container container(communicationLinkMSG);
             // Send container.
