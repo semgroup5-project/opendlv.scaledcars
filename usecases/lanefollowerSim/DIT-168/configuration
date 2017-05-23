@@ -378,7 +378,7 @@ communicationlink.function2 = 1
 # GLOBAL CONFIGURATION
 #
 global.debug = 1      # set to 0 to disable any windows and further output
-global.sim = 1    # Set simulation true or false
+global.sim = 1    # Set simulation true (1) or false (0)
 
 ###############################################################################
 ###############################################################################
