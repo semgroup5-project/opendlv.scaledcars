@@ -138,7 +138,9 @@ namespace scaledcars {
 
         }
 /**
- * This method will make the car move forward while checking for a paking gap.
+ * This method will make the car move forward while checking for a paking gap,
+ * moreover the it calibrates the relative position of the car reacting to the
+ * the obstacle on the right side .
  */
 
         void Park::parkingFinder() {
@@ -191,6 +193,8 @@ namespace scaledcars {
 
 /**
  * This method is the logic of the parking maneuver
+ * it uses the function adjDistCalcualtion() to calculate
+ * the angle in which the car will turn into the gap
  */
 
         void Park::parallelPark() {
@@ -255,7 +259,7 @@ namespace scaledcars {
         }
 
 /**
- * This method takes an int i as sensor readings and int id as sensor type
+ * This method takes an int i as sensor(ultrasocinc infrared) readings and int id as sensor type
  * then detects whether if it's within the range for obstacle
  * @param i the sensor reads data
  * @param id the sensor type
@@ -306,7 +310,9 @@ namespace scaledcars {
         }
 
 /**
- * This method takes a double start as the gap size and return a estimated path the car should travel while parking
+ * This method takes a double start as the gap size and return a estimated path that the
+ * car should travel while parking, the numbers 40 is the approximate best angle for the
+ * car to turn into the gap.
  * @param start parking gap size
  * @return estimated parking travel distance
  */
@@ -323,10 +329,7 @@ namespace scaledcars {
             return abs(adjDist);
         }
 /**
- * This method takes a double start as the gap size and return a
- * estimated path the car should travel while parking
- * @param start parking gap size
- * @return estimated parking travel distance
+ * Send the container, with all information/instrucctions to the conference
  */
 
         void Park::sendParkerMSG() {
