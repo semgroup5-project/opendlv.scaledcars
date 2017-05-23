@@ -72,8 +72,12 @@ namespace scaledcars {
 
             // This method will be call automatically _after_ return from body().
         }
-
-        // This method will do the main data processing job.
+/**
+ * if there is a next container, proceed with the method inside
+ * if _state is set to true, then run the parking algorithm
+ *
+ * @param c container received from the conference
+ */
 
         void Park::nextContainer(Container &c) {
 
@@ -83,7 +87,7 @@ namespace scaledcars {
                 _state = communicationLinkMSG.getStateParker();
                 if (_state) {
                     _stop = 0;
-                    //     setParkingType(communicationLinkMSG.getParkingType());
+                    // setParkingType(communicationLinkMSG.getParkingType());
                     irRear = communicationLinkMSG.getInfraredBack();
                     usFront = communicationLinkMSG.getUltraSonicFrontCenter();
                     usFrontRight = communicationLinkMSG.getUltraSonicFrontRight();
@@ -133,8 +137,9 @@ namespace scaledcars {
             }
 
         }
-
-        //going forwards till finds a gap
+/**
+ * This method will make the car move forward while checking for a paking gap.
+ */
 
         void Park::parkingFinder() {
             // Parking space starting point
@@ -175,9 +180,18 @@ namespace scaledcars {
             }
         }
 
+/**
+ * this method will set the parameter "parkingType" according to method call
+ * @param type parking type
+ */
+
         void Park::setParkingType(int type) {
             parkingType = type;
         }
+
+/**
+ * This method is the logic of the parking maneuver
+ */
 
         void Park::parallelPark() {
 
@@ -231,9 +245,22 @@ namespace scaledcars {
 
         }
 
+/**
+ * This method set the parkingState according to function call
+ * @param state the state of parking procedure
+ */
+
         void Park::setParkingState(int state) {
             parkingState = state;
         }
+
+/**
+ * This method takes an int i as sensor readings and int id as sensor type
+ * then detects whether if it's within the range for obstacle
+ * @param i the sensor reads data
+ * @param id the sensor type
+ * @return true for obstacle detected, false for not.
+ */
 
         bool Park::obstacleDetection(int i, int id) {
             bool ifObstacle;
@@ -278,21 +305,29 @@ namespace scaledcars {
             return ifObstacle;
         }
 
+/**
+ * This method takes a double start as the gap size and return a estimated path the car should travel while parking
+ * @param start parking gap size
+ * @return estimated parking travel distance
+ */
         double Park::adjDistCalculation(double start) {
 
             /*     backDist = end - start;
-
-                 //turn degrees toradians
-
-                 double cosVal = cos(backDist / (GAP / 2)); // cos value with the proximity angle
-
-                 adjDist = abs(cosVal) * backDist;   // proximity value of the car traveled distance (paralleled to the road)
-
+                  turn degrees to radians
+                  double cosVal = cos(backDist / (GAP / 2)); // cos value with the proximity angle
+                  adjDist = abs(cosVal) * backDist;   // proximity value of the car traveled distance
+                  (paralleled to the road)
             */
 
             adjDist = start / cos(40);
             return abs(adjDist);
         }
+/**
+ * This method takes a double start as the gap size and return a
+ * estimated path the car should travel while parking
+ * @param start parking gap size
+ * @return estimated parking travel distance
+ */
 
         void Park::sendParkerMSG() {
             ParkerMSG p;
