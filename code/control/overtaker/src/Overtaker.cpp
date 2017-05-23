@@ -173,7 +173,7 @@ namespace scaledcars {
             } else if (stage == HAVE_BOTH_IR) {
                 odo += odometerReal;
 
-                if ((IR_FR > 0 && IR_RR > 0) && odo > 6) {
+                if ((IR_FR > 0 && IR_RR > 0) && odo > 5) {
                     stage = KEEP_TURN_RIGHT;
                     m_vehicleControl.setSpeed(SPEED_CAR);
                     m_vehicleControl.setSteeringWheelAngle(TURN_ANGLE_CAR_RIGHT);
@@ -191,7 +191,7 @@ namespace scaledcars {
                 }
 
             } else if (stage == HAVE_NO_READING) {
-                if ((IR_FR < 0) && (US_R < 0)) {
+                if ((IR_FR < 0) && (US_R < 0) && (IR_RR < 0)) {
                     stage = KEEP_TURN_RIGHT_END;
                     m_vehicleControl.setBrakeLights(false);
                     m_vehicleControl.setSpeed(SPEED_CAR);
@@ -213,7 +213,7 @@ namespace scaledcars {
             } else if (stage == KEEP_TURN_RIGHT_END) {
                 odo += odometerReal;
 
-                if (odo > 4 && IR_RR < 0) {
+                if (odo > 5 && IR_RR < 0) {
                     stage = ADJUST_TO_STRAIGHT;
                     m_vehicleControl.setBrakeLights(false);
                     m_vehicleControl.setSpeed(SPEED_CAR);
@@ -227,7 +227,7 @@ namespace scaledcars {
                 odo += odometerReal;
 
                 if (flag) {
-                    if (odo > 4) {
+                    if (odo > 2) {
                         m_vehicleControl.setBrakeLights(false);
                         m_vehicleControl.setSpeed(SPEED_CAR);
                         m_vehicleControl.setSteeringWheelAngle(TURN_ANGLE_CAR_LEFT);
@@ -235,7 +235,7 @@ namespace scaledcars {
                     }
 
                 } else {
-                    if (odo > 7 ) {
+                    if (odo > 10 ) {
                         _state = 0;
 
                         overtakerMSG.setState(1);

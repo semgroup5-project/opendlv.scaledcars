@@ -391,5 +391,5 @@ udpconnectionstreamer.ip = 100.10.16.40
 #
 # SERIALS
 #
-serialreceivehandler.sensors = 
-serialsendhandler.actuators = 
+serialreceivehandler.sensors = /dev/ttyACM1
+serialsendhandler.actuators = /dev/ttyACM2
