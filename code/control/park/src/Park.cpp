@@ -194,7 +194,8 @@ namespace scaledcars {
 /**
  * This method is the logic of the parking maneuver
  * it uses the function adjDistCalcualtion() to calculate
- * the angle in which the car will turn into the gap
+ * the adjacent distance that the car will turn into the gap
+ * while parking. The
  */
 
         void Park::parallelPark() {
@@ -212,6 +213,8 @@ namespace scaledcars {
                         vc.setSteeringWheelAngle(1.5);
                         cout << "PARKING : Turning right" << endl;
                         cout << "calc " << (odometer - backStart) << endl;
+                        //tweeking the adjacent distance by multiplaying it to 1.15
+                        //to get the desire turn
                         if (odometer - backStart >= (adjDist * 1.15)) {
                             setParkingState(LEFT_TURN);
                         }
@@ -224,6 +227,8 @@ namespace scaledcars {
                     vc.setSpeed(60);
                     cout << "PARKING : Turning left" << endl;
                     cout << "adjDist" << adjDist << endl;
+                    //tweeking the adjacent distance by multiplaying it to 1.65
+                    //to get the desire turn
                     if (obstacleDetection(irRear, 3) || (odometer - backStart >= (adjDist * 1.65))) {
                         cout<<"moving in gap forward"<<endl;
                         setParkingState(INGAP_RIGHT_TURN);
@@ -259,7 +264,7 @@ namespace scaledcars {
         }
 
 /**
- * This method takes an int i as sensor(ultrasocinc infrared) readings and int id as sensor type
+ * This method takes an int i as sensor(ultrasonic & infrared) readings and int id as sensor type
  * then detects whether if it's within the range for obstacle
  * @param i the sensor reads data
  * @param id the sensor type
@@ -310,8 +315,9 @@ namespace scaledcars {
         }
 
 /**
- * This method takes a double start as the gap size and return a estimated path that the
- * car should travel while parking, the numbers 40 is the approximate best angle for the
+ * This method takes a double start (parkinfg space) as the gap size and return a estimated path that the
+ * car should travel while parking, the numbers 40 is the approximate best angle for the car to start turning
+ * in order to get into the parking gap
  * car to turn into the gap.
  * @param start parking gap size
  * @return estimated parking travel distance
